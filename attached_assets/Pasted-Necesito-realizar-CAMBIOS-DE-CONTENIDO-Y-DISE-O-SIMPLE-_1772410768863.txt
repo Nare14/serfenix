@@ -1,0 +1,58 @@
+Necesito realizar CAMBIOS DE CONTENIDO Y DISEÑO SIMPLE en una sección existente de mi página web.
+No crear nuevas funcionalidades complejas ni backend. Mantener estilos, colores y tipografías actuales.
+
+1️⃣ SECCIÓN “MI HISTORIA” – TEXTO
+
+Debajo del título que dice “MI HISTORIA”, agregar EXACTAMENTE el siguiente texto,
+respetando saltos de línea y manteniendo el estilo visual actual de textos largos:
+
+PORQUE Y PARA QUE HAGO LO QUE HAGO - Soy el testimonio vivo de que si se quiere, lo podes lograr.
+
+Todo comienza cuando en marzo del 2023 toco fondo. Tenía un trabajo dependiente, en el que “ganaba bien”, “lo seguro”, vivía sola en Villa Devoto, Buenos Aires, desde afuera se veía bien pero puertas para adentro (mi interior) era un infierno.
+
+Me voy 7 días sola a Córdoba a replantearme la vida entera, a estar en silencio para poder esclarecerme y tomar decisiones ya que no podía más. Me doy cuenta y empiezo con todo el dolor al ego del mundo a entender en carne viva que todo mi mal, físico, amoroso, laboral, económico, era mi responsabilidad.
+
+Y ahí comienza el proceso más importante, transformador, incómodo, doloroso y gratificante de mi vida. Allá en lo profundo de mi corazón tenía sueños y sabía que me merecía una vida mejor, PERO PERO!! tenía precios que pagar. Toda mi vida entera hasta ese momento.
+
+Me encerré sola a estudiar, trabajar (ya había comenzando en el área digital), meditar, iba al gym, lo único social que hacía y así todos los días, sin rendirme. Pasé hambre (priorizaba el dinero para pagar cuentas), pasé soledad, vendí todos mis muebles, mi ropa, mientras me iba descubriendo e iba descubriendo mí misión de vida.
+
+Quería gritarlo al mundo (como ahora) pero todavía no era el momento y te explico por qué:
+
+Uno de mis sueños era volver a México (había vivido 2 años antes de pandemia acá). Y en una de las meditaciones, ayunando bastante por no tener para comer, vi el Caribe. Mi trabajo espiritual con Dios (yo no sabía que era Dios, continuaba puertas para adentro).
+
+Y acá se une todo: mi otro sueño era trabajar digitalmente y si bien lo había empezado a hacer en otras áreas, nada terminaba de hacerme sentir plena, porque todo es un proceso de trabajo, paciencia y perseverancia. Los tiempos de Dios son perfectos.
+
+Mayo 2025 vuelvo a México, me voy a Ciudad de México, lo logré. Pero Dios me había mostrado el Caribe. Vuelvo a caer en cosas del mundo, porque mis creencias dominantes aún no estaban totalmente transformadas.
+
+Octubre 2025, gracias a Dios, vuelvo al Caribe. Tan Dios que incluso el vuelo me lo regalaron.
+
+Diciembre 2025 empiezo a grabar, a encarnar mi misión de vida descubierta en 2023. Pero días antes de Navidad vuelvo a tocar fondo. Me rindo por completo y escucho esa voz interna —Dios— que me dice que diga la verdad, incluso cuando el ego no quiere.
+
+Elegí obedecer. Y mi vida comenzó a cambiar a pasos agigantados.
+
+Rendición. Aceptación. Humildad. Disciplina. Obediencia.
+
+Hoy, en el Caribe —el lugar que Dios me mostró cuando tenía la heladera vacía— encarnando mi misión de vida, todo tuvo un propósito mayor: que más seres puedan renacer, despertar su luz y recordar quiénes son, como lo hice yo en este camino que Dios me hizo transitar.
+
+---
+
+2️⃣ CARRUSEL / CARRRETE DE FOTOS (LADO IZQUIERDO)
+
+- Al lado IZQUIERDO del texto de “Mi Historia”, agregar un carrusel simple de imágenes.
+- El texto debe quedar a la DERECHA.
+- El carrusel debe contener 8 fotos.
+- Las imágenes deben pasar automáticamente de forma suave mientras el usuario lee el texto.
+- No usar librerías pesadas.
+- Puede ser un slider simple con CSS o JavaScript básico.
+- Las imágenes deben ser placeholders por ahora (ej: image1.jpg, image2.jpg, etc.).
+- Mantener el mismo estilo de la página (colores, bordes, proporciones).
+- Responsive: en mobile, mostrar primero el carrusel y debajo el texto.
+
+REQUISITOS IMPORTANTES:
+- No modificar el resto de la página.
+- No cambiar tipografías ni colores globales.
+- No agregar backend ni lógica compleja.
+- Código claro y comentado solo donde sea necesario.
+
+RESULTADO ESPERADO:
+Una sección “Mi Historia” emocional y profesional, con el texto completo a la derecha y un carrusel de 8 imágenes a la izquierda que acompañe visualmente la lectura.

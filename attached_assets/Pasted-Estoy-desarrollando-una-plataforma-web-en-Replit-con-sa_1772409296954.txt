@@ -1,0 +1,67 @@
+Estoy desarrollando una plataforma web en Replit con salas de membresía paga.
+
+Necesito crear una PÁGINA INTERMEDIA DE PAGO que se muestre cuando un usuario haga clic en “Unirse a la sala” o “Pagar membresía”.
+
+OBJETIVO:
+Permitir que el usuario elija entre dos opciones de pago:
+1) Pagar con Mercado Pago (redirección automática)
+2) Acordar otro medio de pago coordinado de forma directa
+
+ESTRUCTURA DE LA PÁGINA:
+
+TÍTULO PRINCIPAL:
+"¿Cómo acceder a las salas utilizando otros medios de pago?"
+
+SUBTÍTULO / TEXTO INTRODUCTORIO:
+"Elegí tu medio de pago.
+Podés realizar el pago utilizando otros medios disponibles. El método se coordina de forma directa con nosotros."
+
+SECCIÓN: OPCIONES DE PAGO
+
+OPCIÓN 1 – PAGO CON :contentReference[oaicite:0]{index=0}:
+- Botón principal que diga:
+  "Pagar con Mercado Pago"
+- Al hacer clic:
+  - Redirigir al link de pago correspondiente a la membresía seleccionada.
+  - Abrir en una nueva pestaña.
+- Usar un link editable (placeholder) para poder modificarlo luego.
+
+OPCIÓN 2 – PAGO “A ACORDAR”:
+Mostrar una sección explicativa con los siguientes pasos, de forma clara y ordenada:
+
+PASO 1 – Completá el registro
+"Avanzá con el registro en la plataforma utilizando el mismo email que vas a usar para el pago."
+
+PASO 2 – Contactanos por Instagram
+"Escribinos por Instagram para informarnos que querés pagar por otro medio y coordinar ahí el método de pago que prefieras."
+
+PASO 3 – Activación del acceso
+"Importante: El acceso a la escuela se habilita una vez confirmado el pago."
+
+CHECKBOX LEGALES (OBLIGATORIOS):
+- Checkbox con texto:
+  "He leído y acepto los Términos y Condiciones del Servicio."
+- Checkbox con texto:
+  "He leído y acepto la Política de Privacidad."
+- El usuario NO puede continuar si no acepta ambos.
+
+COMPORTAMIENTO:
+- El usuario debe estar logueado para acceder a esta página.
+- Mostrar claramente qué sala está intentando comprar.
+- Mantener el mismo formato visual, tipografía y colores del resto de la página.
+
+DISEÑO:
+- Estilo limpio, profesional y coherente con la identidad del sitio.
+- Diseño responsive.
+- Jerarquía visual clara entre títulos, botones y pasos.
+
+REQUISITOS TÉCNICOS:
+- Usar HTML, CSS y JavaScript (o el stack actual del proyecto).
+- Comentar el código indicando dónde modificar:
+  - Links de pago
+  - Texto
+  - Enlace a Instagram
+- No romper la estructura ni funcionalidades existentes.
+
+RESULTADO ESPERADO:
+Una página clara y confiable donde el usuario pueda elegir entre pagar con Mercado Pago o coordinar otro medio de pago, entendiendo perfectamente los pasos y condiciones antes de continuar.

@@ -1,0 +1,93 @@
+Construí un sitio web moderno, responsive, premium y espiritual (inspirado en tanfulness.com pero sin copiar). Debe transmitir renacer, calidez y elegancia.
+
+STACK (preferencia):
+- Vanilla: 3 páginas HTML (index.html, miembros.html, salas.html) + CSS + JS.
+- Autenticación MVP con localStorage (registro/login/logout).
+- Proteger salas.html: si no hay sesión -> redirigir a miembros.html.
+
+DISEÑO:
+- Paleta: rosas y rojos con degradados suaves (rose/red), acentos en blanco y un tono vino oscuro para contraste.
+- Estética premium: glassmorphism suave (blur), cards con borde translúcido, sombras sutiles.
+- Tipografías Google:
+  - Títulos: "Playfair Display"
+  - Texto: "Poppins" o "Inter"
+- Agregar wave shapes (SVG) como separadores entre secciones.
+- Animaciones suaves:
+  - Fade-in / slide-up al scrollear (IntersectionObserver)
+  - Hover suave en botones y cards
+- Layout limpio, aireado, mobile-first.
+
+HOME (index.html):
+1) Header:
+   - Logo/Marca placeholder
+   - Botón visible “ACCESO MIEMBROS” -> miembros.html
+
+2) Hero centrado (pantalla inicial):
+   - Título grande centrado: “Tu poder habita dentro de ti ♥”
+   - Subtítulo: “Bienvenido a tu renacer”
+   - Botón primario: “Explorar salas” (scroll a sección Salas)
+   - Fondo: degradado rosa/rojo + brillo suave (radial glow)
+
+3) Sección “Mi historia”
+   - Título: “Mi historia”
+   - Texto placeholder + botón “Leer más” (por ahora scroll al video o no hace nada)
+
+4) Sección Video
+   - Contenedor responsive 16:9 con borde redondeado y sombra
+   - Placeholder: embed de YouTube (un video ejemplo) o poster si es <video>
+
+5) Sección 3 cards con imagen placeholder y texto en mayúscula:
+   - Card 1: CONECTA CON DIOS
+   - Card 2: DESCUBRE TU MISIÓN DE VIDA
+   - Card 3: TRABAJO INTEGRAL
+   - Imágenes: placeholders (gradientes o assets simples)
+
+6) Sección “Salas” (2 tarjetas comparativas grandes):
+   - Tarjeta 1: Sala Fénix — Suscripción mensual 99 USD
+     Texto en cursiva EXACTO:
+     "Vas a reprogramar tu subconsciente, dejar vicios, crear una relación con Dios, aprender de la palabra, generar un entorno nuevo y sano, descubrir tu propósito"
+     Lista:
+     - Acceso a la mentoría semanal grupal (sábados 9AM MEX y 11AM ARG)
+     - Acceso a contenido práctico +20 clases (todas las semanas se actualizan o hay nuevas)
+     - Acceso comunidad vía telegram
+     Botón: “Quiero entrar” -> miembros.html
+
+   - Tarjeta 2: Sala Fénix 2.0 — 3 meses — Inversión 899 USD
+     Lista:
+     - Acceso a la mentoría semanal grupal (sábados 9AM MEX y 11AM ARG)
+     - Acceso mentoría individual , una vez por semana (horario y día a definir)
+     - Acceso a contenido práctico +20 clases (todas las semanas se actualizan o hay nuevas)
+     - Acceso comunidad vía telegram
+     - Acceso a Whatsapp 1:1 ilimitado
+     - Descubrir tu propósito
+     Botón: “Quiero entrar” -> miembros.html
+
+7) Footer con links: Inicio, Mi historia, Salas, Acceso miembros
+
+MIEMBROS (miembros.html):
+- Card centrada con tabs (Registro / Login) o switch.
+- Registro:
+  - Email, contraseña, confirmar contraseña
+  - Validaciones
+  - Guardar usuario en localStorage (lista simple) y setear sesión (currentUser)
+- Login:
+  - Email, contraseña
+  - Validar contra usuarios guardados
+- Al éxito: redirigir a salas.html
+- Mensajes de error claros
+
+SALAS (salas.html) PROTEGIDA:
+- Si no hay currentUser -> redirect a miembros.html
+- Mostrar:
+  - “Bienvenido, {email}”
+  - Botón “Cerrar sesión” (borra currentUser y vuelve a index)
+  - Sección Sala Fénix: grid de cards “Clase 1, Clase 2...” con placeholders de video
+  - Sección Sala Fénix 2.0: similar
+- Incluir 1 embed placeholder por sala (o “Video próximamente”)
+
+REQUISITOS:
+- Archivos prolijos: /assets opcional, styles.css, auth.js, main.js
+- Código comentado lo justo
+- Debe correr en Replit sin configurar nada raro
+- Buen contraste y legibilidad (texto claro sobre fondos rojos/rosas)
+ENTREGAR: todos los archivos y el proyecto funcionando.

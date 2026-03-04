@@ -1,0 +1,88 @@
+Necesito ajustar CONTENIDO, JERARQUÍA DE TEXTOS y BOTONES en la página:
+“Cómo acceder a las salas utilizando otros medios de pago”.
+
+No crear nuevas secciones ni lógica compleja.
+Mantener colores, tipografías y estilo general del sitio.
+
+---
+
+1️⃣ TÍTULOS Y SUBTÍTULOS (JERARQUÍA)
+
+- El TÍTULO PRINCIPAL debe mantenerse pero en un tamaño MÁS CHICO que antes.
+- Debajo del título, agregar un subtítulo que diga EXACTAMENTE:
+  "Elegí tu medio de pago."
+- Debajo de ese, agregar otro subtítulo (más chico) que diga:
+  "Podés realizar el pago utilizando otros medios disponibles."
+
+Mantener coherencia visual con el resto de la página.
+
+---
+
+2️⃣ OPCIONES DE PAGO (ESTRUCTURA GENERAL)
+
+Las opciones deben mantenerse en el mismo lugar y formato visual actual.
+
+---
+
+🔹 OPCIÓN 1 – PAGAR CON :contentReference[oaicite:0]{index=0}
+
+- Esta opción está correcta.
+- IMPORTANTE:
+  - Al presionar el botón “Pagar con Mercado Pago”
+  - Redirigir DIRECTAMENTE a la página externa de Mercado Pago para realizar el pago.
+  - Abrir en una nueva pestaña.
+- No agregar pasos intermedios.
+- Usar link editable (placeholder).
+
+---
+
+🔹 OPCIÓN 2 – OTRO MEDIO DE PAGO
+
+Modificar SOLO los textos, manteniendo el diseño.
+
+TEXTO 1 – REGISTRO (REEMPLAZAR EL ACTUAL):
+"Es importante que te encuentres registrado/a en la plataforma con tu email para poder continuar con la operación y luego habilitar tu acceso."
+
+TEXTO 2 – CONTACTO (DEJAR IGUAL):
+"Contactanos por Instagram  
+Escribinos por Instagram para informarnos que querés pagar por otro medio y coordinar ahí el método de pago que prefieras."
+
+TEXTO 3 – ACTIVACIÓN DEL ACCESO (MODIFICAR):
+"Importante: El acceso a la sala se habilita una vez confirmado el pago."
+
+No mencionar la palabra “escuela”.
+
+---
+
+3️⃣ BOTONES (CLARIDAD Y SIMPLICIDAD)
+
+- Mostrar DOS BOTONES claros, pero evitar confusión:
+
+BOTÓN A – PARA OPCIÓN 1:
+Texto:
+"Pagar con Mercado Pago"
+Acción:
+- Redirige a Mercado Pago.
+
+BOTÓN B – PARA OPCIÓN 2:
+Texto:
+"Contactar por Instagram"
+Acción:
+- Abre el link de Instagram en una nueva pestaña.
+
+REGLA DE USABILIDAD:
+- Cada botón debe estar visualmente asociado a su opción correspondiente.
+- No usar un solo botón que cambie de función.
+- Priorizar claridad y simplicidad para el usuario.
+
+---
+
+REQUISITOS IMPORTANTES:
+- No duplicar información.
+- No mostrar nuevamente las salas.
+- No cambiar estilos globales.
+- No agregar lógica innecesaria.
+- Mantener la experiencia simple y directa.
+
+RESULTADO ESPERADO:
+Una página clara, ordenada y fácil de entender, donde el usuario elige el medio de pago sin confusión y accede directamente a pagar o a contactar por Instagram según la opción elegida.
