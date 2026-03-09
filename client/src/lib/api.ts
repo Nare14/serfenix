@@ -7,19 +7,82 @@ export async function adminLogin(email: string, password: string) {
 }
 
 export async function adminChangePassword(newPassword: string) {
-  const res = await apiRequest("POST", "/api/admin/change-password", { newPassword });
+  const res = await apiRequest("POST", "/api/admin/change-password", {
+    newPassword,
+  });
   return res.json();
 }
 
 // Member auth
 export async function memberLogin(email: string, password: string) {
-  const res = await apiRequest("POST", "/api/auth/login", { email, password });
-  return res.json();
+  try {
+    const res = await apiRequest("POST", "/api/auth/login", {
+      email,
+      password,
+    });
+    return await res.json();
+  } catch (_error) {
+    const savedUsers = JSON.parse(localStorage.getItem("mockUsers") || "[]");
+
+    const user = savedUsers.find(
+      (u: any) => u.email === email && u.password === password
+    );
+
+    if (!user) {
+      throw new Error("Credenciales incorrectas");
+    }
+
+    return {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      membershipActive: user.membershipActive ?? false,
+      membershipType: user.membershipType ?? null,
+    };
+  }
 }
 
-export async function memberRegister(name: string, email: string, password: string) {
-  const res = await apiRequest("POST", "/api/auth/register", { name, email, password });
-  return res.json();
+export async function memberRegister(
+  name: string,
+  email: string,
+  password: string
+) {
+  try {
+    const res = await apiRequest("POST", "/api/auth/register", {
+      name,
+      email,
+      password,
+    });
+    return await res.json();
+  } catch (_error) {
+    const savedUsers = JSON.parse(localStorage.getItem("mockUsers") || "[]");
+
+    const existingUser = savedUsers.find((u: any) => u.email === email);
+    if (existingUser) {
+      throw new Error("El email ya está registrado");
+    }
+
+    const newUser = {
+      id: Date.now(),
+      name,
+      email,
+      password,
+      membershipActive: false,
+      membershipType: null,
+      disabled: false,
+    };
+
+    savedUsers.push(newUser);
+    localStorage.setItem("mockUsers", JSON.stringify(savedUsers));
+
+    return {
+      id: newUser.id,
+      name: newUser.name,
+      email: newUser.email,
+      membershipActive: newUser.membershipActive,
+      membershipType: newUser.membershipType,
+    };
+  }
 }
 
 // Admin - Users

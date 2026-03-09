@@ -31,7 +31,6 @@ const historiaImages = [
 
 function HistoriaCarousel() {
   const [current, setCurrent] = useState(0);
-
   const next = useCallback(() => {
     setCurrent((prev) => (prev + 1) % historiaImages.length);
   }, []);
@@ -241,6 +240,15 @@ export default function Home() {
     transition: { duration: 0.8 },
   };
 
+  const handleJoin = (plan: "fenix" | "fenix_pro") => {
+    const currentUser = localStorage.getItem("currentUser");
+
+    if (currentUser) {
+      window.location.href = `/pago?plan=${plan}`;
+    } else {
+      window.location.href = `/miembros?redirect=/pago?plan=${plan}`;
+    }
+  };
   return (
     <div className="min-h-screen pt-20">
       {/* HERO SECTION */}
@@ -336,24 +344,14 @@ export default function Home() {
             <div className="h-1 bg-rose-400 rounded-full mx-auto animate-line-grow" />
           </motion.div>
 
-          <div className="flex flex-col lg:flex-row gap-12 max-w-6xl mx-auto items-start">
-            <motion.div
-              initial={{ opacity: 0, x: -30 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.7 }}
-              className="lg:w-5/12 w-full shrink-0"
-            >
+          <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 md:gap-10 lg:gap-12 items-start">
+            {/* CARRUSEL */}
+            <div className="lg:col-span-5 w-full">
               <HistoriaCarousel />
-            </motion.div>
+            </div>
 
-            <motion.div
-              initial={{ opacity: 0, x: 30 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.7, delay: 0.2 }}
-              className="lg:w-7/12 w-full space-y-5 text-rose-900/80 leading-relaxed"
-            >
+            {/* PRIMERA PARTE DEL TEXTO */}
+            <div className="lg:col-span-7 space-y-5 text-rose-900/80 leading-relaxed text-justify">
               <p className="text-xl font-serif font-bold text-rose-950">
                 PORQUE Y PARA QUE HAGO LO QUE HAGO
               </p>
@@ -397,7 +395,10 @@ export default function Home() {
                 Quería gritarlo al mundo (como ahora) pero todavía no era el
                 momento y te explico por qué:
               </p>
+            </div>
 
+            {/* TEXTO COMPLETO ABAJO */}
+            <div className="lg:col-span-12 w-full max-w-4xl mx-auto px-1 sm:px-2 md:px-4 text-justify space-y-5 md:space-y-6 text-rose-900/80 leading-7 md:leading-8">
               <p>
                 Uno de mis sueños era volver a México (había vivido 2 años antes
                 de pandemia acá). Y en una de las meditaciones, ayunando
@@ -447,7 +448,7 @@ export default function Home() {
                 y recordar quiénes son, como lo hice yo en este camino que Dios
                 me hizo transitar.
               </p>
-            </motion.div>
+            </div>
           </div>
         </div>
       </section>
@@ -546,11 +547,11 @@ export default function Home() {
             </p>
           </motion.div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-6xl mx-auto">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8 max-w-6xl mx-auto">
             {/* SALA FÉNIX */}
             <motion.div {...fadeInUp}>
               <Card className="glass-card h-full rounded-[2rem] border-rose-200 overflow-hidden relative group hover:-translate-y-1 transition-transform duration-500">
-                <CardContent className="p-10 flex flex-col h-full relative z-10">
+                <CardContent className="p-6 sm:p-8 md:p-10 flex flex-col h-full relative z-10">
                   <h3 className="text-3xl font-serif font-bold text-rose-950 mb-2">
                     Sala Fénix
                   </h3>
@@ -577,7 +578,7 @@ export default function Home() {
                     ))}
                   </ul>
 
-                  <Link href="/miembros">
+                  <Link href="/pago?plan=fenix">
                     <Button className="w-full bg-rose-600 hover:bg-rose-700 text-white rounded-full h-14 text-lg font-medium shadow-xl shadow-rose-600/20 hover:scale-[1.02] transition-transform">
                       QUIERO UNIRME
                     </Button>
@@ -592,13 +593,10 @@ export default function Home() {
               transition={{ duration: 0.8, delay: 0.2 }}
             >
               <Card className="glass-card h-full rounded-[2rem] border-rose-200 overflow-hidden relative group hover:-translate-y-1 transition-transform duration-500">
-                <CardContent className="p-10 flex flex-col h-full relative z-10">
+                <CardContent className="p-6 sm:p-8 md:p-10 flex flex-col h-full relative z-10">
                   <h3 className="text-3xl font-serif font-bold text-rose-950 mb-2">
                     Sala Fénix 2.0
                   </h3>
-                  <p className="text-rose-600/80 font-medium mb-2">
-                    Transforma tu realidad a fuego 🔥
-                  </p>
                   <div className="flex items-baseline gap-2 mb-8">
                     <span className="text-4xl font-bold text-rose-700">
                       1499 USD
@@ -626,7 +624,7 @@ export default function Home() {
                     ))}
                   </ul>
 
-                  <Link href="/miembros">
+                  <Link href="/pago?plan=fenix_pro">
                     <Button className="w-full bg-rose-600 hover:bg-rose-700 text-white rounded-full h-14 text-lg font-medium shadow-xl shadow-rose-600/20 hover:scale-[1.02] transition-transform">
                       QUIERO UNIRME
                     </Button>

@@ -4,14 +4,13 @@ import { storage } from "./storage";
 import { insertVideoSchema, updateVideoSchema } from "@shared/schema";
 
 // Admin credentials - stored in memory, can be changed at runtime
-let adminEmail = "admin@fenix.com";
-let adminPassword = "admin123";
+let adminEmail = "sofivgonzalez7@gmail.com";
+let adminPassword = "Diosteama1995MUCHO!";
 
 export async function registerRoutes(
   httpServer: Server,
   app: Express
 ): Promise<Server> {
-
   // ==========================================
   // AUTH - Admin Login
   // ==========================================
@@ -26,7 +25,9 @@ export async function registerRoutes(
   app.post("/api/admin/change-password", (req, res) => {
     const { newPassword } = req.body;
     if (!newPassword || newPassword.length < 6) {
-      return res.status(400).json({ message: "La contraseña debe tener al menos 6 caracteres" });
+      return res
+        .status(400)
+        .json({ message: "La contraseña debe tener al menos 6 caracteres" });
     }
     adminPassword = newPassword;
     return res.json({ success: true });
@@ -38,7 +39,9 @@ export async function registerRoutes(
   app.post("/api/auth/register", async (req, res) => {
     const { email, password, name } = req.body;
     if (!email || !password || !name) {
-      return res.status(400).json({ message: "Nombre, email y contraseña son requeridos" });
+      return res
+        .status(400)
+        .json({ message: "Nombre, email y contraseña son requeridos" });
     }
 
     const existing = await storage.getUserByEmail(email);
@@ -47,13 +50,21 @@ export async function registerRoutes(
     }
 
     const user = await storage.createUser({ email, password, name });
-    return res.json({ id: user.id, name: user.name, email: user.email, membershipActive: user.membershipActive, membershipType: user.membershipType });
+    return res.json({
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      membershipActive: user.membershipActive,
+      membershipType: user.membershipType,
+    });
   });
 
   app.post("/api/auth/login", async (req, res) => {
     const { email, password } = req.body;
     if (!email || !password) {
-      return res.status(400).json({ message: "Email y contraseña son requeridos" });
+      return res
+        .status(400)
+        .json({ message: "Email y contraseña son requeridos" });
     }
 
     const user = await storage.getUserByEmail(email);
@@ -64,7 +75,13 @@ export async function registerRoutes(
       return res.status(403).json({ message: "Tu cuenta ha sido desactivada" });
     }
 
-    return res.json({ id: user.id, name: user.name, email: user.email, membershipActive: user.membershipActive, membershipType: user.membershipType });
+    return res.json({
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      membershipActive: user.membershipActive,
+      membershipType: user.membershipType,
+    });
   });
 
   // ==========================================
@@ -72,7 +89,7 @@ export async function registerRoutes(
   // ==========================================
   app.get("/api/admin/users", async (_req, res) => {
     const allUsers = await storage.getAllUsers();
-    const safeUsers = allUsers.map(u => ({
+    const safeUsers = allUsers.map((u) => ({
       id: u.id,
       email: u.email,
       disabled: u.disabled,
@@ -86,8 +103,15 @@ export async function registerRoutes(
   app.patch("/api/admin/users/:id", async (req, res) => {
     const id = parseInt(req.params.id);
     const updated = await storage.updateUser(id, req.body);
-    if (!updated) return res.status(404).json({ message: "Usuario no encontrado" });
-    return res.json({ id: updated.id, email: updated.email, disabled: updated.disabled, membershipActive: updated.membershipActive, membershipType: updated.membershipType });
+    if (!updated)
+      return res.status(404).json({ message: "Usuario no encontrado" });
+    return res.json({
+      id: updated.id,
+      email: updated.email,
+      disabled: updated.disabled,
+      membershipActive: updated.membershipActive,
+      membershipType: updated.membershipType,
+    });
   });
 
   app.delete("/api/admin/users/:id", async (req, res) => {
@@ -107,7 +131,9 @@ export async function registerRoutes(
   app.post("/api/admin/videos", async (req, res) => {
     const parsed = insertVideoSchema.safeParse(req.body);
     if (!parsed.success) {
-      return res.status(400).json({ message: "Datos inválidos", errors: parsed.error.errors });
+      return res
+        .status(400)
+        .json({ message: "Datos inválidos", errors: parsed.error.errors });
     }
     const video = await storage.createVideo(parsed.data);
     return res.json(video);
@@ -117,10 +143,13 @@ export async function registerRoutes(
     const id = parseInt(req.params.id);
     const parsed = updateVideoSchema.safeParse(req.body);
     if (!parsed.success) {
-      return res.status(400).json({ message: "Datos inválidos", errors: parsed.error.errors });
+      return res
+        .status(400)
+        .json({ message: "Datos inválidos", errors: parsed.error.errors });
     }
     const updated = await storage.updateVideo(id, parsed.data);
-    if (!updated) return res.status(404).json({ message: "Video no encontrado" });
+    if (!updated)
+      return res.status(404).json({ message: "Video no encontrado" });
     return res.json(updated);
   });
 
@@ -157,7 +186,9 @@ export async function registerRoutes(
   app.get("/api/settings", async (_req, res) => {
     const settings = await storage.getAllSettings();
     const obj: Record<string, string> = {};
-    settings.forEach(s => { obj[s.key] = s.value; });
+    settings.forEach((s) => {
+      obj[s.key] = s.value;
+    });
     return res.json(obj);
   });
 
