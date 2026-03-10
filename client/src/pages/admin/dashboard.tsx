@@ -98,6 +98,8 @@ export default function AdminDashboard() {
   const [videoCategory, setVideoCategory] = useState("general");
   const [videoOrder, setVideoOrder] = useState("0");
   const [videoMembership, setVideoMembership] = useState("fenix");
+  const [videoSaving, setVideoSaving] = useState(false);
+  const [videoError, setVideoError] = useState("");
 
   useEffect(() => {
     if (localStorage.getItem("adminAuth") !== "true") {
@@ -221,6 +223,7 @@ export default function AdminDashboard() {
     setVideoCategory("general");
     setVideoOrder("0");
     setVideoMembership("fenix");
+    setVideoError("");
     setShowVideoForm(true);
   };
 
@@ -232,31 +235,62 @@ export default function AdminDashboard() {
     setVideoCategory(v.category);
     setVideoOrder(String(v.sortOrder));
     setVideoMembership(v.membershipRequired);
+    setVideoError("");
     setShowVideoForm(true);
   };
 
   const handleSaveVideo = async () => {
-    const data = {
-      title: videoTitle,
-      url: videoUrl,
-      description: videoDesc,
-      category: videoCategory,
-      sortOrder: parseInt(videoOrder) || 0,
-      membershipRequired: videoMembership,
-      active: true,
-    };
+    setVideoError("");
 
-    if (editingVideo) {
-      const updated = await updateVideo(editingVideo.id, data);
-      setVideos(videos.map((v) => (v.id === editingVideo.id ? updated : v)));
-      showSaved("Video actualizado");
-    } else {
-      const created = await createVideo(data);
-      setVideos([...videos, created]);
-      showSaved("Video creado exitosamente");
+    if (!videoTitle.trim()) {
+      setVideoError("Ingresá un título para el video.");
+      return;
     }
 
-    setShowVideoForm(false);
+    if (!videoUrl.trim()) {
+      setVideoError("Ingresá la URL del video.");
+      return;
+    }
+
+    setVideoSaving(true);
+
+    try {
+      const data = {
+        title: videoTitle.trim(),
+        url: videoUrl.trim(),
+        description: videoDesc.trim(),
+        category: videoCategory.trim() || "general",
+        sortOrder: parseInt(videoOrder) || 0,
+        membershipRequired: videoMembership,
+        active: true,
+      };
+
+      if (editingVideo) {
+        const updated = await updateVideo(editingVideo.id, data);
+        setVideos(videos.map((v) => (v.id === editingVideo.id ? updated : v)));
+        showSaved("Video actualizado");
+      } else {
+        const created = await createVideo(data);
+        setVideos([...videos, created]);
+        showSaved("Video creado exitosamente");
+      }
+
+      setShowVideoForm(false);
+      setEditingVideo(null);
+      setVideoTitle("");
+      setVideoUrl("");
+      setVideoDesc("");
+      setVideoCategory("general");
+      setVideoOrder("0");
+      setVideoMembership("fenix");
+    } catch (error) {
+      console.error(error);
+      setVideoError(
+        "No se pudo guardar el video. Revisá la URL o intentá de nuevo."
+      );
+    } finally {
+      setVideoSaving(false);
+    }
   };
 
   const handleToggleVideoActive = async (v: VideoItem) => {
@@ -425,12 +459,15 @@ export default function AdminDashboard() {
           </TabsList>
 
           <TabsContent value="videos" className="space-y-6">
-            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
+            <div className="flex flex-col lg:flex-row lg:justify-between lg:items-center gap-4 rounded-3xl border border-zinc-200 bg-white p-5 shadow-sm">
               <div>
-                <h2 className="text-xl font-bold text-zinc-900">
+                <p className="text-xs uppercase tracking-[0.25em] text-rose-500/80 mb-2">
+                  Biblioteca
+                </p>
+                <h2 className="text-2xl font-bold text-zinc-900">
                   Gestión de Videos
                 </h2>
-                <p className="text-zinc-500 text-sm">
+                <p className="text-zinc-500 text-sm mt-1">
                   Total: {videos.length} videos
                 </p>
               </div>
@@ -439,25 +476,42 @@ export default function AdminDashboard() {
                 className="bg-rose-600 hover:bg-rose-700 text-white rounded-xl"
               >
                 <Plus className="w-4 h-4 mr-2" />
-                Nuevo Video
+                Nuevo video
               </Button>
             </div>
 
             {showVideoForm && (
-              <Card className="border-rose-200 shadow-sm rounded-2xl">
-                <CardHeader className="flex flex-row items-center justify-between">
-                  <CardTitle>
-                    {editingVideo ? "Editar Video" : "Nuevo Video"}
-                  </CardTitle>
+              <Card className="border-rose-200 shadow-lg rounded-3xl overflow-hidden">
+                <CardHeader className="flex flex-row items-center justify-between bg-gradient-to-r from-rose-50 to-white border-b border-rose-100">
+                  <div>
+                    <CardTitle className="text-xl text-zinc-900">
+                      {editingVideo ? "Editar video" : "Crear nuevo video"}
+                    </CardTitle>
+                    <CardDescription>
+                      Completá los datos del contenido que querés subir al portal.
+                    </CardDescription>
+                  </div>
+
                   <Button
                     variant="ghost"
                     size="icon"
-                    onClick={() => setShowVideoForm(false)}
+                    onClick={() => {
+                      setShowVideoForm(false);
+                      setVideoError("");
+                    }}
+                    className="rounded-full"
                   >
                     <X className="w-4 h-4" />
                   </Button>
                 </CardHeader>
-                <CardContent className="space-y-4">
+
+                <CardContent className="space-y-5 p-6">
+                  {videoError && (
+                    <div className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+                      {videoError}
+                    </div>
+                  )}
+
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <Label>Título</Label>
@@ -465,14 +519,17 @@ export default function AdminDashboard() {
                         value={videoTitle}
                         onChange={(e) => setVideoTitle(e.target.value)}
                         placeholder="Módulo 1: Introducción"
+                        className="rounded-xl"
                       />
                     </div>
+
                     <div className="space-y-2">
-                      <Label>URL del Video</Label>
+                      <Label>URL del video</Label>
                       <Input
                         value={videoUrl}
                         onChange={(e) => setVideoUrl(e.target.value)}
-                        placeholder="https://youtu.be/..."
+                        placeholder="https://youtu.be/... o enlace embebido"
+                        className="rounded-xl"
                       />
                     </div>
                   </div>
@@ -482,7 +539,8 @@ export default function AdminDashboard() {
                     <Input
                       value={videoDesc}
                       onChange={(e) => setVideoDesc(e.target.value)}
-                      placeholder="Breve descripción"
+                      placeholder="Breve descripción del contenido"
+                      className="rounded-xl"
                     />
                   </div>
 
@@ -493,23 +551,27 @@ export default function AdminDashboard() {
                         value={videoCategory}
                         onChange={(e) => setVideoCategory(e.target.value)}
                         placeholder="Módulo 1"
+                        className="rounded-xl"
                       />
                     </div>
+
                     <div className="space-y-2">
                       <Label>Orden</Label>
                       <Input
                         type="number"
                         value={videoOrder}
                         onChange={(e) => setVideoOrder(e.target.value)}
+                        className="rounded-xl"
                       />
                     </div>
+
                     <div className="space-y-2">
                       <Label>Membresía requerida</Label>
                       <Select
                         value={videoMembership}
                         onValueChange={setVideoMembership}
                       >
-                        <SelectTrigger>
+                        <SelectTrigger className="rounded-xl">
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
@@ -522,12 +584,31 @@ export default function AdminDashboard() {
                     </div>
                   </div>
 
-                  <Button
-                    onClick={handleSaveVideo}
-                    className="bg-zinc-900 text-white hover:bg-zinc-800 rounded-xl"
-                  >
-                    {editingVideo ? "Guardar Cambios" : "Crear Video"}
-                  </Button>
+                  <div className="flex flex-col sm:flex-row gap-3 pt-2">
+                    <Button
+                      onClick={handleSaveVideo}
+                      disabled={videoSaving}
+                      className="bg-rose-600 text-white hover:bg-rose-700 rounded-xl"
+                    >
+                      {videoSaving
+                        ? "Guardando..."
+                        : editingVideo
+                        ? "Guardar cambios"
+                        : "Crear video"}
+                    </Button>
+
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => {
+                        setShowVideoForm(false);
+                        setVideoError("");
+                      }}
+                      className="rounded-xl"
+                    >
+                      Cancelar
+                    </Button>
+                  </div>
                 </CardContent>
               </Card>
             )}
