@@ -564,9 +564,9 @@ export default function Home() {
 
                   <ul className="space-y-4 mb-10 flex-grow">
                     {[
-                      "Acceso a la mentoría semanal grupal (sábados 9AM MEX y 11AM ARG)",
-                      "Acceso al contenido práctico",
-                      "Acceso comunidad vía telegram",
+                      "Mentoría semanal en VIVO con Sofi",
+                      "Acceso a comunidad Telegram",
+                      "Acceso a contenido práctico grabado",
                     ].map((item, i) => (
                       <li
                         key={i}
@@ -606,13 +606,12 @@ export default function Home() {
 
                   <ul className="space-y-4 mb-10 flex-grow">
                     {[
-                      "Mentoría 1:1 una vez por semana",
-                      "Rutinas personalizadas (cuerpo – mente – espíritu)",
-                      "Acceso WhatsApp 1:1 ilimitado",
+                      "Mentoría semanal en VIVO con Sofi exclusiva Sala Fenix 2.0",
+                      "WhatsApp ilimitado 1:1 conmigo",
+                      "Acceso a comunidad exclusiva WhatsApp Sala Fenix 2.0",
                       "Descubrí tu misión de vida",
-                      "Acceso a mentoría grupal Sala Fénix",
-                      "Acceso a la comunidad vía Telegram",
-                      "Acceso al contenido práctico",
+                      "Rutinas personalizadas de cuerpo, mente y espíritu",
+                      "Reprogramá tu subconsciente y creá la vida que merecés y soñás en todas las áreas",
                     ].map((item, i) => (
                       <li
                         key={i}
