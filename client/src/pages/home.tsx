@@ -395,7 +395,8 @@ export default function Home() {
             </div>
 
             {/* TEXTO COMPLETO ABAJO */}
-            <div className="lg:col-span-12 w-full max-w-4xl mx-auto px-1 sm:px-2 md:px-4 text-justify space-y-5 md:space-y-6 text-rose-900/80 leading-7 md:leading-8">
+            {/* TEXTO COMPLETO ABAJO */}
+            <div className="lg:col-span-12 w-full px-1 sm:px-2 md:px-4 text-justify space-y-5 md:space-y-6 text-rose-900/80 leading-7 md:leading-8">
               <p>
                 Uno de mis sueños era volver a México (había vivido 2 años antes
                 de pandemia acá). Y en una de las meditaciones, ayunando
