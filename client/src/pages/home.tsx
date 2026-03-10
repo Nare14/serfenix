@@ -339,7 +339,7 @@ export default function Home() {
         <div className="container mx-auto px-4">
           <motion.div {...fadeInUp} className="text-center mb-12 space-y-4">
             <h2 className="text-4xl md:text-5xl font-serif text-rose-950">
-              Mi historia
+              PORQUE Y PARA QUE HAGO LO QUE HAGO
             </h2>
             <div className="h-1 bg-rose-400 rounded-full mx-auto animate-line-grow" />
           </motion.div>
@@ -352,9 +352,6 @@ export default function Home() {
 
             {/* PRIMERA PARTE DEL TEXTO */}
             <div className="lg:col-span-7 space-y-5 text-rose-900/80 leading-relaxed text-justify">
-              <p className="text-xl font-serif font-bold text-rose-950">
-                PORQUE Y PARA QUE HAGO LO QUE HAGO
-              </p>
               <p className="font-semibold text-rose-800">
                 Soy el testimonio vivo de que si se quiere, lo podes lograr.
               </p>
