@@ -319,7 +319,7 @@ export default function AdminDashboard() {
       <aside className="w-full md:w-72 bg-gradient-to-b from-rose-950 via-red-900 to-rose-900 text-rose-100 flex flex-col shrink-0 shadow-2xl">
         <div className="p-6 border-b border-white/10">
           <p className="text-xs uppercase tracking-[0.3em] text-rose-200/80 mb-2">
-            SerFenix
+            SabiduriaFenix
           </p>
           <h2 className="text-3xl font-serif font-bold text-white">
             Fénix Admin
@@ -357,7 +357,7 @@ export default function AdminDashboard() {
               Dashboard
             </h1>
             <p className="text-rose-900/60 mt-2">
-              Administrá SerFenix desde un solo lugar.
+              Administrá SabiduriaFenix desde un solo lugar.
             </p>
           </div>
 
