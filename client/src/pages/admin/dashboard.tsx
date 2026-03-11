@@ -36,6 +36,9 @@ import {
   Crown,
   Sparkles,
   BadgeDollarSign,
+  ArrowUp,
+  ArrowDown,
+  PlayCircle,
 } from "lucide-react";
 import {
   fetchUsers,
@@ -69,8 +72,51 @@ interface VideoItem {
   membershipRequired: string;
 }
 
+function normalizeVideoPreviewUrl(url: string) {
+  const clean = url.trim();
+  if (!clean) return "";
+
+  if (clean.includes("youtube.com/embed/")) return clean;
+
+  if (clean.includes("youtu.be/")) {
+    const id = clean.split("youtu.be/")[1]?.split("?")[0];
+    return id ? `https://www.youtube.com/embed/${id}` : clean;
+  }
+
+  if (clean.includes("youtube.com/watch")) {
+    try {
+      const parsed = new URL(clean);
+      const id = parsed.searchParams.get("v");
+      return id ? `https://www.youtube.com/embed/${id}` : clean;
+    } catch {
+      return clean;
+    }
+  }
+
+  if (clean.includes("vimeo.com/") && !clean.includes("player.vimeo.com")) {
+    const parts = clean.split("vimeo.com/");
+    const id = parts[1]?.split("?")[0];
+    return id ? `https://player.vimeo.com/video/${id}` : clean;
+  }
+
+  return clean;
+}
+
+function getLocalViews(videoId: number) {
+  try {
+    const raw = localStorage.getItem("mockVideoViews");
+    if (!raw) return 0;
+    const parsed = JSON.parse(raw);
+    return Number(parsed?.[videoId] || 0);
+  } catch {
+    return 0;
+  }
+}
+
 export default function AdminDashboard() {
   const [, setLocation] = useLocation();
+
+  const [activeTab, setActiveTab] = useState("videos");
   const [users, setUsers] = useState<UserItem[]>([]);
   const [videos, setVideos] = useState<VideoItem[]>([]);
   const [newPassword, setNewPassword] = useState("");
@@ -116,8 +162,12 @@ export default function AdminDashboard() {
       fetchSettings(),
     ]);
 
+    const sortedVideos = [...v].sort(
+      (a: VideoItem, b: VideoItem) => a.sortOrder - b.sortOrder
+    );
+
     setUsers(u);
-    setVideos(v);
+    setVideos(sortedVideos);
     setSiteTitle(s.siteTitle || "Tu poder habita dentro de ti ");
     setSiteSubtitle(s.siteSubtitle || "Bienvenido a tu renacer");
     setPriceFenix(s.priceFenix || "99");
@@ -221,7 +271,7 @@ export default function AdminDashboard() {
     setVideoUrl("");
     setVideoDesc("");
     setVideoCategory("general");
-    setVideoOrder("0");
+    setVideoOrder(String(videos.length));
     setVideoMembership("fenix");
     setVideoError("");
     setShowVideoForm(true);
@@ -267,11 +317,17 @@ export default function AdminDashboard() {
 
       if (editingVideo) {
         const updated = await updateVideo(editingVideo.id, data);
-        setVideos(videos.map((v) => (v.id === editingVideo.id ? updated : v)));
+        setVideos(
+          videos
+            .map((v) => (v.id === editingVideo.id ? updated : v))
+            .sort((a, b) => a.sortOrder - b.sortOrder)
+        );
         showSaved("Video actualizado");
       } else {
         const created = await createVideo(data);
-        setVideos([...videos, created]);
+        setVideos(
+          [...videos, created].sort((a, b) => a.sortOrder - b.sortOrder)
+        );
         showSaved("Video creado exitosamente");
       }
 
@@ -305,6 +361,34 @@ export default function AdminDashboard() {
     showSaved("Video eliminado");
   };
 
+  const handleMoveVideo = async (index: number, direction: "up" | "down") => {
+    const newVideos = [...videos];
+    const swapIndex = direction === "up" ? index - 1 : index + 1;
+
+    if (swapIndex < 0 || swapIndex >= newVideos.length) return;
+
+    const current = newVideos[index];
+    const target = newVideos[swapIndex];
+
+    const currentOrder = current.sortOrder;
+    const targetOrder = target.sortOrder;
+
+    newVideos[index] = { ...target, sortOrder: currentOrder };
+    newVideos[swapIndex] = { ...current, sortOrder: targetOrder };
+
+    const sorted = [...newVideos].sort((a, b) => a.sortOrder - b.sortOrder);
+    setVideos(sorted);
+
+    try {
+      await updateVideo(current.id, { sortOrder: targetOrder });
+      await updateVideo(target.id, { sortOrder: currentOrder });
+      showSaved("Orden actualizado");
+    } catch (error) {
+      console.error(error);
+      showSaved("Orden actualizado localmente");
+    }
+  };
+
   const totalUsers = users.length;
   const activeMemberships = users.filter((u) => u.membershipActive).length;
   const fenixUsers = users.filter(
@@ -314,9 +398,15 @@ export default function AdminDashboard() {
     (u) => u.membershipActive && u.membershipType === "fenix_pro"
   ).length;
 
+  const previewUrl = normalizeVideoPreviewUrl(videoUrl);
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-rose-50 via-pink-50 to-red-50 flex flex-col md:flex-row">
-      <aside className="w-full md:w-72 bg-gradient-to-b from-rose-950 via-red-900 to-rose-900 text-rose-100 flex flex-col shrink-0 shadow-2xl">
+    <Tabs
+      value={activeTab}
+      onValueChange={setActiveTab}
+      className="min-h-screen bg-gradient-to-br from-rose-50 via-pink-50 to-red-50 flex flex-col md:flex-row"
+    >
+      <aside className="w-full md:w-80 bg-gradient-to-b from-rose-950 via-red-900 to-rose-900 text-rose-100 flex flex-col shrink-0 shadow-2xl">
         <div className="p-6 border-b border-white/10">
           <p className="text-xs uppercase tracking-[0.3em] text-rose-200/80 mb-2">
             SabiduriaFenix
@@ -329,12 +419,54 @@ export default function AdminDashboard() {
           </p>
         </div>
 
-        <nav className="flex-1 px-4 py-6 space-y-2 hidden md:block">
-          <div className="flex items-center gap-3 px-4 py-3 bg-white/10 text-white rounded-2xl font-medium border border-white/10 backdrop-blur-sm">
+        <div className="px-4 py-6">
+          <div className="flex items-center gap-3 px-4 py-3 bg-white/10 text-white rounded-2xl font-medium border border-white/10 backdrop-blur-sm mb-4">
             <LayoutDashboard className="w-5 h-5" />
             Dashboard
           </div>
-        </nav>
+
+          <TabsList className="flex flex-col gap-2 h-auto bg-transparent p-0">
+            <TabsTrigger
+              value="videos"
+              className="w-full justify-start rounded-2xl px-4 py-3 text-left text-rose-100/80 hover:bg-white/10 data-[state=active]:bg-white data-[state=active]:text-rose-900 data-[state=active]:shadow-sm"
+            >
+              <Video className="w-4 h-4 mr-3" />
+              Videos
+            </TabsTrigger>
+
+            <TabsTrigger
+              value="content"
+              className="w-full justify-start rounded-2xl px-4 py-3 text-left text-rose-100/80 hover:bg-white/10 data-[state=active]:bg-white data-[state=active]:text-rose-900 data-[state=active]:shadow-sm"
+            >
+              <FileEdit className="w-4 h-4 mr-3" />
+              Contenido
+            </TabsTrigger>
+
+            <TabsTrigger
+              value="users"
+              className="w-full justify-start rounded-2xl px-4 py-3 text-left text-rose-100/80 hover:bg-white/10 data-[state=active]:bg-white data-[state=active]:text-rose-900 data-[state=active]:shadow-sm"
+            >
+              <Users className="w-4 h-4 mr-3" />
+              Usuarios
+            </TabsTrigger>
+
+            <TabsTrigger
+              value="settings"
+              className="w-full justify-start rounded-2xl px-4 py-3 text-left text-rose-100/80 hover:bg-white/10 data-[state=active]:bg-white data-[state=active]:text-rose-900 data-[state=active]:shadow-sm"
+            >
+              <Settings className="w-4 h-4 mr-3" />
+              Ajustes
+            </TabsTrigger>
+
+            <TabsTrigger
+              value="security"
+              className="w-full justify-start rounded-2xl px-4 py-3 text-left text-rose-100/80 hover:bg-white/10 data-[state=active]:bg-white data-[state=active]:text-rose-900 data-[state=active]:shadow-sm"
+            >
+              <Shield className="w-4 h-4 mr-3" />
+              Seguridad
+            </TabsTrigger>
+          </TabsList>
+        </div>
 
         <div className="p-4 mt-auto border-t border-white/10">
           <Button
@@ -427,304 +559,529 @@ export default function AdminDashboard() {
           </Card>
         </div>
 
-        <Tabs defaultValue="videos" className="w-full">
-          <TabsList className="grid w-full max-w-4xl grid-cols-5 bg-white/80 border border-rose-100 mb-8 p-1 rounded-2xl shadow-sm">
-            <TabsTrigger
-              value="videos"
-              className="rounded-xl text-rose-900/70 data-[state=active]:bg-gradient-to-r data-[state=active]:from-rose-600 data-[state=active]:to-red-600 data-[state=active]:text-white data-[state=active]:shadow-sm"
-            >
-              <Video className="w-4 h-4 mr-2 hidden sm:block" />
-              Videos
-            </TabsTrigger>
-            <TabsTrigger
-              value="content"
-              className="rounded-xl text-rose-900/70 data-[state=active]:bg-gradient-to-r data-[state=active]:from-rose-600 data-[state=active]:to-red-600 data-[state=active]:text-white data-[state=active]:shadow-sm"
-            >
-              <FileEdit className="w-4 h-4 mr-2 hidden sm:block" />
-              Contenido
-            </TabsTrigger>
-            <TabsTrigger
-              value="users"
-              className="rounded-xl text-rose-900/70 data-[state=active]:bg-gradient-to-r data-[state=active]:from-rose-600 data-[state=active]:to-red-600 data-[state=active]:text-white data-[state=active]:shadow-sm"
-            >
-              <Users className="w-4 h-4 mr-2 hidden sm:block" />
-              Usuarios
-            </TabsTrigger>
-            <TabsTrigger
-              value="settings"
-              className="rounded-xl text-rose-900/70 data-[state=active]:bg-gradient-to-r data-[state=active]:from-rose-600 data-[state=active]:to-red-600 data-[state=active]:text-white data-[state=active]:shadow-sm"
-            >
-              <Settings className="w-4 h-4 mr-2 hidden sm:block" />
-              Ajustes
-            </TabsTrigger>
-            <TabsTrigger
-              value="security"
-              className="rounded-xl text-rose-900/70 data-[state=active]:bg-gradient-to-r data-[state=active]:from-rose-600 data-[state=active]:to-red-600 data-[state=active]:text-white data-[state=active]:shadow-sm"
-            >
-              <Shield className="w-4 h-4 mr-2 hidden sm:block" />
-              Seguridad
-            </TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="videos" className="space-y-6">
-            <div className="flex flex-col lg:flex-row lg:justify-between lg:items-center gap-4 rounded-3xl border border-rose-100 bg-white/90 p-5 shadow-md">
-              <div>
-                <p className="text-xs uppercase tracking-[0.25em] text-rose-500/80 mb-2">
-                  Biblioteca
-                </p>
-                <h2 className="text-2xl font-bold text-rose-950">
-                  Gestión de Videos
-                </h2>
-                <p className="text-rose-900/60 text-sm mt-1">
-                  Total: {videos.length} videos
-                </p>
-              </div>
-              <Button
-                onClick={openNewVideo}
-                className="bg-gradient-to-r from-rose-600 to-red-600 hover:from-rose-700 hover:to-red-700 text-white rounded-2xl shadow-sm"
-              >
-                <Plus className="w-4 h-4 mr-2" />
-                Nuevo video
-              </Button>
+        <TabsContent value="videos" className="space-y-6 mt-0">
+          <div className="flex flex-col lg:flex-row lg:justify-between lg:items-center gap-4 rounded-3xl border border-rose-100 bg-white/90 p-5 shadow-md">
+            <div>
+              <p className="text-xs uppercase tracking-[0.25em] text-rose-500/80 mb-2">
+                Biblioteca
+              </p>
+              <h2 className="text-2xl font-bold text-rose-950">
+                Gestión de Videos
+              </h2>
+              <p className="text-rose-900/60 text-sm mt-1">
+                Total: {videos.length} videos
+              </p>
             </div>
+            <Button
+              onClick={openNewVideo}
+              className="bg-gradient-to-r from-rose-600 to-red-600 hover:from-rose-700 hover:to-red-700 text-white rounded-2xl shadow-sm"
+            >
+              <Plus className="w-4 h-4 mr-2" />
+              Nuevo video
+            </Button>
+          </div>
 
-            {showVideoForm && (
-              <Card className="border-rose-200 shadow-lg rounded-3xl overflow-hidden bg-white/95">
-                <CardHeader className="flex flex-row items-center justify-between bg-gradient-to-r from-rose-100 via-pink-50 to-white border-b border-rose-100">
-                  <div>
-                    <CardTitle className="text-xl text-rose-950">
-                      {editingVideo ? "Editar video" : "Crear nuevo video"}
-                    </CardTitle>
-                    <CardDescription className="text-rose-900/60">
-                      Completá los datos del contenido que querés subir al
-                      portal.
-                    </CardDescription>
+          {showVideoForm && (
+            <Card className="border-rose-200 shadow-lg rounded-3xl overflow-hidden bg-white/95">
+              <CardHeader className="flex flex-row items-center justify-between bg-gradient-to-r from-rose-100 via-pink-50 to-white border-b border-rose-100">
+                <div>
+                  <CardTitle className="text-xl text-rose-950">
+                    {editingVideo ? "Editar video" : "Crear nuevo video"}
+                  </CardTitle>
+                  <CardDescription className="text-rose-900/60">
+                    Completá los datos del contenido que querés subir al portal.
+                  </CardDescription>
+                </div>
+
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => {
+                    setShowVideoForm(false);
+                    setVideoError("");
+                  }}
+                  className="rounded-full hover:bg-rose-100"
+                >
+                  <X className="w-4 h-4" />
+                </Button>
+              </CardHeader>
+
+              <CardContent className="space-y-6 p-6">
+                {videoError && (
+                  <div className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+                    {videoError}
                   </div>
+                )}
 
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => {
-                      setShowVideoForm(false);
-                      setVideoError("");
-                    }}
-                    className="rounded-full hover:bg-rose-100"
-                  >
-                    <X className="w-4 h-4" />
-                  </Button>
-                </CardHeader>
+                <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+                  <div className="space-y-5">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label className="text-rose-950">Título</Label>
+                        <Input
+                          value={videoTitle}
+                          onChange={(e) => setVideoTitle(e.target.value)}
+                          placeholder="Módulo 1: Introducción"
+                          className="rounded-xl border-rose-200 focus-visible:ring-rose-400"
+                        />
+                      </div>
 
-                <CardContent className="space-y-5 p-6">
-                  {videoError && (
-                    <div className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-                      {videoError}
+                      <div className="space-y-2">
+                        <Label className="text-rose-950">URL del video</Label>
+                        <Input
+                          value={videoUrl}
+                          onChange={(e) => setVideoUrl(e.target.value)}
+                          placeholder="https://youtu.be/... o embed"
+                          className="rounded-xl border-rose-200 focus-visible:ring-rose-400"
+                        />
+                      </div>
                     </div>
-                  )}
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <Label className="text-rose-950">Título</Label>
+                      <Label className="text-rose-950">Descripción</Label>
                       <Input
-                        value={videoTitle}
-                        onChange={(e) => setVideoTitle(e.target.value)}
-                        placeholder="Módulo 1: Introducción"
+                        value={videoDesc}
+                        onChange={(e) => setVideoDesc(e.target.value)}
+                        placeholder="Breve descripción del contenido"
                         className="rounded-xl border-rose-200 focus-visible:ring-rose-400"
                       />
                     </div>
 
-                    <div className="space-y-2">
-                      <Label className="text-rose-950">URL del video</Label>
-                      <Input
-                        value={videoUrl}
-                        onChange={(e) => setVideoUrl(e.target.value)}
-                        placeholder="https://youtu.be/... o enlace embebido"
-                        className="rounded-xl border-rose-200 focus-visible:ring-rose-400"
-                      />
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <div className="space-y-2">
+                        <Label className="text-rose-950">
+                          Categoría / Módulo
+                        </Label>
+                        <Input
+                          value={videoCategory}
+                          onChange={(e) => setVideoCategory(e.target.value)}
+                          placeholder="Módulo 1"
+                          className="rounded-xl border-rose-200 focus-visible:ring-rose-400"
+                        />
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label className="text-rose-950">Orden</Label>
+                        <Input
+                          type="number"
+                          value={videoOrder}
+                          onChange={(e) => setVideoOrder(e.target.value)}
+                          className="rounded-xl border-rose-200 focus-visible:ring-rose-400"
+                        />
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label className="text-rose-950">
+                          Membresía requerida
+                        </Label>
+                        <Select
+                          value={videoMembership}
+                          onValueChange={setVideoMembership}
+                        >
+                          <SelectTrigger className="rounded-xl border-rose-200 focus:ring-rose-400">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="fenix">Sala Fénix</SelectItem>
+                            <SelectItem value="fenix_pro">
+                              Sala Fénix 2.0
+                            </SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
                     </div>
-                  </div>
 
-                  <div className="space-y-2">
-                    <Label className="text-rose-950">Descripción</Label>
-                    <Input
-                      value={videoDesc}
-                      onChange={(e) => setVideoDesc(e.target.value)}
-                      placeholder="Breve descripción del contenido"
-                      className="rounded-xl border-rose-200 focus-visible:ring-rose-400"
-                    />
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div className="space-y-2">
-                      <Label className="text-rose-950">
-                        Categoría / Módulo
-                      </Label>
-                      <Input
-                        value={videoCategory}
-                        onChange={(e) => setVideoCategory(e.target.value)}
-                        placeholder="Módulo 1"
-                        className="rounded-xl border-rose-200 focus-visible:ring-rose-400"
-                      />
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label className="text-rose-950">Orden</Label>
-                      <Input
-                        type="number"
-                        value={videoOrder}
-                        onChange={(e) => setVideoOrder(e.target.value)}
-                        className="rounded-xl border-rose-200 focus-visible:ring-rose-400"
-                      />
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label className="text-rose-950">
-                        Membresía requerida
-                      </Label>
-                      <Select
-                        value={videoMembership}
-                        onValueChange={setVideoMembership}
+                    <div className="flex flex-col sm:flex-row gap-3 pt-2">
+                      <Button
+                        onClick={handleSaveVideo}
+                        disabled={videoSaving}
+                        className="bg-gradient-to-r from-rose-600 to-red-600 text-white hover:from-rose-700 hover:to-red-700 rounded-2xl"
                       >
-                        <SelectTrigger className="rounded-xl border-rose-200 focus:ring-rose-400">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="fenix">Sala Fénix</SelectItem>
-                          <SelectItem value="fenix_pro">
-                            Sala Fénix 2.0
-                          </SelectItem>
-                        </SelectContent>
-                      </Select>
+                        {videoSaving
+                          ? "Guardando..."
+                          : editingVideo
+                          ? "Guardar cambios"
+                          : "Crear video"}
+                      </Button>
+
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={() => {
+                          setShowVideoForm(false);
+                          setVideoError("");
+                        }}
+                        className="rounded-2xl border-rose-200 text-rose-800 hover:bg-rose-50"
+                      >
+                        Cancelar
+                      </Button>
                     </div>
                   </div>
 
-                  <div className="flex flex-col sm:flex-row gap-3 pt-2">
-                    <Button
-                      onClick={handleSaveVideo}
-                      disabled={videoSaving}
-                      className="bg-gradient-to-r from-rose-600 to-red-600 text-white hover:from-rose-700 hover:to-red-700 rounded-2xl"
-                    >
-                      {videoSaving
-                        ? "Guardando..."
-                        : editingVideo
-                        ? "Guardar cambios"
-                        : "Crear video"}
-                    </Button>
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-2 text-rose-900">
+                      <PlayCircle className="w-5 h-5 text-rose-600" />
+                      <span className="font-medium">Preview del video</span>
+                    </div>
 
-                    <Button
-                      type="button"
-                      variant="outline"
-                      onClick={() => {
-                        setShowVideoForm(false);
-                        setVideoError("");
-                      }}
-                      className="rounded-2xl border-rose-200 text-rose-800 hover:bg-rose-50"
-                    >
-                      Cancelar
-                    </Button>
+                    <div className="rounded-3xl overflow-hidden border border-rose-200 bg-rose-50 min-h-[260px] flex items-center justify-center">
+                      {previewUrl ? (
+                        <iframe
+                          src={previewUrl}
+                          title="Preview del video"
+                          className="w-full aspect-video"
+                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                          allowFullScreen
+                        />
+                      ) : (
+                        <div className="text-center px-6 text-rose-900/50">
+                          Pegá una URL para ver la vista previa acá.
+                        </div>
+                      )}
+                    </div>
                   </div>
-                </CardContent>
-              </Card>
-            )}
+                </div>
+              </CardContent>
+            </Card>
+          )}
 
-            <Card className="border-rose-100 shadow-md rounded-3xl overflow-hidden bg-white/95">
-              <CardContent className="p-0">
+          <Card className="border-rose-100 shadow-md rounded-3xl overflow-hidden bg-white/95">
+            <CardContent className="p-0">
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm text-left">
+                  <thead className="bg-rose-50 text-rose-900/70 font-medium">
+                    <tr>
+                      <th className="px-4 py-3">Título</th>
+                      <th className="px-4 py-3 hidden md:table-cell">
+                        Categoría
+                      </th>
+                      <th className="px-4 py-3 hidden md:table-cell">
+                        Membresía
+                      </th>
+                      <th className="px-4 py-3 hidden md:table-cell">Vistas</th>
+                      <th className="px-4 py-3">Estado</th>
+                      <th className="px-4 py-3 text-right">Orden</th>
+                      <th className="px-4 py-3 text-right">Acciones</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-rose-100 bg-white">
+                    {videos.length === 0 ? (
+                      <tr>
+                        <td
+                          colSpan={7}
+                          className="px-4 py-8 text-center text-rose-900/50"
+                        >
+                          No hay videos todavía. Crea el primero.
+                        </td>
+                      </tr>
+                    ) : (
+                      videos.map((v, index) => (
+                        <tr
+                          key={v.id}
+                          className="hover:bg-rose-50/60 transition-colors"
+                        >
+                          <td className="px-4 py-3">
+                            <span className="font-medium text-rose-950">
+                              {v.title}
+                            </span>
+                            {v.description && (
+                              <p className="text-rose-900/50 text-xs mt-0.5 truncate max-w-xs">
+                                {v.description}
+                              </p>
+                            )}
+                          </td>
+                          <td className="px-4 py-3 hidden md:table-cell text-rose-900/60 capitalize">
+                            {v.category}
+                          </td>
+                          <td className="px-4 py-3 hidden md:table-cell">
+                            <span
+                              className={`px-2 py-0.5 rounded-full text-xs font-medium ${
+                                v.membershipRequired === "fenix_pro"
+                                  ? "bg-red-100 text-red-700"
+                                  : "bg-rose-100 text-rose-700"
+                              }`}
+                            >
+                              {v.membershipRequired === "fenix_pro"
+                                ? "Fénix 2.0"
+                                : "Fénix"}
+                            </span>
+                          </td>
+                          <td className="px-4 py-3 hidden md:table-cell text-rose-900/60">
+                            {getLocalViews(v.id)}
+                          </td>
+                          <td className="px-4 py-3">
+                            <span
+                              className={`px-2 py-0.5 rounded-full text-xs font-medium ${
+                                v.active
+                                  ? "bg-emerald-100 text-emerald-700"
+                                  : "bg-red-100 text-red-700"
+                              }`}
+                            >
+                              {v.active ? "Activo" : "Inactivo"}
+                            </span>
+                          </td>
+                          <td className="px-4 py-3 text-right">
+                            <div className="flex justify-end gap-1">
+                              <Button
+                                variant="outline"
+                                size="icon"
+                                className="border-rose-200 hover:bg-rose-50"
+                                onClick={() => handleMoveVideo(index, "up")}
+                                disabled={index === 0}
+                                title="Subir"
+                              >
+                                <ArrowUp className="w-4 h-4" />
+                              </Button>
+                              <Button
+                                variant="outline"
+                                size="icon"
+                                className="border-rose-200 hover:bg-rose-50"
+                                onClick={() => handleMoveVideo(index, "down")}
+                                disabled={index === videos.length - 1}
+                                title="Bajar"
+                              >
+                                <ArrowDown className="w-4 h-4" />
+                              </Button>
+                            </div>
+                          </td>
+                          <td className="px-4 py-3 text-right">
+                            <div className="flex justify-end gap-1">
+                              <Button
+                                variant="outline"
+                                size="icon"
+                                onClick={() => handleToggleVideoActive(v)}
+                                title={v.active ? "Desactivar" : "Activar"}
+                                className="border-rose-200 hover:bg-rose-50"
+                              >
+                                {v.active ? (
+                                  <EyeOff className="w-4 h-4" />
+                                ) : (
+                                  <Eye className="w-4 h-4" />
+                                )}
+                              </Button>
+                              <Button
+                                variant="outline"
+                                size="icon"
+                                onClick={() => openEditVideo(v)}
+                                title="Editar"
+                                className="border-rose-200 hover:bg-rose-50"
+                              >
+                                <Pencil className="w-4 h-4" />
+                              </Button>
+                              <Button
+                                variant="outline"
+                                size="icon"
+                                className="text-red-600 hover:bg-red-50 border-red-200"
+                                onClick={() => handleDeleteVideo(v)}
+                                title="Eliminar"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </Button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="content" className="space-y-6 mt-0">
+          <Card className="border-rose-100 shadow-md rounded-3xl bg-white/95">
+            <CardHeader>
+              <CardTitle className="text-rose-950">
+                Textos Principales
+              </CardTitle>
+              <CardDescription className="text-rose-900/60">
+                Modifica los textos que aparecen en la página de inicio
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="space-y-2">
+                <Label className="text-rose-950">Título Hero (Principal)</Label>
+                <Input
+                  value={siteTitle}
+                  onChange={(e) => setSiteTitle(e.target.value)}
+                  className="max-w-xl rounded-xl border-rose-200 focus-visible:ring-rose-400"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label className="text-rose-950">Subtítulo Hero</Label>
+                <Input
+                  value={siteSubtitle}
+                  onChange={(e) => setSiteSubtitle(e.target.value)}
+                  className="max-w-xl rounded-xl border-rose-200 focus-visible:ring-rose-400"
+                />
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="border-rose-100 shadow-md rounded-3xl bg-white/95">
+            <CardHeader>
+              <CardTitle className="text-rose-950">Planes y Precios</CardTitle>
+              <CardDescription className="text-rose-900/60">
+                Actualiza los costos de las membresías
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+              <div className="space-y-2">
+                <Label className="text-rose-950">
+                  Precio Sala Fénix (USD/mes)
+                </Label>
+                <Input
+                  type="number"
+                  value={priceFenix}
+                  onChange={(e) => setPriceFenix(e.target.value)}
+                  className="rounded-xl border-rose-200 focus-visible:ring-rose-400"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label className="text-rose-950">
+                  Precio Sala Fénix 2.0 (USD/6 meses)
+                </Label>
+                <Input
+                  type="number"
+                  value={priceFenixPro}
+                  onChange={(e) => setPriceFenixPro(e.target.value)}
+                  className="rounded-xl border-rose-200 focus-visible:ring-rose-400"
+                />
+              </div>
+            </CardContent>
+          </Card>
+
+          <Button
+            onClick={handleSaveContent}
+            className="bg-gradient-to-r from-rose-600 to-red-600 text-white hover:from-rose-700 hover:to-red-700 rounded-2xl shadow-sm"
+          >
+            Guardar Cambios de Contenido
+          </Button>
+        </TabsContent>
+
+        <TabsContent value="users" className="space-y-6 mt-0">
+          <Card className="border-rose-100 shadow-md rounded-3xl bg-white/95">
+            <CardHeader>
+              <CardTitle className="text-rose-950">
+                Gestión de Usuarios
+              </CardTitle>
+              <CardDescription className="text-rose-900/60">
+                Total registrados: {users.length}
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="rounded-2xl border border-rose-100 overflow-hidden">
                 <div className="overflow-x-auto">
                   <table className="w-full text-sm text-left">
                     <thead className="bg-rose-50 text-rose-900/70 font-medium">
                       <tr>
-                        <th className="px-4 py-3">Título</th>
-                        <th className="px-4 py-3 hidden md:table-cell">
-                          Categoría
-                        </th>
-                        <th className="px-4 py-3 hidden md:table-cell">
-                          Membresía
-                        </th>
+                        <th className="px-4 py-3">Email</th>
                         <th className="px-4 py-3">Estado</th>
+                        <th className="px-4 py-3">Membresía</th>
                         <th className="px-4 py-3 text-right">Acciones</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-rose-100 bg-white">
-                      {videos.length === 0 ? (
+                      {users.length === 0 ? (
                         <tr>
                           <td
-                            colSpan={5}
+                            colSpan={4}
                             className="px-4 py-8 text-center text-rose-900/50"
                           >
-                            No hay videos todavía. Crea el primero.
+                            No hay usuarios registrados todavía.
                           </td>
                         </tr>
                       ) : (
-                        videos.map((v) => (
+                        users.map((user) => (
                           <tr
-                            key={v.id}
+                            key={user.id}
                             className="hover:bg-rose-50/60 transition-colors"
                           >
+                            <td className="px-4 py-3 font-medium text-rose-950">
+                              {user.email}
+                            </td>
                             <td className="px-4 py-3">
-                              <span className="font-medium text-rose-950">
-                                {v.title}
-                              </span>
-                              {v.description && (
-                                <p className="text-rose-900/50 text-xs mt-0.5 truncate max-w-xs">
-                                  {v.description}
-                                </p>
-                              )}
-                            </td>
-                            <td className="px-4 py-3 hidden md:table-cell text-rose-900/60 capitalize">
-                              {v.category}
-                            </td>
-                            <td className="px-4 py-3 hidden md:table-cell">
                               <span
-                                className={`px-2 py-0.5 rounded-full text-xs font-medium ${
-                                  v.membershipRequired === "fenix_pro"
+                                className={`px-2.5 py-1 rounded-full text-xs font-medium ${
+                                  user.disabled
                                     ? "bg-red-100 text-red-700"
-                                    : "bg-rose-100 text-rose-700"
+                                    : "bg-emerald-100 text-emerald-700"
                                 }`}
                               >
-                                {v.membershipRequired === "fenix_pro"
-                                  ? "Fénix 2.0"
-                                  : "Fénix"}
+                                {user.disabled ? "Desactivado" : "Activo"}
                               </span>
                             </td>
                             <td className="px-4 py-3">
-                              <span
-                                className={`px-2 py-0.5 rounded-full text-xs font-medium ${
-                                  v.active
-                                    ? "bg-emerald-100 text-emerald-700"
-                                    : "bg-red-100 text-red-700"
-                                }`}
-                              >
-                                {v.active ? "Activo" : "Inactivo"}
-                              </span>
+                              <div className="flex items-center gap-2">
+                                <span
+                                  className={`px-2 py-0.5 rounded-full text-xs font-medium ${
+                                    user.membershipActive
+                                      ? "bg-rose-100 text-rose-700"
+                                      : "bg-zinc-100 text-zinc-500"
+                                  }`}
+                                >
+                                  {user.membershipActive
+                                    ? user.membershipType === "fenix_pro"
+                                      ? "Fénix 2.0"
+                                      : "Fénix"
+                                    : "Sin membresía"}
+                                </span>
+
+                                {user.membershipActive && (
+                                  <Select
+                                    value={user.membershipType || "fenix"}
+                                    onValueChange={(val) =>
+                                      handleChangeMembershipType(user, val)
+                                    }
+                                  >
+                                    <SelectTrigger className="w-28 h-7 text-xs border-rose-200">
+                                      <SelectValue />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                      <SelectItem value="fenix">
+                                        Fénix
+                                      </SelectItem>
+                                      <SelectItem value="fenix_pro">
+                                        Fénix 2.0
+                                      </SelectItem>
+                                    </SelectContent>
+                                  </Select>
+                                )}
+                              </div>
                             </td>
                             <td className="px-4 py-3 text-right">
                               <div className="flex justify-end gap-1">
                                 <Button
                                   variant="outline"
+                                  size="sm"
+                                  onClick={() => handleToggleMembership(user)}
+                                  className="text-xs border-rose-200 text-rose-800 hover:bg-rose-50"
+                                >
+                                  {user.membershipActive
+                                    ? "Quitar membresía"
+                                    : "Dar membresía"}
+                                </Button>
+                                <Button
+                                  variant="outline"
                                   size="icon"
-                                  onClick={() => handleToggleVideoActive(v)}
-                                  title={v.active ? "Desactivar" : "Activar"}
+                                  onClick={() => handleToggleUser(user)}
+                                  title={
+                                    user.disabled ? "Activar" : "Desactivar"
+                                  }
                                   className="border-rose-200 hover:bg-rose-50"
                                 >
-                                  {v.active ? (
-                                    <EyeOff className="w-4 h-4" />
-                                  ) : (
+                                  {user.disabled ? (
                                     <Eye className="w-4 h-4" />
+                                  ) : (
+                                    <EyeOff className="w-4 h-4" />
                                   )}
                                 </Button>
                                 <Button
                                   variant="outline"
                                   size="icon"
-                                  onClick={() => openEditVideo(v)}
-                                  title="Editar"
-                                  className="border-rose-200 hover:bg-rose-50"
-                                >
-                                  <Pencil className="w-4 h-4" />
-                                </Button>
-                                <Button
-                                  variant="outline"
-                                  size="icon"
                                   className="text-red-600 hover:bg-red-50 border-red-200"
-                                  onClick={() => handleDeleteVideo(v)}
+                                  onClick={() => handleDeleteUser(user)}
                                   title="Eliminar"
                                 >
                                   <Trash2 className="w-4 h-4" />
@@ -737,399 +1094,185 @@ export default function AdminDashboard() {
                     </tbody>
                   </table>
                 </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
 
-          <TabsContent value="content" className="space-y-6">
-            <Card className="border-rose-100 shadow-md rounded-3xl bg-white/95">
-              <CardHeader>
-                <CardTitle className="text-rose-950">
-                  Textos Principales
-                </CardTitle>
-                <CardDescription className="text-rose-900/60">
-                  Modifica los textos que aparecen en la página de inicio
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
+        <TabsContent value="settings" className="space-y-6 mt-0">
+          <Card className="border-rose-100 shadow-md rounded-3xl bg-white/95">
+            <CardHeader>
+              <CardTitle className="text-rose-950">
+                Información de Contacto
+              </CardTitle>
+              <CardDescription className="text-rose-900/60">
+                Enlaces y datos del sitio
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4 max-w-xl">
+              <div className="space-y-2">
+                <Label className="text-rose-950">WhatsApp</Label>
+                <Input
+                  value={whatsapp}
+                  onChange={(e) => setWhatsapp(e.target.value)}
+                  placeholder="+54 9 11 1234-5678"
+                  className="rounded-xl border-rose-200 focus-visible:ring-rose-400"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label className="text-rose-950">Instagram (contacto)</Label>
+                <Input
+                  value={instagram}
+                  onChange={(e) => setInstagram(e.target.value)}
+                  placeholder="@tu.cuenta"
+                  className="rounded-xl border-rose-200 focus-visible:ring-rose-400"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label className="text-rose-950">Email de Soporte</Label>
+                <Input
+                  type="email"
+                  value={contactEmail}
+                  onChange={(e) => setContactEmail(e.target.value)}
+                  className="rounded-xl border-rose-200 focus-visible:ring-rose-400"
+                />
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="border-rose-100 shadow-md rounded-3xl bg-white/95">
+            <CardHeader>
+              <CardTitle className="text-rose-950">Redes Sociales</CardTitle>
+              <CardDescription className="text-rose-900/60">
+                Enlaces que aparecen en el pie de página.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4 max-w-xl">
+              <div className="space-y-2">
+                <Label className="text-rose-950">
+                  Instagram (URL completa)
+                </Label>
+                <Input
+                  value={socialInstagram}
+                  onChange={(e) => setSocialInstagram(e.target.value)}
+                  placeholder="https://instagram.com/tu.cuenta"
+                  className="rounded-xl border-rose-200 focus-visible:ring-rose-400"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label className="text-rose-950">TikTok (URL completa)</Label>
+                <Input
+                  value={socialTiktok}
+                  onChange={(e) => setSocialTiktok(e.target.value)}
+                  placeholder="https://tiktok.com/@tu.cuenta"
+                  className="rounded-xl border-rose-200 focus-visible:ring-rose-400"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label className="text-rose-950">
+                  Canal de YouTube (URL completa)
+                </Label>
+                <Input
+                  value={socialYoutube}
+                  onChange={(e) => setSocialYoutube(e.target.value)}
+                  placeholder="https://youtube.com/@tu.canal"
+                  className="rounded-xl border-rose-200 focus-visible:ring-rose-400"
+                />
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="border-rose-100 shadow-md rounded-3xl bg-white/95">
+            <CardHeader>
+              <CardTitle className="text-rose-950">
+                Links de Pago (Mercado Pago)
+              </CardTitle>
+              <CardDescription className="text-rose-900/60">
+                Pegá aquí los links de pago generados en Mercado Pago.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4 max-w-xl">
+              <div className="space-y-2">
+                <Label className="text-rose-950">
+                  Link de Pago — Sala Fénix ($99 USD)
+                </Label>
+                <Input
+                  value={payLinkFenix}
+                  onChange={(e) => setPayLinkFenix(e.target.value)}
+                  placeholder="https://www.mercadopago.com/..."
+                  className="rounded-xl border-rose-200 focus-visible:ring-rose-400"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label className="text-rose-950">
+                  Link de Pago — Sala Fénix 2.0 ($1499 USD)
+                </Label>
+                <Input
+                  value={payLinkFenixPro}
+                  onChange={(e) => setPayLinkFenixPro(e.target.value)}
+                  placeholder="https://www.mercadopago.com/..."
+                  className="rounded-xl border-rose-200 focus-visible:ring-rose-400"
+                />
+              </div>
+              <Button
+                onClick={handleSaveSettings}
+                className="bg-gradient-to-r from-rose-600 to-red-600 text-white hover:from-rose-700 hover:to-red-700 mt-4 rounded-2xl shadow-sm"
+              >
+                Guardar Configuración
+              </Button>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="security" className="space-y-6 mt-0">
+          <Card className="border-red-200 shadow-md rounded-3xl bg-white/95">
+            <CardHeader className="bg-gradient-to-r from-red-50 to-rose-50 border-b border-red-100 rounded-t-3xl">
+              <CardTitle className="text-red-900 flex items-center">
+                <Shield className="w-5 h-5 mr-2" />
+                Seguridad de la Cuenta
+              </CardTitle>
+              <CardDescription className="text-red-900/70">
+                Cambiá la contraseña de acceso al panel de administrador
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="pt-6 max-w-md">
+              <form onSubmit={handleChangePassword} className="space-y-4">
                 <div className="space-y-2">
-                  <Label className="text-rose-950">
-                    Título Hero (Principal)
-                  </Label>
-                  <Input
-                    value={siteTitle}
-                    onChange={(e) => setSiteTitle(e.target.value)}
-                    className="max-w-xl rounded-xl border-rose-200 focus-visible:ring-rose-400"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label className="text-rose-950">Subtítulo Hero</Label>
-                  <Input
-                    value={siteSubtitle}
-                    onChange={(e) => setSiteSubtitle(e.target.value)}
-                    className="max-w-xl rounded-xl border-rose-200 focus-visible:ring-rose-400"
-                  />
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card className="border-rose-100 shadow-md rounded-3xl bg-white/95">
-              <CardHeader>
-                <CardTitle className="text-rose-950">
-                  Planes y Precios
-                </CardTitle>
-                <CardDescription className="text-rose-900/60">
-                  Actualiza los costos de las membresías
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                <div className="space-y-2">
-                  <Label className="text-rose-950">
-                    Precio Sala Fénix (USD/mes)
-                  </Label>
-                  <Input
-                    type="number"
-                    value={priceFenix}
-                    onChange={(e) => setPriceFenix(e.target.value)}
-                    className="rounded-xl border-rose-200 focus-visible:ring-rose-400"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label className="text-rose-950">
-                    Precio Sala Fénix 2.0 (USD/6 meses)
-                  </Label>
-                  <Input
-                    type="number"
-                    value={priceFenixPro}
-                    onChange={(e) => setPriceFenixPro(e.target.value)}
-                    className="rounded-xl border-rose-200 focus-visible:ring-rose-400"
-                  />
-                </div>
-              </CardContent>
-            </Card>
-
-            <Button
-              onClick={handleSaveContent}
-              className="bg-gradient-to-r from-rose-600 to-red-600 text-white hover:from-rose-700 hover:to-red-700 rounded-2xl shadow-sm"
-            >
-              Guardar Cambios de Contenido
-            </Button>
-          </TabsContent>
-
-          <TabsContent value="users">
-            <Card className="border-rose-100 shadow-md rounded-3xl bg-white/95">
-              <CardHeader>
-                <CardTitle className="text-rose-950">
-                  Gestión de Usuarios
-                </CardTitle>
-                <CardDescription className="text-rose-900/60">
-                  Total registrados: {users.length}
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="rounded-2xl border border-rose-100 overflow-hidden">
-                  <div className="overflow-x-auto">
-                    <table className="w-full text-sm text-left">
-                      <thead className="bg-rose-50 text-rose-900/70 font-medium">
-                        <tr>
-                          <th className="px-4 py-3">Email</th>
-                          <th className="px-4 py-3">Estado</th>
-                          <th className="px-4 py-3">Membresía</th>
-                          <th className="px-4 py-3 text-right">Acciones</th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-rose-100 bg-white">
-                        {users.length === 0 ? (
-                          <tr>
-                            <td
-                              colSpan={4}
-                              className="px-4 py-8 text-center text-rose-900/50"
-                            >
-                              No hay usuarios registrados todavía.
-                            </td>
-                          </tr>
-                        ) : (
-                          users.map((user) => (
-                            <tr
-                              key={user.id}
-                              className="hover:bg-rose-50/60 transition-colors"
-                            >
-                              <td className="px-4 py-3 font-medium text-rose-950">
-                                {user.email}
-                              </td>
-                              <td className="px-4 py-3">
-                                <span
-                                  className={`px-2.5 py-1 rounded-full text-xs font-medium ${
-                                    user.disabled
-                                      ? "bg-red-100 text-red-700"
-                                      : "bg-emerald-100 text-emerald-700"
-                                  }`}
-                                >
-                                  {user.disabled ? "Desactivado" : "Activo"}
-                                </span>
-                              </td>
-                              <td className="px-4 py-3">
-                                <div className="flex items-center gap-2">
-                                  <span
-                                    className={`px-2 py-0.5 rounded-full text-xs font-medium ${
-                                      user.membershipActive
-                                        ? "bg-rose-100 text-rose-700"
-                                        : "bg-zinc-100 text-zinc-500"
-                                    }`}
-                                  >
-                                    {user.membershipActive
-                                      ? user.membershipType === "fenix_pro"
-                                        ? "Fénix 2.0"
-                                        : "Fénix"
-                                      : "Sin membresía"}
-                                  </span>
-
-                                  {user.membershipActive && (
-                                    <Select
-                                      value={user.membershipType || "fenix"}
-                                      onValueChange={(val) =>
-                                        handleChangeMembershipType(user, val)
-                                      }
-                                    >
-                                      <SelectTrigger className="w-28 h-7 text-xs border-rose-200">
-                                        <SelectValue />
-                                      </SelectTrigger>
-                                      <SelectContent>
-                                        <SelectItem value="fenix">
-                                          Fénix
-                                        </SelectItem>
-                                        <SelectItem value="fenix_pro">
-                                          Fénix 2.0
-                                        </SelectItem>
-                                      </SelectContent>
-                                    </Select>
-                                  )}
-                                </div>
-                              </td>
-                              <td className="px-4 py-3 text-right">
-                                <div className="flex justify-end gap-1">
-                                  <Button
-                                    variant="outline"
-                                    size="sm"
-                                    onClick={() => handleToggleMembership(user)}
-                                    className="text-xs border-rose-200 text-rose-800 hover:bg-rose-50"
-                                  >
-                                    {user.membershipActive
-                                      ? "Quitar membresía"
-                                      : "Dar membresía"}
-                                  </Button>
-                                  <Button
-                                    variant="outline"
-                                    size="icon"
-                                    onClick={() => handleToggleUser(user)}
-                                    title={
-                                      user.disabled ? "Activar" : "Desactivar"
-                                    }
-                                    className="border-rose-200 hover:bg-rose-50"
-                                  >
-                                    {user.disabled ? (
-                                      <Eye className="w-4 h-4" />
-                                    ) : (
-                                      <EyeOff className="w-4 h-4" />
-                                    )}
-                                  </Button>
-                                  <Button
-                                    variant="outline"
-                                    size="icon"
-                                    className="text-red-600 hover:bg-red-50 border-red-200"
-                                    onClick={() => handleDeleteUser(user)}
-                                    title="Eliminar"
-                                  >
-                                    <Trash2 className="w-4 h-4" />
-                                  </Button>
-                                </div>
-                              </td>
-                            </tr>
-                          ))
-                        )}
-                      </tbody>
-                    </table>
+                  <Label className="text-rose-950">Nueva Contraseña</Label>
+                  <div className="relative">
+                    <Input
+                      type={showPassword ? "text" : "password"}
+                      value={newPassword}
+                      onChange={(e) => setNewPassword(e.target.value)}
+                      placeholder="Mínimo 6 caracteres"
+                      className="pr-10 rounded-xl border-rose-200 focus-visible:ring-rose-400"
+                      required
+                      minLength={6}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-3 top-2.5 text-rose-500 hover:text-rose-700 transition-colors"
+                    >
+                      {showPassword ? (
+                        <EyeOff className="h-4 w-4" />
+                      ) : (
+                        <Eye className="h-4 w-4" />
+                      )}
+                    </button>
                   </div>
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="settings" className="space-y-6">
-            <Card className="border-rose-100 shadow-md rounded-3xl bg-white/95">
-              <CardHeader>
-                <CardTitle className="text-rose-950">
-                  Información de Contacto
-                </CardTitle>
-                <CardDescription className="text-rose-900/60">
-                  Enlaces y datos del sitio
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4 max-w-xl">
-                <div className="space-y-2">
-                  <Label className="text-rose-950">WhatsApp</Label>
-                  <Input
-                    value={whatsapp}
-                    onChange={(e) => setWhatsapp(e.target.value)}
-                    placeholder="+54 9 11 1234-5678"
-                    className="rounded-xl border-rose-200 focus-visible:ring-rose-400"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label className="text-rose-950">Instagram (contacto)</Label>
-                  <Input
-                    value={instagram}
-                    onChange={(e) => setInstagram(e.target.value)}
-                    placeholder="@tu.cuenta"
-                    className="rounded-xl border-rose-200 focus-visible:ring-rose-400"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label className="text-rose-950">Email de Soporte</Label>
-                  <Input
-                    type="email"
-                    value={contactEmail}
-                    onChange={(e) => setContactEmail(e.target.value)}
-                    className="rounded-xl border-rose-200 focus-visible:ring-rose-400"
-                  />
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card className="border-rose-100 shadow-md rounded-3xl bg-white/95">
-              <CardHeader>
-                <CardTitle className="text-rose-950">Redes Sociales</CardTitle>
-                <CardDescription className="text-rose-900/60">
-                  Enlaces que aparecen en el pie de página.
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4 max-w-xl">
-                <div className="space-y-2">
-                  <Label className="text-rose-950">
-                    Instagram (URL completa)
-                  </Label>
-                  <Input
-                    value={socialInstagram}
-                    onChange={(e) => setSocialInstagram(e.target.value)}
-                    placeholder="https://instagram.com/tu.cuenta"
-                    className="rounded-xl border-rose-200 focus-visible:ring-rose-400"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label className="text-rose-950">TikTok (URL completa)</Label>
-                  <Input
-                    value={socialTiktok}
-                    onChange={(e) => setSocialTiktok(e.target.value)}
-                    placeholder="https://tiktok.com/@tu.cuenta"
-                    className="rounded-xl border-rose-200 focus-visible:ring-rose-400"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label className="text-rose-950">
-                    Canal de YouTube (URL completa)
-                  </Label>
-                  <Input
-                    value={socialYoutube}
-                    onChange={(e) => setSocialYoutube(e.target.value)}
-                    placeholder="https://youtube.com/@tu.canal"
-                    className="rounded-xl border-rose-200 focus-visible:ring-rose-400"
-                  />
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card className="border-rose-100 shadow-md rounded-3xl bg-white/95">
-              <CardHeader>
-                <CardTitle className="text-rose-950">
-                  Links de Pago (Mercado Pago)
-                </CardTitle>
-                <CardDescription className="text-rose-900/60">
-                  Pegá aquí los links de pago generados en Mercado Pago.
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4 max-w-xl">
-                <div className="space-y-2">
-                  <Label className="text-rose-950">
-                    Link de Pago — Sala Fénix ($99 USD)
-                  </Label>
-                  <Input
-                    value={payLinkFenix}
-                    onChange={(e) => setPayLinkFenix(e.target.value)}
-                    placeholder="https://www.mercadopago.com/..."
-                    className="rounded-xl border-rose-200 focus-visible:ring-rose-400"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label className="text-rose-950">
-                    Link de Pago — Sala Fénix 2.0 ($1499 USD)
-                  </Label>
-                  <Input
-                    value={payLinkFenixPro}
-                    onChange={(e) => setPayLinkFenixPro(e.target.value)}
-                    placeholder="https://www.mercadopago.com/..."
-                    className="rounded-xl border-rose-200 focus-visible:ring-rose-400"
-                  />
                 </div>
                 <Button
-                  onClick={handleSaveSettings}
-                  className="bg-gradient-to-r from-rose-600 to-red-600 text-white hover:from-rose-700 hover:to-red-700 mt-4 rounded-2xl shadow-sm"
+                  type="submit"
+                  className="w-full rounded-2xl bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-700 hover:to-rose-700 text-white"
                 >
-                  Guardar Configuración
+                  Actualizar Contraseña
                 </Button>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="security" className="space-y-6">
-            <Card className="border-red-200 shadow-md rounded-3xl bg-white/95">
-              <CardHeader className="bg-gradient-to-r from-red-50 to-rose-50 border-b border-red-100 rounded-t-3xl">
-                <CardTitle className="text-red-900 flex items-center">
-                  <Shield className="w-5 h-5 mr-2" />
-                  Seguridad de la Cuenta
-                </CardTitle>
-                <CardDescription className="text-red-900/70">
-                  Cambiá la contraseña de acceso al panel de administrador
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="pt-6 max-w-md">
-                <form onSubmit={handleChangePassword} className="space-y-4">
-                  <div className="space-y-2">
-                    <Label className="text-rose-950">Nueva Contraseña</Label>
-                    <div className="relative">
-                      <Input
-                        type={showPassword ? "text" : "password"}
-                        value={newPassword}
-                        onChange={(e) => setNewPassword(e.target.value)}
-                        placeholder="Mínimo 6 caracteres"
-                        className="pr-10 rounded-xl border-rose-200 focus-visible:ring-rose-400"
-                        required
-                        minLength={6}
-                      />
-                      <button
-                        type="button"
-                        onClick={() => setShowPassword(!showPassword)}
-                        className="absolute right-3 top-2.5 text-rose-500 hover:text-rose-700 transition-colors"
-                      >
-                        {showPassword ? (
-                          <EyeOff className="h-4 w-4" />
-                        ) : (
-                          <Eye className="h-4 w-4" />
-                        )}
-                      </button>
-                    </div>
-                  </div>
-                  <Button
-                    type="submit"
-                    className="w-full rounded-2xl bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-700 hover:to-rose-700 text-white"
-                  >
-                    Actualizar Contraseña
-                  </Button>
-                </form>
-              </CardContent>
-            </Card>
-          </TabsContent>
-        </Tabs>
+              </form>
+            </CardContent>
+          </Card>
+        </TabsContent>
       </main>
-    </div>
+    </Tabs>
   );
 }
