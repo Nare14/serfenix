@@ -27,7 +27,6 @@ export default function Pago() {
     "https://www.instagram.com/sofivgonzalez?igsh=MXM4ZndidHk4dDBkNg%3D%3D&utm_source=qr";
 
   const isFenixPro = plan === "fenix_pro";
-
   const planName = isFenixPro ? "Sala Fénix 2.0" : "Sala Fénix";
 
   const paymentOptions = isFenixPro
@@ -81,7 +80,6 @@ export default function Pago() {
       <div className="absolute top-[-20%] left-[-20%] w-[55vw] h-[55vw] bg-rose-200/35 rounded-full blur-[120px] pointer-events-none" />
       <div className="absolute bottom-[-20%] right-[-20%] w-[55vw] h-[55vw] bg-red-100/35 rounded-full blur-[120px] pointer-events-none" />
 
-      {/* BARRA SUPERIOR */}
       <div className="max-w-6xl mx-auto mb-12 flex items-center justify-between bg-white/85 backdrop-blur-md border border-rose-200/70 rounded-[1.5rem] px-4 md:px-6 py-4 shadow-sm">
         <Link href="/">
           <Button
@@ -108,7 +106,6 @@ export default function Pago() {
         </Button>
       </div>
 
-      {/* HERO */}
       <motion.div
         initial={{ opacity: 0, y: 18 }}
         animate={{ opacity: 1, y: 0 }}
@@ -130,7 +127,6 @@ export default function Pago() {
         </p>
       </motion.div>
 
-      {/* BLOQUE IMPORTANTE */}
       <motion.div
         initial={{ opacity: 0, y: 18 }}
         animate={{ opacity: 1, y: 0 }}
@@ -158,12 +154,9 @@ export default function Pago() {
         </div>
       </motion.div>
 
-      {/* OPCIONES DE PAGO */}
       <div
         className={`max-w-6xl mx-auto grid grid-cols-1 ${
-          paymentOptions.length === 2
-            ? "md:grid-cols-2"
-            : "md:grid-cols-2 xl:grid-cols-3"
+          isFenixPro ? "md:grid-cols-2" : "md:grid-cols-2 xl:grid-cols-3"
         } gap-6 md:gap-8`}
       >
         {paymentOptions.map((option, index) => {
