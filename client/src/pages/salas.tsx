@@ -33,6 +33,21 @@ function getEmbedUrl(url: string): string {
   return url;
 }
 
+function hasActiveMembership(user: any): boolean {
+  if (!user) return false;
+
+  return (
+    user.membershipActive === true ||
+    user.hasMembership === true ||
+    user.plan === "fenix" ||
+    user.plan === "fenix_pro" ||
+    user.membership === "fenix" ||
+    user.membership === "fenix_pro" ||
+    user.membershipType === "fenix" ||
+    user.membershipType === "fenix_pro"
+  );
+}
+
 export default function Salas() {
   const [, setLocation] = useLocation();
   const [user, setUser] = useState<any>(null);
@@ -48,13 +63,35 @@ export default function Salas() {
       return;
     }
 
-    const parsed = JSON.parse(stored);
-    setUser(parsed);
+    try {
+      const parsed = JSON.parse(stored);
+      setUser(parsed);
 
-    fetchMemberVideos(parsed.id)
-      .then(setVideos)
-      .catch((err) => setError(err.message || "No se pudo cargar el contenido"))
-      .finally(() => setLoading(false));
+      const memberHasAccess = hasActiveMembership(parsed);
+
+      if (!memberHasAccess) {
+        setLoading(false);
+        return;
+      }
+
+      if (!parsed.id) {
+        setLoading(false);
+        return;
+      }
+
+      fetchMemberVideos(parsed.id)
+        .then((data) => {
+          setVideos(Array.isArray(data) ? data : []);
+        })
+        .catch((err) =>
+          setError(err?.message || "No se pudo cargar el contenido")
+        )
+        .finally(() => setLoading(false));
+    } catch (err) {
+      console.error("Error leyendo currentUser:", err);
+      localStorage.removeItem("currentUser");
+      setLocation("/miembros");
+    }
   }, [setLocation]);
 
   const handleLogout = () => {
@@ -64,15 +101,13 @@ export default function Salas() {
 
   if (!user) return null;
 
-  const needsPayment = !user.membershipActive;
+  const needsPayment = !hasActiveMembership(user);
 
   return (
     <div className="min-h-screen bg-[#fcf7f8] pb-24 relative overflow-hidden">
-      {/* FONDOS DECORATIVOS */}
       <div className="absolute top-[-10%] left-[-10%] w-[40vw] h-[40vw] rounded-full bg-rose-200/30 blur-[100px] pointer-events-none" />
       <div className="absolute bottom-[-10%] right-[-10%] w-[40vw] h-[40vw] rounded-full bg-amber-100/30 blur-[100px] pointer-events-none" />
 
-      {/* HEADER */}
       <header className="sticky top-0 z-40 border-b border-rose-100/80 bg-white/85 backdrop-blur-md">
         <div className="max-w-7xl mx-auto px-4 md:px-6 h-16 flex items-center justify-between">
           <Link href="/">
@@ -92,7 +127,6 @@ export default function Salas() {
         </div>
       </header>
 
-      {/* HERO */}
       <section className="relative py-14 md:py-20">
         <div className="max-w-6xl mx-auto px-4 md:px-6 text-center">
           {!needsPayment && (
@@ -155,7 +189,6 @@ export default function Salas() {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              {/* SALA FENIX */}
               <motion.div
                 initial={{ opacity: 0, y: 18 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -199,7 +232,6 @@ export default function Salas() {
                 </Link>
               </motion.div>
 
-              {/* SALA FENIX 2.0 */}
               <motion.div
                 initial={{ opacity: 0, y: 18 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -281,7 +313,6 @@ export default function Salas() {
           </section>
         ) : (
           <section className="max-w-6xl mx-auto">
-            {/* BLOQUE DE BIENVENIDA */}
             <motion.div
               initial={{ opacity: 0, y: 14 }}
               animate={{ opacity: 1, y: 0 }}
@@ -315,7 +346,6 @@ export default function Salas() {
               </div>
             </motion.div>
 
-            {/* SI HAY VIDEOS */}
             {videos.length > 0 ? (
               <>
                 <div className="mb-8">
@@ -379,7 +409,6 @@ export default function Salas() {
                 </div>
               </>
             ) : (
-              /* SI NO HAY VIDEOS TODAVÍA */
               <motion.div
                 initial={{ opacity: 0, y: 14 }}
                 animate={{ opacity: 1, y: 0 }}
