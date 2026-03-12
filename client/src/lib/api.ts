@@ -229,17 +229,7 @@ export async function fetchSettings() {
   return getLocal<Record<string, string>>("mockSettings", {});
 }
 
-    const server = await res.json();
-
-    // Mezcla servidor + local
-    return { ...server, ...local };
-  } catch {
-    return local;
-  }
-}
-
 export async function saveSettings(data: Record<string, string>) {
-  // guarda directamente en localStorage
   const current = getLocal<Record<string, string>>("mockSettings", {});
   const updated = { ...current, ...data };
 
