@@ -226,12 +226,21 @@ export async function fetchMemberVideos(userId: number) {
 
 // Settings
 export async function fetchSettings() {
+  const local = getLocal<Record<string, string>>("mockSettings", {});
+
   try {
     const res = await fetch("/api/settings");
-    if (!res.ok) throw new Error("API error");
-    return await res.json();
+
+    if (!res.ok) {
+      return local;
+    }
+
+    const server = await res.json();
+
+    // Mezcla servidor + local
+    return { ...server, ...local };
   } catch {
-    return getLocal<Record<string, string>>("mockSettings", {});
+    return local;
   }
 }
 
