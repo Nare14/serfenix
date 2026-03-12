@@ -237,12 +237,15 @@ export async function fetchSettings() {
 
 export async function saveSettings(data: Record<string, string>) {
   try {
-    const res = await apiRequest("POST", "/api/admin/settings", data);
+    const res = await apiRequest("PATCH", "/api/admin/settings", data);
     return await res.json();
-  } catch {
+  } catch (error) {
+    console.error("Error guardando settings en API, uso localStorage:", error);
+
     const current = getLocal<Record<string, string>>("mockSettings", {});
     const updated = { ...current, ...data };
     setLocal("mockSettings", updated);
-    return { success: true };
+
+    return { success: true, localFallback: true };
   }
 }
