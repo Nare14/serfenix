@@ -156,30 +156,35 @@ export default function AdminDashboard() {
   }, [setLocation]);
 
   const loadData = async () => {
-    const [u, v, s] = await Promise.all([
-      fetchUsers(),
-      fetchAdminVideos(),
-      fetchSettings(),
-    ]);
+    try {
+      const [u, v, s] = await Promise.all([
+        fetchUsers(),
+        fetchAdminVideos(),
+        fetchSettings(),
+      ]);
 
-    const sortedVideos = [...v].sort(
-      (a: VideoItem, b: VideoItem) => a.sortOrder - b.sortOrder
-    );
+      const sortedVideos = [...v].sort(
+        (a: VideoItem, b: VideoItem) => a.sortOrder - b.sortOrder
+      );
 
-    setUsers(u);
-    setVideos(sortedVideos);
-    setSiteTitle(s.siteTitle || "Tu poder habita dentro de ti ");
-    setSiteSubtitle(s.siteSubtitle || "Bienvenido a tu renacer");
-    setPriceFenix(s.priceFenix || "99");
-    setPriceFenixPro(s.priceFenixPro || "899");
-    setWhatsapp(s.contactWhatsapp || "");
-    setInstagram(s.contactInstagram || "");
-    setContactEmail(s.contactEmail || "");
-    setSocialInstagram(s.socialInstagram || "");
-    setSocialTiktok(s.socialTiktok || "");
-    setSocialYoutube(s.socialYoutube || "");
-    setPayLinkFenix(s.payLinkFenix || "");
-    setPayLinkFenixPro(s.payLinkFenixPro || "");
+      setUsers(u);
+      setVideos(sortedVideos);
+      setSiteTitle(s.siteTitle || "Tu poder habita dentro de ti");
+      setSiteSubtitle(s.siteSubtitle || "Bienvenido a tu renacer");
+      setPriceFenix(s.priceFenix || "99");
+      setPriceFenixPro(s.priceFenixPro || "899");
+      setWhatsapp(s.contactWhatsapp || "");
+      setInstagram(s.contactInstagram || "");
+      setContactEmail(s.contactEmail || "");
+      setSocialInstagram(s.socialInstagram || "");
+      setSocialTiktok(s.socialTiktok || "");
+      setSocialYoutube(s.socialYoutube || "");
+      setPayLinkFenix(s.payLinkFenix || "");
+      setPayLinkFenixPro(s.payLinkFenixPro || "");
+    } catch (error) {
+      console.error("Error cargando dashboard:", error);
+      showSaved("Error al cargar videos o datos del panel");
+    }
   };
 
   const handleLogout = () => {
