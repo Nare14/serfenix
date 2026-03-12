@@ -193,29 +193,40 @@ export default function AdminDashboard() {
   };
 
   const handleSaveContent = async () => {
-    await saveSettings({
-      siteTitle,
-      siteSubtitle,
-      priceFenix,
-      priceFenixPro,
-    });
-    showSaved("Contenido guardado exitosamente");
+    try {
+      await saveSettings({
+        siteTitle,
+        siteSubtitle,
+        priceFenix,
+        priceFenixPro,
+      });
+
+      showSaved("Contenido guardado exitosamente");
+    } catch (error) {
+      console.error("Error al guardar contenido:", error);
+      showSaved("Error al guardar el contenido");
+    }
   };
 
   const handleSaveSettings = async () => {
-    await saveSettings({
-      contactWhatsapp: whatsapp,
-      contactInstagram: instagram,
-      contactEmail,
-      socialInstagram,
-      socialTiktok,
-      socialYoutube,
-      payLinkFenix,
-      payLinkFenixPro,
-    });
-    showSaved("Configuración guardada exitosamente");
-  };
+    try {
+      await saveSettings({
+        contactWhatsapp: whatsapp,
+        contactInstagram: instagram,
+        contactEmail,
+        socialInstagram,
+        socialTiktok,
+        socialYoutube,
+        payLinkFenix,
+        payLinkFenixPro,
+      });
 
+      showSaved("Configuración guardada exitosamente");
+    } catch (error) {
+      console.error("Error al guardar configuración:", error);
+      showSaved("Error al guardar la configuración");
+    }
+  };
   const handleChangePassword = async (e: React.FormEvent) => {
     e.preventDefault();
     if (newPassword.length < 6) return;
