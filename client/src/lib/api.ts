@@ -138,13 +138,14 @@ export async function deleteUser(id: number) {
 
 // Admin - Videos
 export async function fetchAdminVideos() {
-  try {
-    const res = await fetch("/api/admin/videos");
-    if (!res.ok) throw new Error("API error");
-    return await res.json();
-  } catch {
-    return getLocal<any[]>("mockVideos", []);
+  const res = await fetch("/api/admin/videos");
+
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(`No se pudieron cargar los videos: ${res.status} ${text}`);
   }
+
+  return await res.json();
 }
 
 export async function createVideo(data: any) {
@@ -153,58 +154,32 @@ export async function createVideo(data: any) {
 }
 
 export async function updateVideo(id: number, data: any) {
-  try {
-    const res = await apiRequest("PATCH", `/api/admin/videos/${id}`, data);
-    return await res.json();
-  } catch {
-    const videos = getLocal<any[]>("mockVideos", []);
-    const updatedVideos = videos.map((v) =>
-      v.id === id ? { ...v, ...data } : v
-    );
-    setLocal("mockVideos", updatedVideos);
-    return updatedVideos.find((v) => v.id === id);
-  }
+  const res = await apiRequest("PATCH", `/api/admin/videos/${id}`, data);
+  return await res.json();
 }
 
 export async function deleteVideo(id: number) {
-  try {
-    const res = await apiRequest("DELETE", `/api/admin/videos/${id}`);
-    return await res.json();
-  } catch {
-    const videos = getLocal<any[]>("mockVideos", []);
-    const updatedVideos = videos.filter((v) => v.id !== id);
-    setLocal("mockVideos", updatedVideos);
-    return { success: true };
-  }
+  const res = await apiRequest("DELETE", `/api/admin/videos/${id}`);
+  return await res.json();
 }
 
 // Member - Videos
 export async function fetchMemberVideos(userId: number) {
-  try {
-    const res = await fetch(`/api/videos?userId=${userId}`);
-    if (!res.ok) {
+  const res = await fetch(`/api/videos?userId=${userId}`);
+
+  if (!res.ok) {
+    let message = "No se pudo cargar el contenido";
+    try {
       const err = await res.json();
-      throw new Error(err.message);
+      message = err.message || message;
+    } catch {
+      const text = await res.text();
+      if (text) message = text;
     }
-    return await res.json();
-  } catch {
-    const videos = getLocal<any[]>("mockVideos", []);
-    const users = getLocal<any[]>("mockUsers", []);
-    const user = users.find((u) => u.id === userId);
-
-    if (!user) throw new Error("No autorizado");
-    if (user.disabled) throw new Error("Acceso denegado");
-    if (!user.membershipActive) throw new Error("Membresía no activa");
-
-    return videos.filter(
-      (v) =>
-        v.active &&
-        (v.membershipRequired === "fenix"
-          ? user.membershipType === "fenix" ||
-            user.membershipType === "fenix_pro"
-          : user.membershipType === "fenix_pro")
-    );
+    throw new Error(message);
   }
+
+  return await res.json();
 }
 
 // Settings
