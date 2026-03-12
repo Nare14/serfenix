@@ -226,14 +226,8 @@ export async function fetchMemberVideos(userId: number) {
 
 // Settings
 export async function fetchSettings() {
-  const local = getLocal<Record<string, string>>("mockSettings", {});
-
-  try {
-    const res = await fetch("/api/settings");
-
-    if (!res.ok) {
-      return local;
-    }
+  return getLocal<Record<string, string>>("mockSettings", {});
+}
 
     const server = await res.json();
 
