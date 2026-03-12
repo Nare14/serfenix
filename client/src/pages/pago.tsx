@@ -39,7 +39,6 @@ export default function Pago() {
           href: "https://www.paypal.com/ncp/payment/DQGGMRWCB9ZAL",
           icon: DollarSign,
           buttonText: "Pagar con PayPal",
-          primary: true,
         },
         {
           title: "Pago a acordar",
@@ -48,7 +47,6 @@ export default function Pago() {
           href: instagramLink,
           icon: MessageCircle,
           buttonText: "Contactar por Instagram",
-          primary: false,
         },
       ]
     : [
@@ -59,7 +57,6 @@ export default function Pago() {
           href: "https://mpago.la/1rjkQVx",
           icon: CreditCard,
           buttonText: "Pagar con Mercado Pago",
-          primary: true,
         },
         {
           title: "PayPal",
@@ -68,7 +65,6 @@ export default function Pago() {
           href: "https://www.paypal.com/ncp/payment/9Y2TWTFFA2U32",
           icon: DollarSign,
           buttonText: "Pagar con PayPal",
-          primary: false,
         },
         {
           title: "Pago a acordar",
@@ -77,7 +73,6 @@ export default function Pago() {
           href: instagramLink,
           icon: MessageCircle,
           buttonText: "Contactar por Instagram",
-          primary: false,
         },
       ];
 
@@ -195,13 +190,7 @@ export default function Pago() {
               </p>
 
               <a href={option.href} target="_blank" rel="noopener noreferrer">
-                <Button
-                  className={
-                    option.primary
-                      ? "w-full h-12 md:h-13 rounded-2xl bg-rose-600 hover:bg-rose-700 text-white font-medium shadow-lg shadow-rose-600/20"
-                      : "w-full h-12 md:h-13 rounded-2xl border border-rose-300 bg-white text-rose-800 hover:bg-rose-50 font-medium"
-                  }
-                >
+                <Button className="w-full h-12 md:h-13 rounded-2xl bg-rose-600 hover:bg-rose-700 text-white font-medium shadow-lg shadow-rose-600/20">
                   <Icon className="mr-2 h-5 w-5" />
                   {option.buttonText}
                 </Button>
