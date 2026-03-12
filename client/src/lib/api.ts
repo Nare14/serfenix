@@ -148,25 +148,8 @@ export async function fetchAdminVideos() {
 }
 
 export async function createVideo(data: any) {
-  try {
-    const res = await apiRequest("POST", "/api/admin/videos", data);
-    return await res.json();
-  } catch {
-    const videos = getLocal<any[]>("mockVideos", []);
-    const newVideo = {
-      id: Date.now(),
-      title: data.title,
-      description: data.description ?? "",
-      url: data.url,
-      category: data.category ?? "general",
-      sortOrder: data.sortOrder ?? 0,
-      active: data.active ?? true,
-      membershipRequired: data.membershipRequired ?? "fenix",
-    };
-    videos.push(newVideo);
-    setLocal("mockVideos", videos);
-    return newVideo;
-  }
+  const res = await apiRequest("POST", "/api/admin/videos", data);
+  return await res.json();
 }
 
 export async function updateVideo(id: number, data: any) {
