@@ -245,18 +245,11 @@ export async function fetchSettings() {
 }
 
 export async function saveSettings(data: Record<string, string>) {
-  const res = await fetch("/api/admin/settings", {
-    method: "PUT",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(data),
-  });
+  // guarda directamente en localStorage
+  const current = getLocal<Record<string, string>>("mockSettings", {});
+  const updated = { ...current, ...data };
 
-  if (!res.ok) {
-    const text = await res.text();
-    throw new Error(`Error ${res.status}: ${text}`);
-  }
+  setLocal("mockSettings", updated);
 
-  return res.json();
+  return { success: true };
 }
