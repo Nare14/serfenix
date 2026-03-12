@@ -8,7 +8,7 @@ import {
   DollarSign,
   Sparkles,
 } from "lucide-react";
-import { Link, useLocation } from "wouter";
+import { Link } from "wouter";
 import { motion } from "framer-motion";
 
 export default function Pago() {
@@ -19,9 +19,8 @@ export default function Pago() {
     window.location.href = "/";
   };
 
-  const [location] = useLocation();
-  const params = new URLSearchParams(location.split("?")[1] || "");
-  const plan = params.get("plan")?.trim();
+  const search = typeof window !== "undefined" ? window.location.search : "";
+  const plan = new URLSearchParams(search).get("plan")?.trim();
 
   const instagramLink =
     "https://www.instagram.com/sofivgonzalez?igsh=MXM4ZndidHk4dDBkNg%3D%3D&utm_source=qr";
