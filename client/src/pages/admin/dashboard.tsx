@@ -113,306 +113,310 @@ function getLocalViews(videoId: number) {
   }
 }
 
-export default function AdminDashboard() {}
-const [, setLocation] = useLocation();
+export default function AdminDashboard() {
+  const [, setLocation] = useLocation();
 
-const [activeTab, setActiveTab] = useState("videos");
-const [users, setUsers] = useState<UserItem[]>([]);
-const [videos, setVideos] = useState<VideoItem[]>([]);
-const [newPassword, setNewPassword] = useState("");
-const [showPassword, setShowPassword] = useState(false);
-const [savedMessage, setSavedMessage] = useState("");
+  const [activeTab, setActiveTab] = useState("videos");
+  const [users, setUsers] = useState<UserItem[]>([]);
+  const [videos, setVideos] = useState<VideoItem[]>([]);
+  const [newPassword, setNewPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [savedMessage, setSavedMessage] = useState("");
 
-const [siteTitle, setSiteTitle] = useState("");
-const [siteSubtitle, setSiteSubtitle] = useState("");
-const [priceFenix, setPriceFenix] = useState("99");
-const [priceFenixPro, setPriceFenixPro] = useState("1499");
-const [whatsapp, setWhatsapp] = useState("");
-const [instagram, setInstagram] = useState("");
-const [contactEmail, setContactEmail] = useState("");
-const [socialInstagram, setSocialInstagram] = useState("");
-const [socialTiktok, setSocialTiktok] = useState("");
-const [socialYoutube, setSocialYoutube] = useState("");
-const [payLinkFenix, setPayLinkFenix] = useState("");
-const [payLinkFenixPro, setPayLinkFenixPro] = useState("");
+  const [siteTitle, setSiteTitle] = useState("");
+  const [siteSubtitle, setSiteSubtitle] = useState("");
+  const [priceFenix, setPriceFenix] = useState("99");
+  const [priceFenixPro, setPriceFenixPro] = useState("1499");
+  const [whatsapp, setWhatsapp] = useState("");
+  const [instagram, setInstagram] = useState("");
+  const [contactEmail, setContactEmail] = useState("");
+  const [socialInstagram, setSocialInstagram] = useState("");
+  const [socialTiktok, setSocialTiktok] = useState("");
+  const [socialYoutube, setSocialYoutube] = useState("");
+  const [payLinkFenix, setPayLinkFenix] = useState("");
+  const [payLinkFenixPro, setPayLinkFenixPro] = useState("");
 
-const [showVideoForm, setShowVideoForm] = useState(false);
-const [editingVideo, setEditingVideo] = useState<VideoItem | null>(null);
-const [videoTitle, setVideoTitle] = useState("");
-const [videoUrl, setVideoUrl] = useState("");
-const [videoDesc, setVideoDesc] = useState("");
-const [videoCategory, setVideoCategory] = useState("general");
-const [videoOrder, setVideoOrder] = useState("0");
-const [videoMembership, setVideoMembership] = useState("fenix");
-const [videoSaving, setVideoSaving] = useState(false);
-const [videoError, setVideoError] = useState("");
+  const [showVideoForm, setShowVideoForm] = useState(false);
+  const [editingVideo, setEditingVideo] = useState<VideoItem | null>(null);
+  const [videoTitle, setVideoTitle] = useState("");
+  const [videoUrl, setVideoUrl] = useState("");
+  const [videoDesc, setVideoDesc] = useState("");
+  const [videoCategory, setVideoCategory] = useState("general");
+  const [videoOrder, setVideoOrder] = useState("0");
+  const [videoMembership, setVideoMembership] = useState("fenix");
+  const [videoSaving, setVideoSaving] = useState(false);
+  const [videoError, setVideoError] = useState("");
 
-useEffect(() => {
-  if (localStorage.getItem("adminAuth") !== "true") {
-    setLocation("/admin");
-    return;
-  }
-  loadData();
-}, [setLocation]);
-
-const loadData = async () => {
-  try {
-    const [u, v, s] = await Promise.all([
-      fetchUsers(),
-      fetchAdminVideos(),
-      fetchSettings(),
-    ]);
-
-    const sortedVideos = [...v].sort(
-      (a: VideoItem, b: VideoItem) => a.sortOrder - b.sortOrder
-    );
-
-    setUsers(u);
-    setVideos(sortedVideos);
-    setSiteTitle(s.siteTitle || "Tu poder habita dentro de ti");
-    setSiteSubtitle(s.siteSubtitle || "Bienvenido a tu renacer");
-    setPriceFenix(s.priceFenix || "99");
-    setPriceFenixPro(s.priceFenixPro || "899");
-    setWhatsapp(s.contactWhatsapp || "");
-    setInstagram(s.contactInstagram || "");
-    setContactEmail(s.contactEmail || "");
-    setSocialInstagram(s.socialInstagram || "");
-    setSocialTiktok(s.socialTiktok || "");
-    setSocialYoutube(s.socialYoutube || "");
-    setPayLinkFenix(s.payLinkFenix || "");
-    setPayLinkFenixPro(s.payLinkFenixPro || "");
-  } catch (error) {
-    console.error("Error cargando dashboard:", error);
-    showSaved("Error al cargar videos o datos del panel");
-  }
-};
-
-const handleLogout = () => {
-  localStorage.removeItem("adminAuth");
-  setLocation("/admin");
-};
-
-const showSaved = (msg: string) => {
-  setSavedMessage(msg);
-  setTimeout(() => setSavedMessage(""), 3000);
-};
-
-const handleSaveContent = async () => {
-  try {
-    await saveSettings({
-      siteTitle,
-      siteSubtitle,
-      priceFenix,
-      priceFenixPro,
-    });
-
-    showSaved("Contenido guardado exitosamente");
-  } catch (error) {
-    console.error("Error al guardar contenido:", error);
-    showSaved("Error al guardar el contenido");
-  }
-};
-
-const handleSaveSettings = async () => {
-  try {
-    await saveSettings({
-      contactWhatsapp: whatsapp,
-      contactInstagram: instagram,
-      contactEmail,
-      socialInstagram,
-      socialTiktok,
-      socialYoutube,
-      payLinkFenix,
-      payLinkFenixPro,
-    });
-
-    showSaved("Configuración guardada exitosamente");
-  } catch (error) {
-    console.error("Error al guardar configuración:", error);
-    showSaved("Error al guardar la configuración");
-  }
-};
-const handleChangePassword = async (e: React.FormEvent) => {
-  e.preventDefault();
-  if (newPassword.length < 6) return;
-  await adminChangePassword(newPassword);
-  setNewPassword("");
-  showSaved("Contraseña actualizada");
-};
-
-const handleToggleUser = async (user: UserItem) => {
-  await updateUser(user.id, { disabled: !user.disabled });
-  setUsers(
-    users.map((u) => (u.id === user.id ? { ...u, disabled: !u.disabled } : u))
-  );
-};
-
-const handleToggleMembership = async (user: UserItem) => {
-  const newStatus = !user.membershipActive;
-  await updateUser(user.id, {
-    membershipActive: newStatus,
-    membershipType: newStatus ? "fenix" : null,
-  });
-
-  setUsers(
-    users.map((u) =>
-      u.id === user.id
-        ? {
-            ...u,
-            membershipActive: newStatus,
-            membershipType: newStatus ? "fenix" : null,
-          }
-        : u
-    )
-  );
-};
-
-const handleChangeMembershipType = async (user: UserItem, type: string) => {
-  await updateUser(user.id, { membershipType: type });
-  setUsers(
-    users.map((u) => (u.id === user.id ? { ...u, membershipType: type } : u))
-  );
-};
-
-const handleDeleteUser = async (user: UserItem) => {
-  if (!confirm(`¿Eliminar al usuario ${user.email}?`)) return;
-  await apiDeleteUser(user.id);
-  setUsers(users.filter((u) => u.id !== user.id));
-  showSaved("Usuario eliminado");
-};
-
-const openNewVideo = () => {
-  setEditingVideo(null);
-  setVideoTitle("");
-  setVideoUrl("");
-  setVideoDesc("");
-  setVideoCategory("general");
-  setVideoOrder(String(videos.length));
-  setVideoMembership("fenix");
-  setVideoError("");
-  setShowVideoForm(true);
-};
-
-const openEditVideo = (v: VideoItem) => {
-  setEditingVideo(v);
-  setVideoTitle(v.title);
-  setVideoUrl(v.url);
-  setVideoDesc(v.description || "");
-  setVideoCategory(v.category);
-  setVideoOrder(String(v.sortOrder));
-  setVideoMembership(v.membershipRequired);
-  setVideoError("");
-  setShowVideoForm(true);
-};
-
-const handleSaveVideo = async () => {
-  setVideoError("");
-
-  if (!videoTitle.trim()) {
-    setVideoError("Ingresá un título para el video.");
-    return;
-  }
-
-  if (!videoUrl.trim()) {
-    setVideoError("Ingresá la URL del video.");
-    return;
-  }
-
-  setVideoSaving(true);
-
-  try {
-    const data = {
-      title: videoTitle.trim(),
-      url: videoUrl.trim(),
-      description: videoDesc.trim(),
-      category: videoCategory.trim() || "general",
-      sortOrder: parseInt(videoOrder) || 0,
-      membershipRequired: videoMembership,
-      active: true,
-    };
-
-    if (editingVideo) {
-      const updated = await updateVideo(editingVideo.id, data);
-      setVideos(
-        videos
-          .map((v) => (v.id === editingVideo.id ? updated : v))
-          .sort((a, b) => a.sortOrder - b.sortOrder)
-      );
-      showSaved("Video actualizado");
-    } else {
-      const created = await createVideo(data);
-      setVideos([...videos, created].sort((a, b) => a.sortOrder - b.sortOrder));
-      showSaved("Video creado exitosamente");
+  useEffect(() => {
+    if (localStorage.getItem("adminAuth") !== "true") {
+      setLocation("/admin");
+      return;
     }
+    loadData();
+  }, [setLocation]);
 
-    setShowVideoForm(false);
+  const loadData = async () => {
+    try {
+      const [u, v, s] = await Promise.all([
+        fetchUsers(),
+        fetchAdminVideos(),
+        fetchSettings(),
+      ]);
+
+      const sortedVideos = [...v].sort(
+        (a: VideoItem, b: VideoItem) => a.sortOrder - b.sortOrder
+      );
+
+      setUsers(u);
+      setVideos(sortedVideos);
+      setSiteTitle(s.siteTitle || "Tu poder habita dentro de ti");
+      setSiteSubtitle(s.siteSubtitle || "Bienvenido a tu renacer");
+      setPriceFenix(s.priceFenix || "99");
+      setPriceFenixPro(s.priceFenixPro || "1499");
+      setWhatsapp(s.contactWhatsapp || "");
+      setInstagram(s.contactInstagram || "");
+      setContactEmail(s.contactEmail || "");
+      setSocialInstagram(s.socialInstagram || "");
+      setSocialTiktok(s.socialTiktok || "");
+      setSocialYoutube(s.socialYoutube || "");
+      setPayLinkFenix(s.payLinkFenix || "");
+      setPayLinkFenixPro(s.payLinkFenixPro || "");
+    } catch (error) {
+      console.error("Error cargando dashboard:", error);
+      showSaved("Error al cargar videos o datos del panel");
+    }
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem("adminAuth");
+    setLocation("/admin");
+  };
+
+  const showSaved = (msg: string) => {
+    setSavedMessage(msg);
+    setTimeout(() => setSavedMessage(""), 3000);
+  };
+
+  const handleSaveContent = async () => {
+    try {
+      await saveSettings({
+        siteTitle,
+        siteSubtitle,
+        priceFenix,
+        priceFenixPro,
+      });
+
+      showSaved("Contenido guardado exitosamente");
+    } catch (error) {
+      console.error("Error al guardar contenido:", error);
+      showSaved("Error al guardar el contenido");
+    }
+  };
+
+  const handleSaveSettings = async () => {
+    try {
+      await saveSettings({
+        contactWhatsapp: whatsapp,
+        contactInstagram: instagram,
+        contactEmail,
+        socialInstagram,
+        socialTiktok,
+        socialYoutube,
+        payLinkFenix,
+        payLinkFenixPro,
+      });
+
+      showSaved("Configuración guardada exitosamente");
+    } catch (error) {
+      console.error("Error al guardar configuración:", error);
+      showSaved("Error al guardar la configuración");
+    }
+  };
+
+  const handleChangePassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (newPassword.length < 6) return;
+    await adminChangePassword(newPassword);
+    setNewPassword("");
+    showSaved("Contraseña actualizada");
+  };
+
+  const handleToggleUser = async (user: UserItem) => {
+    await updateUser(user.id, { disabled: !user.disabled });
+    setUsers(
+      users.map((u) => (u.id === user.id ? { ...u, disabled: !u.disabled } : u))
+    );
+  };
+
+  const handleToggleMembership = async (user: UserItem) => {
+    const newStatus = !user.membershipActive;
+    await updateUser(user.id, {
+      membershipActive: newStatus,
+      membershipType: newStatus ? "fenix" : null,
+    });
+
+    setUsers(
+      users.map((u) =>
+        u.id === user.id
+          ? {
+              ...u,
+              membershipActive: newStatus,
+              membershipType: newStatus ? "fenix" : null,
+            }
+          : u
+      )
+    );
+  };
+
+  const handleChangeMembershipType = async (user: UserItem, type: string) => {
+    await updateUser(user.id, { membershipType: type });
+    setUsers(
+      users.map((u) => (u.id === user.id ? { ...u, membershipType: type } : u))
+    );
+  };
+
+  const handleDeleteUser = async (user: UserItem) => {
+    if (!confirm(`¿Eliminar al usuario ${user.email}?`)) return;
+    await apiDeleteUser(user.id);
+    setUsers(users.filter((u) => u.id !== user.id));
+    showSaved("Usuario eliminado");
+  };
+
+  const openNewVideo = () => {
     setEditingVideo(null);
     setVideoTitle("");
     setVideoUrl("");
     setVideoDesc("");
     setVideoCategory("general");
-    setVideoOrder("0");
+    setVideoOrder(String(videos.length));
     setVideoMembership("fenix");
-  } catch (error) {
-    console.error(error);
-    setVideoError(
-      "No se pudo guardar el video en el servidor. Verificá la API e intentá otra vez."
-    );
-  } finally {
-    setVideoSaving(false);
-  }
-};
+    setVideoError("");
+    setShowVideoForm(true);
+  };
 
-const handleToggleVideoActive = async (v: VideoItem) => {
-  try {
-    const updated = await updateVideo(v.id, { active: !v.active });
-    setVideos(videos.map((x) => (x.id === v.id ? updated : x)));
-    showSaved("Estado del video actualizado");
-  } catch (error) {
-    console.error(error);
-    showSaved("No se pudo actualizar el estado del video");
-  }
-};
+  const openEditVideo = (v: VideoItem) => {
+    setEditingVideo(v);
+    setVideoTitle(v.title);
+    setVideoUrl(v.url);
+    setVideoDesc(v.description || "");
+    setVideoCategory(v.category);
+    setVideoOrder(String(v.sortOrder));
+    setVideoMembership(v.membershipRequired);
+    setVideoError("");
+    setShowVideoForm(true);
+  };
 
-const handleDeleteVideo = async (v: VideoItem) => {
-  if (!confirm(`¿Eliminar el video "${v.title}"?`)) return;
+  const handleSaveVideo = async () => {
+    setVideoError("");
 
-  try {
-    await apiDeleteVideo(v.id);
-    setVideos(videos.filter((x) => x.id !== v.id));
-    showSaved("Video eliminado");
-  } catch (error) {
-    console.error(error);
-    showSaved("No se pudo eliminar el video");
-  }
-};
+    if (!videoTitle.trim()) {
+      setVideoError("Ingresá un título para el video.");
+      return;
+    }
 
-const handleMoveVideo = async (index: number, direction: "up" | "down") => {
-  const newVideos = [...videos];
-  const swapIndex = direction === "up" ? index - 1 : index + 1;
+    if (!videoUrl.trim()) {
+      setVideoError("Ingresá la URL del video.");
+      return;
+    }
 
-  if (swapIndex < 0 || swapIndex >= newVideos.length) return;
+    setVideoSaving(true);
 
-  const current = newVideos[index];
-  const target = newVideos[swapIndex];
+    try {
+      const data = {
+        title: videoTitle.trim(),
+        url: videoUrl.trim(),
+        description: videoDesc.trim(),
+        category: videoCategory.trim() || "general",
+        sortOrder: parseInt(videoOrder) || 0,
+        membershipRequired: videoMembership,
+        active: true,
+      };
 
-  const currentOrder = current.sortOrder;
-  const targetOrder = target.sortOrder;
+      if (editingVideo) {
+        const updated = await updateVideo(editingVideo.id, data);
+        setVideos(
+          videos
+            .map((v) => (v.id === editingVideo.id ? updated : v))
+            .sort((a, b) => a.sortOrder - b.sortOrder)
+        );
+        showSaved("Video actualizado");
+      } else {
+        const created = await createVideo(data);
+        setVideos(
+          [...videos, created].sort((a, b) => a.sortOrder - b.sortOrder)
+        );
+        showSaved("Video creado exitosamente");
+      }
 
-  newVideos[index] = { ...target, sortOrder: currentOrder };
-  newVideos[swapIndex] = { ...current, sortOrder: targetOrder };
+      setShowVideoForm(false);
+      setEditingVideo(null);
+      setVideoTitle("");
+      setVideoUrl("");
+      setVideoDesc("");
+      setVideoCategory("general");
+      setVideoOrder("0");
+      setVideoMembership("fenix");
+    } catch (error) {
+      console.error(error);
+      setVideoError(
+        "No se pudo guardar el video en el servidor. Verificá la API e intentá otra vez."
+      );
+    } finally {
+      setVideoSaving(false);
+    }
+  };
 
-  const sorted = [...newVideos].sort((a, b) => a.sortOrder - b.sortOrder);
+  const handleToggleVideoActive = async (v: VideoItem) => {
+    try {
+      const updated = await updateVideo(v.id, { active: !v.active });
+      setVideos(videos.map((x) => (x.id === v.id ? updated : x)));
+      showSaved("Estado del video actualizado");
+    } catch (error) {
+      console.error(error);
+      showSaved("No se pudo actualizar el estado del video");
+    }
+  };
 
-  try {
-    await updateVideo(current.id, { sortOrder: targetOrder });
-    await updateVideo(target.id, { sortOrder: currentOrder });
-    setVideos(sorted);
-    showSaved("Orden actualizado");
-  } catch (error) {
-    console.error(error);
-    showSaved("No se pudo actualizar el orden");
-  }
+  const handleDeleteVideo = async (v: VideoItem) => {
+    if (!confirm(`¿Eliminar el video "${v.title}"?`)) return;
+
+    try {
+      await apiDeleteVideo(v.id);
+      setVideos(videos.filter((x) => x.id !== v.id));
+      showSaved("Video eliminado");
+    } catch (error) {
+      console.error(error);
+      showSaved("No se pudo eliminar el video");
+    }
+  };
+
+  const handleMoveVideo = async (index: number, direction: "up" | "down") => {
+    const newVideos = [...videos];
+    const swapIndex = direction === "up" ? index - 1 : index + 1;
+
+    if (swapIndex < 0 || swapIndex >= newVideos.length) return;
+
+    const current = newVideos[index];
+    const target = newVideos[swapIndex];
+
+    const currentOrder = current.sortOrder;
+    const targetOrder = target.sortOrder;
+
+    newVideos[index] = { ...target, sortOrder: currentOrder };
+    newVideos[swapIndex] = { ...current, sortOrder: targetOrder };
+
+    const sorted = [...newVideos].sort((a, b) => a.sortOrder - b.sortOrder);
+
+    try {
+      await updateVideo(current.id, { sortOrder: targetOrder });
+      await updateVideo(target.id, { sortOrder: currentOrder });
+      setVideos(sorted);
+      showSaved("Orden actualizado");
+    } catch (error) {
+      console.error(error);
+      showSaved("No se pudo actualizar el orden");
+    }
+  };
 
   const totalUsers = users.length;
   const activeMemberships = users.filter((u) => u.membershipActive).length;
@@ -1300,4 +1304,4 @@ const handleMoveVideo = async (index: number, direction: "up" | "down") => {
       </main>
     </Tabs>
   );
-};
+}
