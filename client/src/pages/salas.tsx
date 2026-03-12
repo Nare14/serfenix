@@ -323,7 +323,8 @@ export default function Salas() {
                     Tus contenidos
                   </h3>
                   <p className="text-rose-900/60">
-                    Elegí una sala y empezá cuando quieras.
+                    Acá encontrarás el contenido disponible para tu proceso de
+                    transformación.
                   </p>
                 </div>
 
