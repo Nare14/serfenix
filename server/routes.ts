@@ -1,6 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
+import { pool } from "./db";
 import { insertVideoSchema, updateVideoSchema } from "@shared/schema";
 
 // Admin credentials - stored in memory, can be changed at runtime
@@ -11,6 +12,26 @@ export async function registerRoutes(
   httpServer: Server,
   app: Express
 ): Promise<Server> {
+  // ==========================================
+  // HEALTH / DB TEST
+  // ==========================================
+  app.get("/api/health", (_req, res) => {
+    return res.json({ ok: true });
+  });
+
+  app.get("/api/db-test", async (_req, res) => {
+    try {
+      const result = await pool.query("select 1 as ok");
+      return res.json(result.rows);
+    } catch (error) {
+      console.error("DB TEST ERROR:", error);
+      return res.status(500).json({
+        message: "Error probando la base de datos",
+        error: error instanceof Error ? error.message : String(error),
+      });
+    }
+  });
+
   // ==========================================
   // AUTH - Admin Login
   // ==========================================
@@ -37,167 +58,269 @@ export async function registerRoutes(
   // AUTH - Member Register / Login
   // ==========================================
   app.post("/api/auth/register", async (req, res) => {
-    const { email, password, name } = req.body;
-    if (!email || !password || !name) {
-      return res
-        .status(400)
-        .json({ message: "Nombre, email y contraseña son requeridos" });
-    }
+    try {
+      const { email, password, name } = req.body;
+      if (!email || !password || !name) {
+        return res
+          .status(400)
+          .json({ message: "Nombre, email y contraseña son requeridos" });
+      }
 
-    const existing = await storage.getUserByEmail(email);
-    if (existing) {
-      return res.status(409).json({ message: "El email ya está registrado" });
-    }
+      const existing = await storage.getUserByEmail(email);
+      if (existing) {
+        return res.status(409).json({ message: "El email ya está registrado" });
+      }
 
-    const user = await storage.createUser({ email, password, name });
-    return res.json({
-      id: user.id,
-      name: user.name,
-      email: user.email,
-      membershipActive: user.membershipActive,
-      membershipType: user.membershipType,
-    });
+      const user = await storage.createUser({ email, password, name });
+      return res.json({
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        membershipActive: user.membershipActive,
+        membershipType: user.membershipType,
+      });
+    } catch (error) {
+      console.error("REGISTER ERROR:", error);
+      return res.status(500).json({
+        message: "Error registrando usuario",
+        error: error instanceof Error ? error.message : String(error),
+      });
+    }
   });
 
   app.post("/api/auth/login", async (req, res) => {
-    const { email, password } = req.body;
-    if (!email || !password) {
-      return res
-        .status(400)
-        .json({ message: "Email y contraseña son requeridos" });
-    }
+    try {
+      const { email, password } = req.body;
+      if (!email || !password) {
+        return res
+          .status(400)
+          .json({ message: "Email y contraseña son requeridos" });
+      }
 
-    const user = await storage.getUserByEmail(email);
-    if (!user || user.password !== password) {
-      return res.status(401).json({ message: "Credenciales incorrectas" });
-    }
-    if (user.disabled) {
-      return res.status(403).json({ message: "Tu cuenta ha sido desactivada" });
-    }
+      const user = await storage.getUserByEmail(email);
+      if (!user || user.password !== password) {
+        return res.status(401).json({ message: "Credenciales incorrectas" });
+      }
+      if (user.disabled) {
+        return res
+          .status(403)
+          .json({ message: "Tu cuenta ha sido desactivada" });
+      }
 
-    return res.json({
-      id: user.id,
-      name: user.name,
-      email: user.email,
-      membershipActive: user.membershipActive,
-      membershipType: user.membershipType,
-    });
+      return res.json({
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        membershipActive: user.membershipActive,
+        membershipType: user.membershipType,
+      });
+    } catch (error) {
+      console.error("LOGIN ERROR:", error);
+      return res.status(500).json({
+        message: "Error iniciando sesión",
+        error: error instanceof Error ? error.message : String(error),
+      });
+    }
   });
 
   // ==========================================
   // USERS - Admin management
   // ==========================================
   app.get("/api/admin/users", async (_req, res) => {
-    const allUsers = await storage.getAllUsers();
-    const safeUsers = allUsers.map((u) => ({
-      id: u.id,
-      email: u.email,
-      disabled: u.disabled,
-      membershipActive: u.membershipActive,
-      membershipType: u.membershipType,
-      createdAt: u.createdAt,
-    }));
-    return res.json(safeUsers);
+    try {
+      const allUsers = await storage.getAllUsers();
+      const safeUsers = allUsers.map((u) => ({
+        id: u.id,
+        email: u.email,
+        disabled: u.disabled,
+        membershipActive: u.membershipActive,
+        membershipType: u.membershipType,
+        createdAt: u.createdAt,
+      }));
+      return res.json(safeUsers);
+    } catch (error) {
+      console.error("GET USERS ERROR:", error);
+      return res.status(500).json({
+        message: "Error cargando usuarios",
+        error: error instanceof Error ? error.message : String(error),
+      });
+    }
   });
 
   app.patch("/api/admin/users/:id", async (req, res) => {
-    const id = parseInt(req.params.id);
-    const updated = await storage.updateUser(id, req.body);
-    if (!updated)
-      return res.status(404).json({ message: "Usuario no encontrado" });
-    return res.json({
-      id: updated.id,
-      email: updated.email,
-      disabled: updated.disabled,
-      membershipActive: updated.membershipActive,
-      membershipType: updated.membershipType,
-    });
+    try {
+      const id = parseInt(req.params.id);
+      const updated = await storage.updateUser(id, req.body);
+      if (!updated) {
+        return res.status(404).json({ message: "Usuario no encontrado" });
+      }
+      return res.json({
+        id: updated.id,
+        email: updated.email,
+        disabled: updated.disabled,
+        membershipActive: updated.membershipActive,
+        membershipType: updated.membershipType,
+      });
+    } catch (error) {
+      console.error("UPDATE USER ERROR:", error);
+      return res.status(500).json({
+        message: "Error actualizando usuario",
+        error: error instanceof Error ? error.message : String(error),
+      });
+    }
   });
 
   app.delete("/api/admin/users/:id", async (req, res) => {
-    const id = parseInt(req.params.id);
-    await storage.deleteUser(id);
-    return res.json({ success: true });
+    try {
+      const id = parseInt(req.params.id);
+      await storage.deleteUser(id);
+      return res.json({ success: true });
+    } catch (error) {
+      console.error("DELETE USER ERROR:", error);
+      return res.status(500).json({
+        message: "Error eliminando usuario",
+        error: error instanceof Error ? error.message : String(error),
+      });
+    }
   });
 
   // ==========================================
   // VIDEOS - Admin CRUD
   // ==========================================
   app.get("/api/admin/videos", async (_req, res) => {
-    const allVideos = await storage.getAllVideos();
-    return res.json(allVideos);
+    try {
+      const allVideos = await storage.getAllVideos();
+      return res.json(allVideos);
+    } catch (error) {
+      console.error("GET ADMIN VIDEOS ERROR:", error);
+      return res.status(500).json({
+        message: "Error cargando videos",
+        error: error instanceof Error ? error.message : String(error),
+      });
+    }
   });
 
   app.post("/api/admin/videos", async (req, res) => {
-    const parsed = insertVideoSchema.safeParse(req.body);
-    if (!parsed.success) {
-      return res
-        .status(400)
-        .json({ message: "Datos inválidos", errors: parsed.error.errors });
+    try {
+      const parsed = insertVideoSchema.safeParse(req.body);
+      if (!parsed.success) {
+        return res
+          .status(400)
+          .json({ message: "Datos inválidos", errors: parsed.error.errors });
+      }
+      const video = await storage.createVideo(parsed.data);
+      return res.json(video);
+    } catch (error) {
+      console.error("CREATE VIDEO ERROR:", error);
+      return res.status(500).json({
+        message: "Error creando video",
+        error: error instanceof Error ? error.message : String(error),
+      });
     }
-    const video = await storage.createVideo(parsed.data);
-    return res.json(video);
   });
 
   app.patch("/api/admin/videos/:id", async (req, res) => {
-    const id = parseInt(req.params.id);
-    const parsed = updateVideoSchema.safeParse(req.body);
-    if (!parsed.success) {
-      return res
-        .status(400)
-        .json({ message: "Datos inválidos", errors: parsed.error.errors });
+    try {
+      const id = parseInt(req.params.id);
+      const parsed = updateVideoSchema.safeParse(req.body);
+      if (!parsed.success) {
+        return res
+          .status(400)
+          .json({ message: "Datos inválidos", errors: parsed.error.errors });
+      }
+      const updated = await storage.updateVideo(id, parsed.data);
+      if (!updated) {
+        return res.status(404).json({ message: "Video no encontrado" });
+      }
+      return res.json(updated);
+    } catch (error) {
+      console.error("UPDATE VIDEO ERROR:", error);
+      return res.status(500).json({
+        message: "Error actualizando video",
+        error: error instanceof Error ? error.message : String(error),
+      });
     }
-    const updated = await storage.updateVideo(id, parsed.data);
-    if (!updated)
-      return res.status(404).json({ message: "Video no encontrado" });
-    return res.json(updated);
   });
 
   app.delete("/api/admin/videos/:id", async (req, res) => {
-    const id = parseInt(req.params.id);
-    await storage.deleteVideo(id);
-    return res.json({ success: true });
+    try {
+      const id = parseInt(req.params.id);
+      await storage.deleteVideo(id);
+      return res.json({ success: true });
+    } catch (error) {
+      console.error("DELETE VIDEO ERROR:", error);
+      return res.status(500).json({
+        message: "Error eliminando video",
+        error: error instanceof Error ? error.message : String(error),
+      });
+    }
   });
 
   // ==========================================
   // VIDEOS - Member access (protected)
   // ==========================================
   app.get("/api/videos", async (req, res) => {
-    const userId = req.query.userId as string;
-    if (!userId) {
-      return res.status(401).json({ message: "No autorizado" });
-    }
+    try {
+      const userId = req.query.userId as string;
+      if (!userId) {
+        return res.status(401).json({ message: "No autorizado" });
+      }
 
-    const user = await storage.getUser(parseInt(userId));
-    if (!user || user.disabled) {
-      return res.status(403).json({ message: "Acceso denegado" });
-    }
-    if (!user.membershipActive) {
-      return res.status(403).json({ message: "Membresía no activa" });
-    }
+      const user = await storage.getUser(parseInt(userId));
+      if (!user || user.disabled) {
+        return res.status(403).json({ message: "Acceso denegado" });
+      }
+      if (!user.membershipActive) {
+        return res.status(403).json({ message: "Membresía no activa" });
+      }
 
-    const vids = await storage.getActiveVideos(user.membershipType || "fenix");
-    return res.json(vids);
+      const vids = await storage.getActiveVideos(
+        user.membershipType || "fenix"
+      );
+      return res.json(vids);
+    } catch (error) {
+      console.error("GET MEMBER VIDEOS ERROR:", error);
+      return res.status(500).json({
+        message: "Error cargando videos del miembro",
+        error: error instanceof Error ? error.message : String(error),
+      });
+    }
   });
 
   // ==========================================
   // SITE SETTINGS
   // ==========================================
   app.get("/api/settings", async (_req, res) => {
-    const settings = await storage.getAllSettings();
-    const obj: Record<string, string> = {};
-    settings.forEach((s) => {
-      obj[s.key] = s.value;
-    });
-    return res.json(obj);
+    try {
+      const settings = await storage.getAllSettings();
+      const obj: Record<string, string> = {};
+      settings.forEach((s) => {
+        obj[s.key] = s.value;
+      });
+      return res.json(obj);
+    } catch (error) {
+      console.error("GET SETTINGS ERROR:", error);
+      return res.status(500).json({
+        message: "Error cargando configuración",
+        error: error instanceof Error ? error.message : String(error),
+      });
+    }
   });
 
   app.post("/api/admin/settings", async (req, res) => {
-    const entries = Object.entries(req.body) as [string, string][];
-    for (const [key, value] of entries) {
-      await storage.setSetting(key, value);
+    try {
+      const entries = Object.entries(req.body) as [string, string][];
+      for (const [key, value] of entries) {
+        await storage.setSetting(key, value);
+      }
+      return res.json({ success: true });
+    } catch (error) {
+      console.error("SAVE SETTINGS ERROR:", error);
+      return res.status(500).json({
+        message: "Error guardando configuración",
+        error: error instanceof Error ? error.message : String(error),
+      });
     }
-    return res.json({ success: true });
   });
 
   return httpServer;
