@@ -605,8 +605,8 @@ export default function Home() {
                   <ul className="space-y-4 mb-10 flex-grow">
                     {[
                       "Mentoría semanal en VIVO con Sofi exclusiva Sala Fenix 2.0",
+                      "Acceso total a Sala Fenix",
                       "WhatsApp ilimitado 1:1 conmigo",
-                      "Acceso a comunidad exclusiva WhatsApp Sala Fenix 2.0",
                       "Descubrí tu misión de vida",
                       "Rutinas personalizadas de cuerpo, mente y espíritu",
                       "Reprogramá tu subconsciente y creá la vida que merecés y soñás en todas las áreas",
