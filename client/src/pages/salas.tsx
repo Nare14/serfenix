@@ -19,33 +19,92 @@ interface VideoItem {
   url: string;
   category: string;
   membershipRequired: string;
+  active?: boolean;
 }
 
 function getEmbedUrl(url: string): string {
-  const ytMatch = url.match(
-    /(?:youtu\.be\/|youtube\.com\/watch\?v=|youtube\.com\/embed\/)([a-zA-Z0-9_-]+)/
-  );
-  if (ytMatch) return `https://www.youtube.com/embed/${ytMatch[1]}`;
+  const clean = (url || "").trim();
+  if (!clean) return "";
 
-  const vimeoMatch = url.match(/vimeo\.com\/(\d+)/);
-  if (vimeoMatch) return `https://player.vimeo.com/video/${vimeoMatch[1]}`;
+  if (clean.includes("youtube.com/embed/")) return clean;
 
-  return url;
+  const ytShortMatch = clean.match(/youtu\.be\/([a-zA-Z0-9_-]+)/);
+  if (ytShortMatch) {
+    return `https://www.youtube.com/embed/${ytShortMatch[1]}`;
+  }
+
+  const ytWatchMatch = clean.match(/[?&]v=([a-zA-Z0-9_-]+)/);
+  if (clean.includes("youtube.com/watch") && ytWatchMatch) {
+    return `https://www.youtube.com/embed/${ytWatchMatch[1]}`;
+  }
+
+  const ytEmbedMatch = clean.match(/youtube\.com\/embed\/([a-zA-Z0-9_-]+)/);
+  if (ytEmbedMatch) {
+    return `https://www.youtube.com/embed/${ytEmbedMatch[1]}`;
+  }
+
+  const vimeoPlayerMatch = clean.match(/player\.vimeo\.com\/video\/(\d+)/);
+  if (vimeoPlayerMatch) {
+    return `https://player.vimeo.com/video/${vimeoPlayerMatch[1]}`;
+  }
+
+  const vimeoMatch = clean.match(/vimeo\.com\/(\d+)/);
+  if (vimeoMatch) {
+    return `https://player.vimeo.com/video/${vimeoMatch[1]}`;
+  }
+
+  return clean;
+}
+
+function getMembershipType(user: any): string | null {
+  if (!user) return null;
+
+  if (
+    user.membershipType === "fenix_pro" ||
+    user.plan === "fenix_pro" ||
+    user.membership === "fenix_pro"
+  ) {
+    return "fenix_pro";
+  }
+
+  if (
+    user.membershipType === "fenix" ||
+    user.plan === "fenix" ||
+    user.membership === "fenix"
+  ) {
+    return "fenix";
+  }
+
+  if (user.membershipActive === true || user.hasMembership === true) {
+    return "fenix";
+  }
+
+  return null;
 }
 
 function hasActiveMembership(user: any): boolean {
-  if (!user) return false;
+  return getMembershipType(user) !== null;
+}
 
-  return (
-    user.membershipActive === true ||
-    user.hasMembership === true ||
-    user.plan === "fenix" ||
-    user.plan === "fenix_pro" ||
-    user.membership === "fenix" ||
-    user.membership === "fenix_pro" ||
-    user.membershipType === "fenix" ||
-    user.membershipType === "fenix_pro"
-  );
+function canUserSeeVideo(user: any, video: VideoItem): boolean {
+  const membership = getMembershipType(user);
+
+  if (!membership) return false;
+  if (video.active === false) return false;
+
+  if (membership === "fenix_pro") {
+    return (
+      video.membershipRequired === "fenix_pro" ||
+      video.membershipRequired === "fenix" ||
+      !video.membershipRequired
+    );
+  }
+
+  if (membership === "fenix") {
+    return video.membershipRequired === "fenix" || !video.membershipRequired;
+  }
+
+  return false;
 }
 
 export default function Salas() {
@@ -56,42 +115,42 @@ export default function Salas() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const stored = localStorage.getItem("currentUser");
+    const loadPage = async () => {
+      const stored = localStorage.getItem("currentUser");
 
-    if (!stored) {
-      setLocation("/miembros");
-      return;
-    }
-
-    try {
-      const parsed = JSON.parse(stored);
-      setUser(parsed);
-
-      const memberHasAccess = hasActiveMembership(parsed);
-
-      if (!memberHasAccess) {
-        setLoading(false);
+      if (!stored) {
+        setLocation("/miembros");
         return;
       }
 
-      if (!parsed.id) {
-        setLoading(false);
-        return;
-      }
+      try {
+        const parsed = JSON.parse(stored);
+        setUser(parsed);
 
-      fetchMemberVideos(parsed.id)
-        .then((data) => {
-          setVideos(Array.isArray(data) ? data : []);
-        })
-        .catch((err) =>
-          setError(err?.message || "No se pudo cargar el contenido")
-        )
-        .finally(() => setLoading(false));
-    } catch (err) {
-      console.error("Error leyendo currentUser:", err);
-      localStorage.removeItem("currentUser");
-      setLocation("/miembros");
-    }
+        const memberHasAccess = hasActiveMembership(parsed);
+
+        if (!memberHasAccess) {
+          setLoading(false);
+          return;
+        }
+
+        const data = await fetchMemberVideos();
+        const allVideos = Array.isArray(data) ? data : [];
+
+        const visibleVideos = allVideos.filter((video) =>
+          canUserSeeVideo(parsed, video)
+        );
+
+        setVideos(visibleVideos);
+      } catch (err: any) {
+        console.error("Error cargando salas:", err);
+        setError(err?.message || "No se pudo cargar el contenido");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadPage();
   }, [setLocation]);
 
   const handleLogout = () => {
@@ -102,6 +161,7 @@ export default function Salas() {
   if (!user) return null;
 
   const needsPayment = !hasActiveMembership(user);
+  const membershipType = getMembershipType(user);
 
   return (
     <div className="min-h-screen bg-[#fcf7f8] pb-24 relative overflow-hidden">
@@ -157,7 +217,7 @@ export default function Salas() {
           >
             {needsPayment
               ? "Elegí la membresía que mejor acompañe tu proceso y accedé a un espacio creado para tu transformación."
-              : "Bienvenida a tu espacio privado. Aquí vas a encontrar tus contenidos, tus salas activas y todo lo que necesitas para avanzar a tu ritmo."}
+              : "Bienvenida a tu espacio privado. Aquí vas a encontrar tus contenidos, tus salas activas y todo lo que necesitás para avanzar a tu ritmo."}
           </motion.p>
         </div>
       </section>
@@ -337,9 +397,15 @@ export default function Salas() {
                     </p>
                   </div>
 
-                  <div className="shrink-0">
+                  <div className="shrink-0 flex flex-col items-start lg:items-end gap-2">
                     <div className="rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700 px-5 py-2.5 text-sm font-medium">
                       Acceso habilitado
+                    </div>
+
+                    <div className="text-xs text-rose-500/70 uppercase tracking-[0.18em]">
+                      {membershipType === "fenix_pro"
+                        ? "Sala Fénix 2.0"
+                        : "Sala Fénix"}
                     </div>
                   </div>
                 </div>
