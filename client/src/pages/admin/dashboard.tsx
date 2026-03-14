@@ -903,9 +903,11 @@ export default function AdminDashboard() {
                                   : "bg-rose-100 text-rose-700"
                               }`}
                             >
-                              {v.membershipRequired === "fenix_pro"
-                                ? "Fénix 2.0"
-                                : "Fénix"}
+                              {v.membershipRequired === "all"
+  ? "Ambas"
+  : v.membershipRequired === "fenix_pro"
+  ? "Fénix 2.0"
+  : "Fénix"}
                             </span>
                           </td>
                           <td className="px-4 py-3 hidden md:table-cell text-rose-900/60">
