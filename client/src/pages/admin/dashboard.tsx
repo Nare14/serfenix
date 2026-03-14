@@ -135,6 +135,8 @@ export default function AdminDashboard() {
   const [socialYoutube, setSocialYoutube] = useState("");
   const [payLinkFenix, setPayLinkFenix] = useState("");
   const [payLinkFenixPro, setPayLinkFenixPro] = useState("");
+  const [settingsSaving, setSettingsSaving] = useState(false);
+  const [contentSaving, setContentSaving] = useState(false);
 
   const [showVideoForm, setShowVideoForm] = useState(false);
   const [editingVideo, setEditingVideo] = useState<VideoItem | null>(null);
@@ -155,6 +157,11 @@ export default function AdminDashboard() {
     loadData();
   }, [setLocation]);
 
+  const showSaved = (msg: string) => {
+    setSavedMessage(msg);
+    setTimeout(() => setSavedMessage(""), 3000);
+  };
+
   const loadData = async () => {
     try {
       const [u, v, s] = await Promise.all([
@@ -169,16 +176,20 @@ export default function AdminDashboard() {
 
       setUsers(u);
       setVideos(sortedVideos);
+
       setSiteTitle(s.siteTitle || "Tu poder habita dentro de ti");
       setSiteSubtitle(s.siteSubtitle || "Bienvenido a tu renacer");
       setPriceFenix(s.priceFenix || "99");
       setPriceFenixPro(s.priceFenixPro || "1499");
+
       setWhatsapp(s.contactWhatsapp || "");
       setInstagram(s.contactInstagram || "");
       setContactEmail(s.contactEmail || "");
+
       setSocialInstagram(s.socialInstagram || "");
       setSocialTiktok(s.socialTiktok || "");
       setSocialYoutube(s.socialYoutube || "");
+
       setPayLinkFenix(s.payLinkFenix || "");
       setPayLinkFenixPro(s.payLinkFenixPro || "");
     } catch (error) {
@@ -192,94 +203,135 @@ export default function AdminDashboard() {
     setLocation("/admin");
   };
 
-  const showSaved = (msg: string) => {
-    setSavedMessage(msg);
-    setTimeout(() => setSavedMessage(""), 3000);
-  };
-
   const handleSaveContent = async () => {
     try {
+      setContentSaving(true);
+
       await saveSettings({
-        siteTitle,
-        siteSubtitle,
-        priceFenix,
-        priceFenixPro,
+        siteTitle: siteTitle.trim(),
+        siteSubtitle: siteSubtitle.trim(),
+        priceFenix: priceFenix.trim(),
+        priceFenixPro: priceFenixPro.trim(),
       });
 
+      await loadData();
       showSaved("Contenido guardado exitosamente");
     } catch (error) {
       console.error("Error al guardar contenido:", error);
       showSaved("Error al guardar el contenido");
+    } finally {
+      setContentSaving(false);
     }
   };
 
   const handleSaveSettings = async () => {
     try {
-      await saveSettings({
-        contactWhatsapp: whatsapp,
-        contactInstagram: instagram,
-        contactEmail,
-        socialInstagram,
-        socialTiktok,
-        socialYoutube,
-        payLinkFenix,
-        payLinkFenixPro,
-      });
+      setSettingsSaving(true);
+
+      const payload = {
+        contactWhatsapp: whatsapp.trim(),
+        contactInstagram: instagram.trim(),
+        contactEmail: contactEmail.trim(),
+        socialInstagram: socialInstagram.trim(),
+        socialTiktok: socialTiktok.trim(),
+        socialYoutube: socialYoutube.trim(),
+        payLinkFenix: payLinkFenix.trim(),
+        payLinkFenixPro: payLinkFenixPro.trim(),
+      };
+
+      console.log("Guardando settings:", payload);
+
+      await saveSettings(payload);
+      await loadData();
 
       showSaved("Configuración guardada exitosamente");
     } catch (error) {
       console.error("Error al guardar configuración:", error);
       showSaved("Error al guardar la configuración");
+    } finally {
+      setSettingsSaving(false);
     }
   };
 
   const handleChangePassword = async (e: React.FormEvent) => {
     e.preventDefault();
     if (newPassword.length < 6) return;
-    await adminChangePassword(newPassword);
-    setNewPassword("");
-    showSaved("Contraseña actualizada");
+
+    try {
+      await adminChangePassword(newPassword);
+      setNewPassword("");
+      showSaved("Contraseña actualizada");
+    } catch (error) {
+      console.error("Error al cambiar contraseña:", error);
+      showSaved("No se pudo actualizar la contraseña");
+    }
   };
 
   const handleToggleUser = async (user: UserItem) => {
-    await updateUser(user.id, { disabled: !user.disabled });
-    setUsers(
-      users.map((u) => (u.id === user.id ? { ...u, disabled: !u.disabled } : u))
-    );
+    try {
+      await updateUser(user.id, { disabled: !user.disabled });
+      setUsers(
+        users.map((u) =>
+          u.id === user.id ? { ...u, disabled: !u.disabled } : u
+        )
+      );
+    } catch (error) {
+      console.error(error);
+      showSaved("No se pudo actualizar el usuario");
+    }
   };
 
   const handleToggleMembership = async (user: UserItem) => {
-    const newStatus = !user.membershipActive;
-    await updateUser(user.id, {
-      membershipActive: newStatus,
-      membershipType: newStatus ? "fenix" : null,
-    });
+    try {
+      const newStatus = !user.membershipActive;
 
-    setUsers(
-      users.map((u) =>
-        u.id === user.id
-          ? {
-              ...u,
-              membershipActive: newStatus,
-              membershipType: newStatus ? "fenix" : null,
-            }
-          : u
-      )
-    );
+      await updateUser(user.id, {
+        membershipActive: newStatus,
+        membershipType: newStatus ? "fenix" : null,
+      });
+
+      setUsers(
+        users.map((u) =>
+          u.id === user.id
+            ? {
+                ...u,
+                membershipActive: newStatus,
+                membershipType: newStatus ? "fenix" : null,
+              }
+            : u
+        )
+      );
+    } catch (error) {
+      console.error(error);
+      showSaved("No se pudo actualizar la membresía");
+    }
   };
 
   const handleChangeMembershipType = async (user: UserItem, type: string) => {
-    await updateUser(user.id, { membershipType: type });
-    setUsers(
-      users.map((u) => (u.id === user.id ? { ...u, membershipType: type } : u))
-    );
+    try {
+      await updateUser(user.id, { membershipType: type });
+      setUsers(
+        users.map((u) =>
+          u.id === user.id ? { ...u, membershipType: type } : u
+        )
+      );
+    } catch (error) {
+      console.error(error);
+      showSaved("No se pudo cambiar el tipo de membresía");
+    }
   };
 
   const handleDeleteUser = async (user: UserItem) => {
     if (!confirm(`¿Eliminar al usuario ${user.email}?`)) return;
-    await apiDeleteUser(user.id);
-    setUsers(users.filter((u) => u.id !== user.id));
-    showSaved("Usuario eliminado");
+
+    try {
+      await apiDeleteUser(user.id);
+      setUsers(users.filter((u) => u.id !== user.id));
+      showSaved("Usuario eliminado");
+    } catch (error) {
+      console.error(error);
+      showSaved("No se pudo eliminar el usuario");
+    }
   };
 
   const openNewVideo = () => {
@@ -982,10 +1034,12 @@ export default function AdminDashboard() {
           </Card>
 
           <Button
+            type="button"
             onClick={handleSaveContent}
+            disabled={contentSaving}
             className="bg-gradient-to-r from-rose-600 to-red-600 text-white hover:from-rose-700 hover:to-red-700 rounded-2xl shadow-sm"
           >
-            Guardar Cambios de Contenido
+            {contentSaving ? "Guardando..." : "Guardar Cambios de Contenido"}
           </Button>
         </TabsContent>
 
@@ -1244,10 +1298,12 @@ export default function AdminDashboard() {
                 />
               </div>
               <Button
+                type="button"
                 onClick={handleSaveSettings}
+                disabled={settingsSaving}
                 className="bg-gradient-to-r from-rose-600 to-red-600 text-white hover:from-rose-700 hover:to-red-700 mt-4 rounded-2xl shadow-sm"
               >
-                Guardar Configuración
+                {settingsSaving ? "Guardando..." : "Guardar Configuración"}
               </Button>
             </CardContent>
           </Card>
