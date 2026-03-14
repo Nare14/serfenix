@@ -52,7 +52,7 @@ export default function Pago() {
           title: "Mercado Pago",
           description:
             "Pagá de forma rápida y segura a través de Mercado Pago.",
-          href: "https://mpago.la/1rjkQVx",
+          href: "https://www.mercadopago.com.ar/subscriptions/checkout?preapproval_plan_id=f350471e128b4bc9ae7017d8b3b7184c",
           icon: CreditCard,
           buttonText: "Pagar con Mercado Pago",
         },
