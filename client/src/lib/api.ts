@@ -1,17 +1,14 @@
 import { apiRequest } from "./queryClient";
 
-// Helpers
-function getLocal<T>(key: string, fallback: T): T {
-  try {
-    const raw = localStorage.getItem(key);
-    return raw ? JSON.parse(raw) : fallback;
-  } catch {
-    return fallback;
-  }
-}
+const API_BASE =
+  import.meta.env.VITE_API_BASE_URL ||
+  "https://estasalebien-production.up.railway.app";
 
-function setLocal<T>(key: string, value: T) {
-  localStorage.setItem(key, JSON.stringify(value));
+function buildUrl(path: string) {
+  if (path.startsWith("http://") || path.startsWith("https://")) {
+    return path;
+  }
+  return `${API_BASE}${path}`;
 }
 
 // Admin auth
@@ -29,31 +26,11 @@ export async function adminChangePassword(newPassword: string) {
 
 // Member auth
 export async function memberLogin(email: string, password: string) {
-  try {
-    const res = await apiRequest("POST", "/api/auth/login", {
-      email,
-      password,
-    });
-    return await res.json();
-  } catch (_error) {
-    const savedUsers = getLocal<any[]>("mockUsers", []);
-
-    const user = savedUsers.find(
-      (u: any) => u.email === email && u.password === password
-    );
-
-    if (!user) {
-      throw new Error("Credenciales incorrectas");
-    }
-
-    return {
-      id: user.id,
-      name: user.name,
-      email: user.email,
-      membershipActive: user.membershipActive ?? false,
-      membershipType: user.membershipType ?? null,
-    };
-  }
+  const res = await apiRequest("POST", "/api/auth/login", {
+    email,
+    password,
+  });
+  return await res.json();
 }
 
 export async function memberRegister(
@@ -61,84 +38,45 @@ export async function memberRegister(
   email: string,
   password: string
 ) {
-  try {
-    const res = await apiRequest("POST", "/api/auth/register", {
-      name,
-      email,
-      password,
-    });
-    return await res.json();
-  } catch (_error) {
-    const savedUsers = getLocal<any[]>("mockUsers", []);
-
-    const existingUser = savedUsers.find((u: any) => u.email === email);
-    if (existingUser) {
-      throw new Error("El email ya está registrado");
-    }
-
-    const newUser = {
-      id: Date.now(),
-      name,
-      email,
-      password,
-      membershipActive: false,
-      membershipType: null,
-      disabled: false,
-    };
-
-    savedUsers.push(newUser);
-    setLocal("mockUsers", savedUsers);
-
-    return {
-      id: newUser.id,
-      name: newUser.name,
-      email: newUser.email,
-      membershipActive: newUser.membershipActive,
-      membershipType: newUser.membershipType,
-    };
-  }
+  const res = await apiRequest("POST", "/api/auth/register", {
+    name,
+    email,
+    password,
+  });
+  return await res.json();
 }
 
 // Admin - Users
 export async function fetchUsers() {
-  try {
-    const res = await fetch("/api/admin/users");
-    if (!res.ok) throw new Error("API error");
-    return await res.json();
-  } catch {
-    return getLocal<any[]>("mockUsers", []);
+  const res = await fetch(buildUrl("/api/admin/users"), {
+    credentials: "include",
+  });
+
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(
+      `No se pudieron cargar los usuarios: ${res.status} ${text}`
+    );
   }
+
+  return await res.json();
 }
 
 export async function updateUser(id: number, data: any) {
-  try {
-    const res = await apiRequest("PATCH", `/api/admin/users/${id}`, data);
-    return await res.json();
-  } catch {
-    const users = getLocal<any[]>("mockUsers", []);
-    const updatedUsers = users.map((u) =>
-      u.id === id ? { ...u, ...data } : u
-    );
-    setLocal("mockUsers", updatedUsers);
-    return updatedUsers.find((u) => u.id === id);
-  }
+  const res = await apiRequest("PATCH", `/api/admin/users/${id}`, data);
+  return await res.json();
 }
 
 export async function deleteUser(id: number) {
-  try {
-    const res = await apiRequest("DELETE", `/api/admin/users/${id}`);
-    return await res.json();
-  } catch {
-    const users = getLocal<any[]>("mockUsers", []);
-    const updatedUsers = users.filter((u) => u.id !== id);
-    setLocal("mockUsers", updatedUsers);
-    return { success: true };
-  }
+  const res = await apiRequest("DELETE", `/api/admin/users/${id}`);
+  return await res.json();
 }
 
 // Admin - Videos
 export async function fetchAdminVideos() {
-  const res = await fetch("/api/admin/videos");
+  const res = await fetch(buildUrl("/api/admin/videos"), {
+    credentials: "include",
+  });
 
   if (!res.ok) {
     const text = await res.text();
@@ -165,7 +103,9 @@ export async function deleteVideo(id: number) {
 
 // Member - Videos
 export async function fetchMemberVideos(userId: number) {
-  const res = await fetch(`/api/videos?userId=${userId}`);
+  const res = await fetch(buildUrl(`/api/videos?userId=${userId}`), {
+    credentials: "include",
+  });
 
   if (!res.ok) {
     let message = "No se pudo cargar el contenido";
@@ -184,14 +124,21 @@ export async function fetchMemberVideos(userId: number) {
 
 // Settings
 export async function fetchSettings() {
-  return getLocal<Record<string, string>>("mockSettings", {});
+  const res = await fetch(buildUrl("/api/settings"), {
+    credentials: "include",
+  });
+
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(
+      `No se pudo cargar la configuración: ${res.status} ${text}`
+    );
+  }
+
+  return await res.json();
 }
 
 export async function saveSettings(data: Record<string, string>) {
-  const current = getLocal<Record<string, string>>("mockSettings", {});
-  const updated = { ...current, ...data };
-
-  setLocal("mockSettings", updated);
-
-  return { success: true };
+  const res = await apiRequest("POST", "/api/admin/settings", data);
+  return await res.json();
 }

@@ -12,6 +12,33 @@ declare module "http" {
   }
 }
 
+const allowedOrigins = [
+  "https://sabiduriafenix.com",
+  "https://www.sabiduriafenix.com",
+  "https://estasalebien-production.up.railway.app",
+  "http://localhost:5000",
+  "http://localhost:5173",
+];
+
+app.use((req, res, next) => {
+  const origin = req.headers.origin;
+
+  if (origin && allowedOrigins.includes(origin)) {
+    res.header("Access-Control-Allow-Origin", origin);
+  }
+
+  res.header("Vary", "Origin");
+  res.header("Access-Control-Allow-Credentials", "true");
+  res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  res.header("Access-Control-Allow-Methods", "GET,POST,PATCH,DELETE,OPTIONS");
+
+  if (req.method === "OPTIONS") {
+    return res.sendStatus(204);
+  }
+
+  next();
+});
+
 app.use(
   express.json({
     verify: (req, _res, buf) => {
