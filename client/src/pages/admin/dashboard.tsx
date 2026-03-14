@@ -752,46 +752,49 @@ export default function AdminDashboard() {
                       </div>
 
                       <div className="space-y-2">
-  <Label className="text-rose-950">Membresía requerida</Label>
+                        <Label className="text-rose-950">
+                          Membresía requerida
+                        </Label>
 
-  <div className="flex flex-wrap gap-2">
-    <button
-      type="button"
-      onClick={() => setVideoMembership("fenix")}
-      className={`px-4 py-2 rounded-2xl border text-sm font-medium transition ${
-        videoMembership === "fenix"
-          ? "bg-rose-600 text-white border-rose-600"
-          : "bg-white text-rose-900 border-rose-200 hover:bg-rose-50"
-      }`}
-    >
-      Sala Fénix
-    </button>
+                        <div className="flex flex-wrap gap-2">
+                          <button
+                            type="button"
+                            onClick={() => setVideoMembership("fenix")}
+                            className={`px-4 py-2 rounded-2xl border text-sm font-medium transition ${
+                              videoMembership === "fenix"
+                                ? "bg-rose-600 text-white border-rose-600"
+                                : "bg-white text-rose-900 border-rose-200 hover:bg-rose-50"
+                            }`}
+                          >
+                            Sala Fénix
+                          </button>
 
-    <button
-      type="button"
-      onClick={() => setVideoMembership("fenix_pro")}
-      className={`px-4 py-2 rounded-2xl border text-sm font-medium transition ${
-        videoMembership === "fenix_pro"
-          ? "bg-rose-600 text-white border-rose-600"
-          : "bg-white text-rose-900 border-rose-200 hover:bg-rose-50"
-      }`}
-    >
-      Sala Fénix 2.0
-    </button>
+                          <button
+                            type="button"
+                            onClick={() => setVideoMembership("fenix_pro")}
+                            className={`px-4 py-2 rounded-2xl border text-sm font-medium transition ${
+                              videoMembership === "fenix_pro"
+                                ? "bg-rose-600 text-white border-rose-600"
+                                : "bg-white text-rose-900 border-rose-200 hover:bg-rose-50"
+                            }`}
+                          >
+                            Sala Fénix 2.0
+                          </button>
 
-    <button
-      type="button"
-      onClick={() => setVideoMembership("all")}
-      className={`px-4 py-2 rounded-2xl border text-sm font-medium transition ${
-        videoMembership === "all"
-          ? "bg-rose-600 text-white border-rose-600"
-          : "bg-white text-rose-900 border-rose-200 hover:bg-rose-50"
-      }`}
-    >
-      Ambas
-    </button>
-  </div>
-</div>
+                          <button
+                            type="button"
+                            onClick={() => setVideoMembership("all")}
+                            className={`px-4 py-2 rounded-2xl border text-sm font-medium transition ${
+                              videoMembership === "all"
+                                ? "bg-rose-600 text-white border-rose-600"
+                                : "bg-white text-rose-900 border-rose-200 hover:bg-rose-50"
+                            }`}
+                          >
+                            Ambas
+                          </button>
+                        </div>
+                      </div>
+                    </div>
 
                     <div className="flex flex-col sm:flex-row gap-3 pt-2">
                       <Button
@@ -906,10 +909,10 @@ export default function AdminDashboard() {
                               }`}
                             >
                               {v.membershipRequired === "all"
-  ? "Ambas"
-  : v.membershipRequired === "fenix_pro"
-  ? "Fénix 2.0"
-  : "Fénix"}
+                                ? "Ambas"
+                                : v.membershipRequired === "fenix_pro"
+                                ? "Fénix 2.0"
+                                : "Fénix"}
                             </span>
                           </td>
                           <td className="px-4 py-3 hidden md:table-cell text-rose-900/60">
