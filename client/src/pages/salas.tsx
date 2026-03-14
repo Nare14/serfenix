@@ -96,12 +96,17 @@ function canUserSeeVideo(user: any, video: VideoItem): boolean {
     return (
       video.membershipRequired === "fenix_pro" ||
       video.membershipRequired === "fenix" ||
+      video.membershipRequired === "all" ||
       !video.membershipRequired
     );
   }
 
   if (membership === "fenix") {
-    return video.membershipRequired === "fenix" || !video.membershipRequired;
+    return (
+      video.membershipRequired === "fenix" ||
+      video.membershipRequired === "all" ||
+      !video.membershipRequired
+    );
   }
 
   return false;
@@ -116,25 +121,32 @@ export default function Salas() {
 
   useEffect(() => {
     const loadPage = async () => {
-      const stored = localStorage.getItem("currentUser");
-
-      if (!stored) {
-        setLocation("/miembros");
-        return;
-      }
-
       try {
+        const stored = localStorage.getItem("currentUser");
+
+        if (!stored) {
+          setLocation("/miembros");
+          return;
+        }
         const parsed = JSON.parse(stored);
         setUser(parsed);
 
-        const memberHasAccess = hasActiveMembership(parsed);
-
-        if (!memberHasAccess) {
+        if (!hasActiveMembership(parsed)) {
           setLoading(false);
           return;
         }
 
-        const data = await fetchMemberVideos();
+        console.log("USUARIO LOGUEADO:", parsed);
+
+        const userId = parsed?.id ?? parsed?.userId;
+
+        if (!userId) {
+          setError("No se pudo identificar al usuario.");
+          setLoading(false);
+          return;
+        }
+
+        const data = await fetchMemberVideos(userId);
         const allVideos = Array.isArray(data) ? data : [];
 
         const visibleVideos = allVideos.filter((video) =>
@@ -158,10 +170,20 @@ export default function Salas() {
     setLocation("/");
   };
 
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-[#fcf7f8] flex items-center justify-center px-4">
+        <div className="rounded-[2rem] border border-rose-200/70 bg-white/80 backdrop-blur-sm p-10 text-center shadow-[0_10px_40px_rgba(120,40,60,0.06)]">
+          <p className="text-rose-800/70 text-lg">Cargando tu espacio...</p>
+        </div>
+      </div>
+    );
+  }
+
   if (!user) return null;
 
-  const needsPayment = !hasActiveMembership(user);
   const membershipType = getMembershipType(user);
+  const needsPayment = !membershipType;
 
   return (
     <div className="min-h-screen bg-[#fcf7f8] pb-24 relative overflow-hidden">
@@ -223,13 +245,7 @@ export default function Salas() {
       </section>
 
       <main className="max-w-7xl mx-auto px-4 md:px-6 relative z-10">
-        {loading ? (
-          <div className="max-w-3xl mx-auto">
-            <div className="rounded-[2rem] border border-rose-200/70 bg-white/80 backdrop-blur-sm p-10 text-center shadow-[0_10px_40px_rgba(120,40,60,0.06)]">
-              <p className="text-rose-800/70 text-lg">Cargando tu espacio...</p>
-            </div>
-          </div>
-        ) : error ? (
+        {error ? (
           <div className="max-w-3xl mx-auto">
             <div className="rounded-[2rem] border border-red-200 bg-white/90 p-8 text-center shadow-sm">
               <p className="text-red-500 font-medium">{error}</p>
