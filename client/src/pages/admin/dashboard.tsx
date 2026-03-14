@@ -732,96 +732,113 @@ export default function AdminDashboard() {
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-  <div className="space-y-2">
-    <Label className="text-rose-950">Categoría / Módulo</Label>
-    <Input
-      value={videoCategory}
-      onChange={(e) => setVideoCategory(e.target.value)}
-      placeholder="Módulo 1"
-      className="rounded-xl border-rose-200 focus-visible:ring-rose-400"
-    />
-  </div>
+                      <div className="space-y-2">
+                        <Label className="text-rose-950">
+                          Categoría / Módulo
+                        </Label>
+                        <Input
+                          value={videoCategory}
+                          onChange={(e) => setVideoCategory(e.target.value)}
+                          placeholder="Módulo 1"
+                          className="rounded-xl border-rose-200 focus-visible:ring-rose-400"
+                        />
+                      </div>
 
-  <div className="space-y-2">
-    <Label className="text-rose-950">Orden</Label>
-    <Input
-      type="number"
-      value={videoOrder}
-      onChange={(e) => setVideoOrder(e.target.value)}
-      className="rounded-xl border-rose-200 focus-visible:ring-rose-400"
-    />
-  </div>
+                      <div className="space-y-2">
+                        <Label className="text-rose-950">Orden</Label>
+                        <Input
+                          type="number"
+                          value={videoOrder}
+                          onChange={(e) => setVideoOrder(e.target.value)}
+                          className="rounded-xl border-rose-200 focus-visible:ring-rose-400"
+                        />
+                      </div>
 
-  <div className="space-y-2">
-    <Label className="text-rose-950">Mostrar en salas</Label>
+                      <div className="space-y-2">
+                        <Label className="text-rose-950">
+                          Mostrar en salas
+                        </Label>
 
-    <div className="space-y-3 rounded-2xl border border-rose-200 bg-rose-50/50 p-4">
-      <label className="flex items-center gap-3 text-sm text-rose-900 cursor-pointer">
-        <input
-          type="checkbox"
-          checked={videoMembership === "fenix" || videoMembership === "all"}
-          onChange={(e) => {
-            const checked = e.target.checked;
-            const hasPro =
-              videoMembership === "fenix_pro" || videoMembership === "all";
+                        <div className="space-y-3 rounded-2xl border border-rose-200 bg-rose-50/50 p-4">
+                          <label className="flex items-center gap-3 text-sm text-rose-900 cursor-pointer">
+                            <input
+                              type="checkbox"
+                              checked={
+                                videoMembership === "fenix" ||
+                                videoMembership === "all"
+                              }
+                              onChange={(e) => {
+                                const checked = e.target.checked;
+                                const hasPro =
+                                  videoMembership === "fenix_pro" ||
+                                  videoMembership === "all";
 
-            if (checked && hasPro) setVideoMembership("all");
-            else if (checked) setVideoMembership("fenix");
-            else if (hasPro) setVideoMembership("fenix_pro");
-            else setVideoMembership("");
-          }}
-          className="h-4 w-4 rounded border-rose-300 text-rose-600 focus:ring-rose-400"
-        />
-        Sala Fénix
-      </label>
+                                if (checked && hasPro)
+                                  setVideoMembership("all");
+                                else if (checked) setVideoMembership("fenix");
+                                else if (hasPro)
+                                  setVideoMembership("fenix_pro");
+                                else setVideoMembership("");
+                              }}
+                              className="h-4 w-4 rounded border-rose-300 text-rose-600 focus:ring-rose-400"
+                            />
+                            Sala Fénix
+                          </label>
 
-      <label className="flex items-center gap-3 text-sm text-rose-900 cursor-pointer">
-        <input
-          type="checkbox"
-          checked={videoMembership === "fenix_pro" || videoMembership === "all"}
-          onChange={(e) => {
-            const checked = e.target.checked;
-            const hasFenix =
-              videoMembership === "fenix" || videoMembership === "all";
+                          <label className="flex items-center gap-3 text-sm text-rose-900 cursor-pointer">
+                            <input
+                              type="checkbox"
+                              checked={
+                                videoMembership === "fenix_pro" ||
+                                videoMembership === "all"
+                              }
+                              onChange={(e) => {
+                                const checked = e.target.checked;
+                                const hasFenix =
+                                  videoMembership === "fenix" ||
+                                  videoMembership === "all";
 
-            if (checked && hasFenix) setVideoMembership("all");
-            else if (checked) setVideoMembership("fenix_pro");
-            else if (hasFenix) setVideoMembership("fenix");
-            else setVideoMembership("");
-          }}
-          className="h-4 w-4 rounded border-rose-300 text-rose-600 focus:ring-rose-400"
-        />
-        Sala Fénix 2.0
-      </label>
-    </div>
-  </div>
-</div>
+                                if (checked && hasFenix)
+                                  setVideoMembership("all");
+                                else if (checked)
+                                  setVideoMembership("fenix_pro");
+                                else if (hasFenix) setVideoMembership("fenix");
+                                else setVideoMembership("");
+                              }}
+                              className="h-4 w-4 rounded border-rose-300 text-rose-600 focus:ring-rose-400"
+                            />
+                            Sala Fénix 2.0
+                          </label>
+                        </div>
+                      </div>
+                    </div>
 
-<div className="flex flex-col sm:flex-row gap-3 pt-2">
-  <Button
-    onClick={handleSaveVideo}
-    disabled={videoSaving}
-    className="bg-gradient-to-r from-rose-600 to-red-600 text-white hover:from-rose-700 hover:to-red-700 rounded-2xl"
-  >
-    {videoSaving
-      ? "Guardando..."
-      : editingVideo
-      ? "Guardar cambios"
-      : "Crear video"}
-  </Button>
+                    <div className="flex flex-col sm:flex-row gap-3 pt-2">
+                      <Button
+                        onClick={handleSaveVideo}
+                        disabled={videoSaving}
+                        className="bg-gradient-to-r from-rose-600 to-red-600 text-white hover:from-rose-700 hover:to-red-700 rounded-2xl"
+                      >
+                        {videoSaving
+                          ? "Guardando..."
+                          : editingVideo
+                          ? "Guardar cambios"
+                          : "Crear video"}
+                      </Button>
 
-  <Button
-    type="button"
-    variant="outline"
-    onClick={() => {
-      setShowVideoForm(false);
-      setVideoError("");
-    }}
-    className="rounded-2xl border-rose-200 text-rose-800 hover:bg-rose-50"
-  >
-    Cancelar
-  </Button>
-</div>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={() => {
+                          setShowVideoForm(false);
+                          setVideoError("");
+                        }}
+                        className="rounded-2xl border-rose-200 text-rose-800 hover:bg-rose-50"
+                      >
+                        Cancelar
+                      </Button>
+                    </div>
+                  </div>
 
                   <div className="space-y-3">
                     <div className="flex items-center gap-2 text-rose-900">
