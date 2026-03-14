@@ -102,8 +102,8 @@ export async function deleteVideo(id: number) {
 }
 
 // Member - Videos
-export async function fetchMemberVideos(userId: number) {
-  const res = await fetch(buildUrl(`/api/videos?userId=${userId}`), {
+export async function fetchMemberVideos() {
+  const res = await fetch(buildUrl("/api/videos"), {
     credentials: "include",
   });
 
