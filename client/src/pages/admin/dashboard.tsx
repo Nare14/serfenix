@@ -898,7 +898,9 @@ export default function AdminDashboard() {
                           <td className="px-4 py-3 hidden md:table-cell">
                             <span
                               className={`px-2 py-0.5 rounded-full text-xs font-medium ${
-                                v.membershipRequired === "fenix_pro"
+                                v.membershipRequired === "all"
+                                  ? "bg-purple-100 text-purple-700"
+                                  : v.membershipRequired === "fenix_pro"
                                   ? "bg-red-100 text-red-700"
                                   : "bg-rose-100 text-rose-700"
                               }`}
