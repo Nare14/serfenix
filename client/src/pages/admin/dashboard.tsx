@@ -752,25 +752,46 @@ export default function AdminDashboard() {
                       </div>
 
                       <div className="space-y-2">
-                        <Label className="text-rose-950">
-                          Membresía requerida
-                        </Label>
-                        <Select
-                          value={videoMembership}
-                          onValueChange={setVideoMembership}
-                        >
-                          <SelectTrigger className="rounded-xl border-rose-200 focus:ring-rose-400">
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="fenix">Sala Fénix</SelectItem>
-                            <SelectItem value="fenix_pro">
-                              Sala Fénix 2.0
-                            </SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                    </div>
+  <Label className="text-rose-950">Membresía requerida</Label>
+
+  <div className="flex flex-wrap gap-2">
+    <button
+      type="button"
+      onClick={() => setVideoMembership("fenix")}
+      className={`px-4 py-2 rounded-2xl border text-sm font-medium transition ${
+        videoMembership === "fenix"
+          ? "bg-rose-600 text-white border-rose-600"
+          : "bg-white text-rose-900 border-rose-200 hover:bg-rose-50"
+      }`}
+    >
+      Sala Fénix
+    </button>
+
+    <button
+      type="button"
+      onClick={() => setVideoMembership("fenix_pro")}
+      className={`px-4 py-2 rounded-2xl border text-sm font-medium transition ${
+        videoMembership === "fenix_pro"
+          ? "bg-rose-600 text-white border-rose-600"
+          : "bg-white text-rose-900 border-rose-200 hover:bg-rose-50"
+      }`}
+    >
+      Sala Fénix 2.0
+    </button>
+
+    <button
+      type="button"
+      onClick={() => setVideoMembership("all")}
+      className={`px-4 py-2 rounded-2xl border text-sm font-medium transition ${
+        videoMembership === "all"
+          ? "bg-rose-600 text-white border-rose-600"
+          : "bg-white text-rose-900 border-rose-200 hover:bg-rose-50"
+      }`}
+    >
+      Ambas
+    </button>
+  </div>
+</div>
 
                     <div className="flex flex-col sm:flex-row gap-3 pt-2">
                       <Button
