@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { motion } from "framer-motion";
 import { Link } from "wouter";
-import { CheckCircle2, ChevronRight } from "lucide-react";
+import { CheckCircle2, ChevronRight, Lightbulb } from "lucide-react";
 import { useState, useEffect } from "react";
 
 import bg1 from "@/assets/images/spiritual-card_1.jpg";
@@ -226,13 +226,15 @@ export default function Home() {
               })()}
             </motion.h1>
 
+            {/* SUBTÍTULO CON LAMPARITA */}
             <motion.p
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.5 }}
-              className="text-2xl md:text-3xl text-rose-800/80 mb-12 font-semibold tracking-wide font-serif"
+              className="text-2xl md:text-3xl text-rose-800/80 mb-12 font-semibold tracking-wide font-serif flex items-center justify-center gap-2"
             >
               {siteSubtitle}
+              <Lightbulb className="w-6 h-6 text-rose-500 animate-pulse" />
             </motion.p>
 
             <motion.div
@@ -255,7 +257,6 @@ export default function Home() {
         <div className="absolute bottom-0 left-0 w-full overflow-hidden leading-none">
           <svg
             className="relative block w-full h-[100px]"
-            data-name="Layer 1"
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 1200 120"
             preserveAspectRatio="none"
@@ -267,6 +268,7 @@ export default function Home() {
           </svg>
         </div>
       </section>
+
       {/* 4 CARDS */}
       <section className="py-24 bg-white">
         <div className="container mx-auto px-4">
