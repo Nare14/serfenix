@@ -267,21 +267,20 @@ export default function Home() {
           </svg>
         </div>
       </section>
-
       {/* 4 CARDS */}
       <section className="py-24 bg-white">
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-8">
             {[
-              { title: "CONECTA CON LA ENERGÍA DE DIOS", img: bg1 },
+              { title: "CONECTA CON LA ENERGÍA DE DIOS", img: bg2 },
               {
                 title: "ESPIRITUALIDAD PRÁCTICA APLICADA A TU VIDA",
                 img: bg2,
               },
-              { title: "DESCUBRE TU PROPÓSITO DE VIDA", img: bg3 },
+              { title: "DESCUBRE TU PROPÓSITO DE VIDA", img: bg2 },
               {
                 title:
-                  "TRABAJO INTEGRAL Y EQUILIBRADO ESPÍRITU   ALMA-MENTE-CUERPO",
+                  "TRABAJO INTEGRAL Y EQUILIBRADO ESPÍRITU | ALMA-MENTE-CUERPO",
                 img: bg2,
               },
             ].map((card, idx) => (
@@ -298,9 +297,16 @@ export default function Home() {
                   alt={card.title}
                   className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-rose-950/90 via-rose-900/40 to-transparent" />
+
+                <div className="absolute inset-0 pointer-events-none">
+                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_30%,rgba(255,255,255,0.35)_0%,transparent_60%)] animate-pulse-soft" />
+                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_70%,rgba(255,255,255,0.25)_0%,transparent_60%)] animate-pulse-slow" />
+                </div>
+
+                <div className="absolute inset-0 bg-gradient-to-t from-rose-950/90 via-rose-900/50 to-transparent backdrop-blur-[2px]" />
+
                 <div className="absolute inset-0 p-6 flex items-center justify-center">
-                  <h3 className="text-white text-lg md:text-xl font-serif tracking-wide uppercase leading-snug text-center font-bold whitespace-pre-line">
+                  <h3 className="text-white text-lg md:text-xl font-serif tracking-wide uppercase leading-snug text-center font-bold whitespace-pre-line drop-shadow-[0_0_12px_rgba(255,255,255,0.4)]">
                     {card.title}
                   </h3>
                 </div>
