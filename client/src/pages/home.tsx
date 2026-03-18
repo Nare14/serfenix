@@ -3,73 +3,11 @@ import { Card, CardContent } from "@/components/ui/card";
 import { motion } from "framer-motion";
 import { Link } from "wouter";
 import { CheckCircle2, ChevronRight } from "lucide-react";
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 
 import bg1 from "@/assets/images/spiritual-card_1.jpg";
 import bg2 from "@/assets/images/spiritual-card_2.jpg";
 import bg3 from "@/assets/images/spiritual-card_3.jpg";
-
-import historia1 from "@assets/1_1772410932672.jpeg";
-import historia2 from "@assets/2_1772410932674.jpeg";
-import historia3 from "@assets/3_1772410932676.jpeg";
-import historia4 from "@assets/4_1772410932677.jpeg";
-import historia5 from "@assets/5_1772410932685.jpeg";
-import historia6 from "@assets/6_1772410932686.jpeg";
-import historia7 from "@assets/7_1772410932688.jpeg";
-import historia8 from "@assets/8_1772410932689.jpeg";
-
-const historiaImages = [
-  historia1,
-  historia2,
-  historia3,
-  historia4,
-  historia5,
-  historia6,
-  historia7,
-  historia8,
-];
-
-function HistoriaCarousel() {
-  const [current, setCurrent] = useState(0);
-  const next = useCallback(() => {
-    setCurrent((prev) => (prev + 1) % historiaImages.length);
-  }, []);
-
-  useEffect(() => {
-    const timer = setInterval(next, 4000);
-    return () => clearInterval(timer);
-  }, [next]);
-
-  return (
-    <div
-      className="relative w-full aspect-[3/4] rounded-3xl overflow-hidden shadow-xl border border-rose-200"
-      data-testid="historia-carousel"
-    >
-      {historiaImages.map((img, i) => (
-        <img
-          key={i}
-          src={img}
-          alt={`Mi historia ${i + 1}`}
-          className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 ${
-            i === current ? "opacity-100" : "opacity-0"
-          }`}
-        />
-      ))}
-      <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
-        {historiaImages.map((_, i) => (
-          <button
-            key={i}
-            onClick={() => setCurrent(i)}
-            className={`w-2.5 h-2.5 rounded-full transition-all duration-300 ${
-              i === current ? "bg-white scale-110 shadow" : "bg-white/50"
-            }`}
-            aria-label={`Foto ${i + 1}`}
-          />
-        ))}
-      </div>
-    </div>
-  );
-}
 
 export default function Home() {
   const [siteTitle, setSiteTitle] = useState("Tu poder habita dentro de ti ♥");
@@ -218,6 +156,7 @@ export default function Home() {
       <circle cx="95" cy="54" r="3" fill="white" opacity="0.5" />
     </svg>
   );
+
   const [siteSubtitle, setSiteSubtitle] = useState(
     "Llegó el momento de despertarlo"
   );
@@ -235,6 +174,7 @@ export default function Home() {
       })
       .catch(() => {});
   }, []);
+
   const fadeInUp = {
     initial: { opacity: 0, y: 40 },
     whileInView: { opacity: 1, y: 0 },
@@ -242,15 +182,6 @@ export default function Home() {
     transition: { duration: 0.8 },
   };
 
-  const handleJoin = (plan: "fenix" | "fenix_pro") => {
-    const currentUser = localStorage.getItem("currentUser");
-
-    if (currentUser) {
-      window.location.href = `/pago?plan=${plan}`;
-    } else {
-      window.location.href = `/miembros?redirect=/pago?plan=${plan}`;
-    }
-  };
   return (
     <div className="min-h-screen pt-20">
       {/* HERO SECTION */}
@@ -294,6 +225,7 @@ export default function Home() {
                 );
               })()}
             </motion.h1>
+
             <motion.p
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -302,6 +234,7 @@ export default function Home() {
             >
               {siteSubtitle}
             </motion.p>
+
             <motion.div
               initial={{ opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}
@@ -319,7 +252,6 @@ export default function Home() {
           </motion.div>
         </div>
 
-        {/* Wave Separator */}
         <div className="absolute bottom-0 left-0 w-full overflow-hidden leading-none">
           <svg
             className="relative block w-full h-[100px]"
@@ -331,139 +263,34 @@ export default function Home() {
             <path
               d="M321.39,56.44c58-10.79,114.16-30.13,172-41.86,82.39-16.72,168.19-17.73,250.45-.39C823.78,31,906.67,72,985.66,92.83c70.05,18.48,146.53,26.09,214.34,3V120H0V95.8C59.71,118.06,150.71,101.24,222.46,84.13,256.43,76.04,289.4,63.15,321.39,56.44Z"
               className="fill-white"
-            ></path>
+            />
           </svg>
-        </div>
-      </section>
-
-      {/* MI HISTORIA */}
-      <section id="historia" className="py-24 bg-white relative">
-        <div className="container mx-auto px-4">
-          <motion.div {...fadeInUp} className="text-center mb-12 space-y-4">
-            <h2 className="text-4xl md:text-5xl font-serif text-rose-950">
-              PORQUE Y PARA QUE HAGO LO QUE HAGO
-            </h2>
-            <div className="h-1 bg-rose-400 rounded-full mx-auto animate-line-grow" />
-          </motion.div>
-
-          <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 md:gap-10 lg:gap-12 items-start">
-       
-            {/* PRIMERA PARTE DEL TEXTO */}
-            <div className="lg:col-span-7 space-y-5 text-rose-900/80 leading-relaxed text-justify">
-              <p className="font-semibold text-rose-800">
-                Soy el testimonio vivo de que si se quiere, lo podes lograr.
-              </p>
-
-              <p>
-                Todo comienza cuando en marzo del 2023 toco fondo. Tenía un
-                trabajo dependiente, en el que "ganaba bien", "lo seguro", vivía
-                sola en Villa Devoto, Buenos Aires, desde afuera se veía bien
-                pero puertas para adentro (mi interior) era un infierno.
-              </p>
-
-              <p>
-                Me voy 7 días sola a Córdoba a replantearme la vida entera, a
-                estar en silencio para poder esclarecerme y tomar decisiones ya
-                que no podía más. Me doy cuenta y empiezo con todo el dolor al
-                ego del mundo a entender en carne viva que todo mi mal, físico,
-                amoroso, laboral, económico, era mi responsabilidad.
-              </p>
-
-              <p>
-                Y ahí comienza el proceso más importante, transformador,
-                incómodo, doloroso y gratificante de mi vida. Allá en lo
-                profundo de mi corazón tenía sueños y sabía que me merecía una
-                vida mejor, PERO PERO!! tenía precios que pagar. Toda mi vida
-                entera hasta ese momento.
-              </p>
-
-              <p>
-                Me encerré sola a estudiar, trabajar (ya había comenzando en el
-                área digital), meditar, iba al gym, lo único social que hacía y
-                así todos los días, sin rendirme. Pasé hambre (priorizaba el
-                dinero para pagar cuentas), pasé soledad, vendí todos mis
-                muebles, mi ropa, mientras me iba descubriendo e iba
-                descubriendo mí misión de vida.
-              </p>
-
-              <p>
-                Quería gritarlo al mundo (como ahora) pero todavía no era el
-                momento y te explico por qué:
-              </p>
-            </div>
-
-            {/* TEXTO COMPLETO ABAJO */}
-            {/* TEXTO COMPLETO ABAJO */}
-            <div className="lg:col-span-12 w-full px-1 sm:px-2 md:px-4 text-justify space-y-5 md:space-y-6 text-rose-900/80 leading-7 md:leading-8">
-              <p>
-                Uno de mis sueños era volver a México (había vivido 2 años antes
-                de pandemia acá). Y en una de las meditaciones, ayunando
-                bastante por no tener para comer, vi el Caribe. Mi trabajo
-                espiritual con Dios (yo no sabía que era Dios, continuaba
-                puertas para adentro).
-              </p>
-
-              <p>
-                Y acá se une todo: mi otro sueño era trabajar digitalmente y si
-                bien lo había empezado a hacer en otras áreas, nada terminaba de
-                hacerme sentir plena, porque todo es un proceso de trabajo,
-                paciencia y perseverancia. Los tiempos de Dios son perfectos.
-              </p>
-
-              <p>
-                Mayo 2025 vuelvo a México, me voy a Ciudad de México, lo logré.
-                Pero Dios me había mostrado el Caribe. Vuelvo a caer en cosas
-                del mundo, porque mis creencias dominantes aún no estaban
-                totalmente transformadas.
-              </p>
-
-              <p>
-                Octubre 2025, gracias a Dios, vuelvo al Caribe. Tan Dios que
-                incluso el vuelo me lo regalaron.
-              </p>
-
-              <p>
-                Diciembre 2025 empiezo a grabar, a encarnar mi misión de vida
-                descubierta en 2023. Pero días antes de Navidad vuelvo a tocar
-                fondo. Me rindo por completo y escucho esa voz interna —Dios—
-                que me dice que diga la verdad, incluso cuando el ego no quiere.
-              </p>
-
-              <p className="font-semibold text-rose-950">
-                Elegí obedecer. Y mi vida comenzó a cambiar a pasos agigantados.
-              </p>
-
-              <p className="font-serif text-lg text-rose-950 font-bold">
-                Rendición. Aceptación. Humildad. Disciplina. Obediencia.
-              </p>
-
-              <p>
-                Hoy, en el Caribe —el lugar que Dios me mostró cuando tenía la
-                heladera vacía— encarnando mi misión de vida, todo tuvo un
-                propósito mayor: que más seres puedan renacer, despertar su luz
-                y recordar quiénes son, como lo hice yo en este camino que Dios
-                me hizo transitar.
-              </p>
-            </div>
-          </div>
         </div>
       </section>
 
       {/* 4 CARDS */}
       <section className="py-24 bg-white">
         <div className="container mx-auto px-4">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-8">
             {[
-              { title: "CONECTA CON DIOS", img: bg2 },
-              { title: "DESCUBRE TU MISIÓN DE VIDA", img: bg2 },
-              { title: "TRABAJO INTEGRAL: CUERPO, MENTE Y ESPÍRITU", img: bg2 },
+              { title: "CONECTA CON LA ENERGÍA DE DIOS", img: bg1 },
+              {
+                title: "ESPIRITUALIDAD PRÁCTICA APLICADA A TU VIDA",
+                img: bg2,
+              },
+              { title: "DESCUBRE TU PROPÓSITO DE VIDA", img: bg3 },
+              {
+                title:
+                  "TRABAJO INTEGRAL Y EQUILIBRADO ESPÍRITU | ALMA-MENTE-CUERPO",
+                img: bg2,
+              },
             ].map((card, idx) => (
               <motion.div
                 key={idx}
                 initial={{ opacity: 0, y: 40 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ duration: 0.6, delay: idx * 0.2 }}
+                transition={{ duration: 0.6, delay: idx * 0.15 }}
                 className="group relative overflow-hidden rounded-3xl aspect-square cursor-pointer shadow-lg"
               >
                 <img
@@ -472,8 +299,8 @@ export default function Home() {
                   className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-rose-950/90 via-rose-900/40 to-transparent" />
-                <div className="absolute inset-0 p-8 flex items-center justify-center">
-                  <h3 className="text-white text-xl font-serif tracking-wider uppercase leading-snug text-center font-bold whitespace-pre-line">
+                <div className="absolute inset-0 p-6 flex items-center justify-center">
+                  <h3 className="text-white text-lg md:text-xl font-serif tracking-wide uppercase leading-snug text-center font-bold whitespace-pre-line">
                     {card.title}
                   </h3>
                 </div>
@@ -483,9 +310,47 @@ export default function Home() {
         </div>
       </section>
 
+      {/* VIDEO SECTION */}
+      <section className="py-24 bg-rose-50/50">
+        <div className="container mx-auto px-4">
+          <motion.div {...fadeInUp} className="max-w-4xl mx-auto">
+            <div className="text-center mb-10">
+              <h2 className="text-4xl md:text-5xl font-serif text-rose-950 mb-4">
+                Mi historia completa
+              </h2>
+            </div>
+
+            <div className="relative aspect-video rounded-3xl overflow-hidden shadow-2xl bg-black group">
+              <iframe
+                className="w-full h-full"
+                src="https://www.youtube.com/embed/GpASEn6F8aA"
+                title="Renacer Video"
+                frameBorder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                allowFullScreen
+              />
+            </div>
+
+            <div className="text-center mt-8">
+              <a
+                href="https://www.youtube.com/@soysofivgonzalez"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <Button
+                  size="sm"
+                  className="bg-rose-600 hover:bg-rose-700 text-white rounded-full px-10 h-10 shadow-lg shadow-rose-600/20 text-xs font-medium uppercase tracking-widest"
+                >
+                  Suscribite a mi canal
+                </Button>
+              </a>
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
       {/* SALAS (Pricing) */}
       <section id="salas" className="py-24 bg-rose-50 relative overflow-hidden">
-        {/* Wave Top */}
         <div className="absolute top-0 left-0 w-full overflow-hidden leading-none rotate-180">
           <svg
             className="relative block w-full h-[60px]"
@@ -497,7 +362,7 @@ export default function Home() {
             <path
               d="M321.39,56.44c58-10.79,114.16-30.13,172-41.86,82.39-16.72,168.19-17.73,250.45-.39C823.78,31,906.67,72,985.66,92.83c70.05,18.48,146.53,26.09,214.34,3V120H0V95.8C59.71,118.06,150.71,101.24,222.46,84.13,256.43,76.04,289.4,63.15,321.39,56.44Z"
               className="fill-white"
-            ></path>
+            />
           </svg>
         </div>
 
@@ -512,7 +377,6 @@ export default function Home() {
           </motion.div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8 max-w-6xl mx-auto">
-            {/* SALA FÉNIX */}
             <motion.div {...fadeInUp}>
               <Card className="glass-card h-full rounded-[2rem] border-rose-200 overflow-hidden relative group hover:-translate-y-1 transition-transform duration-500">
                 <CardContent className="p-6 sm:p-8 md:p-10 flex flex-col h-full relative z-10">
@@ -551,7 +415,6 @@ export default function Home() {
               </Card>
             </motion.div>
 
-            {/* SALA FÉNIX 2.0 */}
             <motion.div
               {...fadeInUp}
               transition={{ duration: 0.8, delay: 0.2 }}
@@ -563,7 +426,7 @@ export default function Home() {
                   </h3>
                   <div className="flex items-baseline gap-2 mb-8">
                     <span className="text-4xl font-bold text-rose-700">
-                      1499 USD
+                      {priceFenixPro} USD
                     </span>
                     <span className="text-rose-500 font-medium">/ 6 meses</span>
                   </div>
@@ -598,41 +461,116 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      {/* HISTORIA COMPLETA ABAJO DE TODO */}
+      <section id="historia" className="py-24 bg-white">
+        <div className="container mx-auto px-4">
+          <motion.div
+            {...fadeInUp}
+            className="max-w-4xl mx-auto text-center mb-12"
+          >
+            <h2 className="text-4xl md:text-5xl font-serif text-rose-950 mb-4">
+              Mi historia
+            </h2>
+            <div className="h-1 w-24 bg-rose-400 rounded-full mx-auto" />
+          </motion.div>
+
+          <motion.div
+            {...fadeInUp}
+            className="max-w-4xl mx-auto space-y-6 text-center text-rose-900/80 leading-8"
+          >
+            <p className="font-semibold text-rose-800">
+              Soy el testimonio vivo de que si se quiere, lo podes lograr.
+            </p>
+
+            <p>
+              Todo comienza cuando en marzo del 2023 toco fondo. Tenía un
+              trabajo dependiente, en el que "ganaba bien", "lo seguro", vivía
+              sola en Villa Devoto, Buenos Aires, desde afuera se veía bien pero
+              puertas para adentro (mi interior) era un infierno.
+            </p>
+
+            <p>
+              Me voy 7 días sola a Córdoba a replantearme la vida entera, a
+              estar en silencio para poder esclarecerme y tomar decisiones ya
+              que no podía más. Me doy cuenta y empiezo con todo el dolor al ego
+              del mundo a entender en carne viva que todo mi mal, físico,
+              amoroso, laboral, económico, era mi responsabilidad.
+            </p>
+
+            <p>
+              Y ahí comienza el proceso más importante, transformador, incómodo,
+              doloroso y gratificante de mi vida. Allá en lo profundo de mi
+              corazón tenía sueños y sabía que me merecía una vida mejor, PERO
+              PERO!! tenía precios que pagar. Toda mi vida entera hasta ese
+              momento.
+            </p>
+
+            <p>
+              Me encerré sola a estudiar, trabajar (ya había comenzando en el
+              área digital), meditar, iba al gym, lo único social que hacía y
+              así todos los días, sin rendirme. Pasé hambre (priorizaba el
+              dinero para pagar cuentas), pasé soledad, vendí todos mis muebles,
+              mi ropa, mientras me iba descubriendo e iba descubriendo mí misión
+              de vida.
+            </p>
+
+            <p>
+              Quería gritarlo al mundo (como ahora) pero todavía no era el
+              momento y te explico por qué:
+            </p>
+
+            <p>
+              Uno de mis sueños era volver a México (había vivido 2 años antes
+              de pandemia acá). Y en una de las meditaciones, ayunando bastante
+              por no tener para comer, vi el Caribe. Mi trabajo espiritual con
+              Dios (yo no sabía que era Dios, continuaba puertas para adentro).
+            </p>
+
+            <p>
+              Y acá se une todo: mi otro sueño era trabajar digitalmente y si
+              bien lo había empezado a hacer en otras áreas, nada terminaba de
+              hacerme sentir plena, porque todo es un proceso de trabajo,
+              paciencia y perseverancia. Los tiempos de Dios son perfectos.
+            </p>
+
+            <p>
+              Mayo 2025 vuelvo a México, me voy a Ciudad de México, lo logré.
+              Pero Dios me había mostrado el Caribe. Vuelvo a caer en cosas del
+              mundo, porque mis creencias dominantes aún no estaban totalmente
+              transformadas.
+            </p>
+
+            <p>
+              Octubre 2025, gracias a Dios, vuelvo al Caribe. Tan Dios que
+              incluso el vuelo me lo regalaron.
+            </p>
+
+            <p>
+              Diciembre 2025 empiezo a grabar, a encarnar mi misión de vida
+              descubierta en 2023. Pero días antes de Navidad vuelvo a tocar
+              fondo. Me rindo por completo y escucho esa voz interna —Dios— que
+              me dice que diga la verdad, incluso cuando el ego no quiere.
+            </p>
+
+            <p className="font-semibold text-rose-950">
+              Elegí obedecer. Y mi vida comenzó a cambiar a pasos agigantados.
+            </p>
+
+            <p className="font-serif text-lg text-rose-950 font-bold">
+              Rendición. Aceptación. Humildad. Disciplina. Obediencia.
+            </p>
+
+            <p>
+              Hoy, en el Caribe —el lugar que Dios me mostró cuando tenía la
+              heladera vacía— encarnando mi misión de vida, todo tuvo un
+              propósito mayor: que más seres puedan renacer, despertar su luz y
+              recordar quiénes son, como lo hice yo en este camino que Dios me
+              hizo transitar.
+            </p>
+          </motion.div>
+        </div>
+      </section>
     </div>
   );
 }
-
-{
-  /* VIDEO SECTION */
-}
-<section className="py-24 bg-rose-50/50">
-  <div className="container mx-auto px-4">
-    <motion.div {...fadeInUp} className="max-w-4xl mx-auto">
-      <div className="relative aspect-video rounded-3xl overflow-hidden shadow-2xl bg-black group">
-        <iframe
-          className="w-full h-full"
-          src="https://www.youtube.com/embed/GpASEn6F8aA"
-          title="Renacer Video"
-          frameBorder="0"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-          allowFullScreen
-        ></iframe>
-      </div>
-      <div className="text-center mt-8">
-        <a
-          href="https://www.youtube.com/@soysofivgonzalez"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Button
-            size="sm"
-            className="bg-rose-600 hover:bg-rose-700 text-white rounded-full px-10 h-9 shadow-lg shadow-rose-600/20 text-xs font-medium uppercase tracking-widest"
-          >
-            Suscríbete a mi canal
-          </Button>
-        </a>
-      </div>
-    </motion.div>
-  </div>
-</section>;
-
