@@ -468,9 +468,6 @@ export default function Home() {
             {...fadeInUp}
             className="max-w-4xl mx-auto text-center mb-12"
           >
-            <h2 className="text-4xl md:text-5xl font-serif text-rose-950 mb-4">
-              Mi historia
-            </h2>
             <div className="h-1 w-24 bg-rose-400 rounded-full mx-auto" />
           </motion.div>
 
