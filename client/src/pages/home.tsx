@@ -281,7 +281,7 @@ export default function Home() {
               { title: "DESCUBRE TU PROPÓSITO DE VIDA", img: bg3 },
               {
                 title:
-                  "TRABAJO INTEGRAL Y EQUILIBRADO ESPÍRITU | ALMA-MENTE-CUERPO",
+                  "TRABAJO INTEGRAL Y EQUILIBRADO ESPÍRITU   ALMA-MENTE-CUERPO",
                 img: bg2,
               },
             ].map((card, idx) => (
@@ -461,6 +461,7 @@ export default function Home() {
           </motion.div>
         </div>
       </section>
+
       {/* HISTORIA COMPLETA ABAJO DE TODO */}
       <section id="historia" className="py-24 bg-white">
         <div className="container mx-auto px-4">
