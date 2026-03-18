@@ -218,9 +218,11 @@ export default function Home() {
       <circle cx="95" cy="54" r="3" fill="white" opacity="0.5" />
     </svg>
   );
-  const [siteSubtitle, setSiteSubtitle] = useState("Bienvenido a tu renacer");
+  const [siteSubtitle, setSiteSubtitle] = useState(
+    "Llegó el momento de despertarlo"
+  );
   const [priceFenix, setPriceFenix] = useState("99");
-  const [priceFenixPro, setPriceFenixPro] = useState("899");
+  const [priceFenixPro, setPriceFenixPro] = useState("1499");
 
   useEffect(() => {
     fetch("/api/settings")
@@ -310,7 +312,7 @@ export default function Home() {
                   size="sm"
                   className="bg-rose-600 hover:bg-rose-700 text-white rounded-full px-10 h-9 shadow-lg shadow-rose-600/20 text-xs font-medium uppercase tracking-widest hover:scale-105 transition-transform duration-300"
                 >
-                  Explorar salas <ChevronRight className="ml-2 h-4 w-4" />
+                  Te acompaño aquí <ChevronRight className="ml-2 h-4 w-4" />
                 </Button>
               </a>
             </motion.div>
@@ -345,11 +347,7 @@ export default function Home() {
           </motion.div>
 
           <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 md:gap-10 lg:gap-12 items-start">
-            {/* CARRUSEL */}
-            <div className="lg:col-span-5 w-full">
-              <HistoriaCarousel />
-            </div>
-
+       
             {/* PRIMERA PARTE DEL TEXTO */}
             <div className="lg:col-span-7 space-y-5 text-rose-900/80 leading-relaxed text-justify">
               <p className="font-semibold text-rose-800">
@@ -451,39 +449,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* VIDEO SECTION */}
-      <section className="py-24 bg-rose-50/50">
-        <div className="container mx-auto px-4">
-          <motion.div {...fadeInUp} className="max-w-4xl mx-auto">
-            <div className="relative aspect-video rounded-3xl overflow-hidden shadow-2xl bg-black group">
-              <iframe
-                className="w-full h-full"
-                src="https://www.youtube.com/embed/GpASEn6F8aA"
-                title="Renacer Video"
-                frameBorder="0"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                allowFullScreen
-              ></iframe>
-            </div>
-            <div className="text-center mt-8">
-              <a
-                href="https://www.youtube.com/@soysofivgonzalez"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <Button
-                  size="sm"
-                  className="bg-rose-600 hover:bg-rose-700 text-white rounded-full px-10 h-9 shadow-lg shadow-rose-600/20 text-xs font-medium uppercase tracking-widest"
-                >
-                  Suscríbete a mi canal
-                </Button>
-              </a>
-            </div>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* 3 CARDS */}
+      {/* 4 CARDS */}
       <section className="py-24 bg-white">
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -635,3 +601,38 @@ export default function Home() {
     </div>
   );
 }
+
+{
+  /* VIDEO SECTION */
+}
+<section className="py-24 bg-rose-50/50">
+  <div className="container mx-auto px-4">
+    <motion.div {...fadeInUp} className="max-w-4xl mx-auto">
+      <div className="relative aspect-video rounded-3xl overflow-hidden shadow-2xl bg-black group">
+        <iframe
+          className="w-full h-full"
+          src="https://www.youtube.com/embed/GpASEn6F8aA"
+          title="Renacer Video"
+          frameBorder="0"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+          allowFullScreen
+        ></iframe>
+      </div>
+      <div className="text-center mt-8">
+        <a
+          href="https://www.youtube.com/@soysofivgonzalez"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <Button
+            size="sm"
+            className="bg-rose-600 hover:bg-rose-700 text-white rounded-full px-10 h-9 shadow-lg shadow-rose-600/20 text-xs font-medium uppercase tracking-widest"
+          >
+            Suscríbete a mi canal
+          </Button>
+        </a>
+      </div>
+    </motion.div>
+  </div>
+</section>;
+
