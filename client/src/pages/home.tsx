@@ -310,45 +310,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* VIDEO SECTION */}
-      <section className="py-24 bg-rose-50/50">
-        <div className="container mx-auto px-4">
-          <motion.div {...fadeInUp} className="max-w-4xl mx-auto">
-            <div className="text-center mb-10">
-              <h2 className="text-4xl md:text-5xl font-serif text-rose-950 mb-4">
-                Mi historia completa
-              </h2>
-            </div>
-
-            <div className="relative aspect-video rounded-3xl overflow-hidden shadow-2xl bg-black group">
-              <iframe
-                className="w-full h-full"
-                src="https://www.youtube.com/embed/GpASEn6F8aA"
-                title="Renacer Video"
-                frameBorder="0"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                allowFullScreen
-              />
-            </div>
-
-            <div className="text-center mt-8">
-              <a
-                href="https://www.youtube.com/@soysofivgonzalez"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <Button
-                  size="sm"
-                  className="bg-rose-600 hover:bg-rose-700 text-white rounded-full px-10 h-10 shadow-lg shadow-rose-600/20 text-xs font-medium uppercase tracking-widest"
-                >
-                  Suscribite a mi canal
-                </Button>
-              </a>
-            </div>
-          </motion.div>
-        </div>
-      </section>
-
       {/* SALAS (Pricing) */}
       <section id="salas" className="py-24 bg-rose-50 relative overflow-hidden">
         <div className="absolute top-0 left-0 w-full overflow-hidden leading-none rotate-180">
@@ -462,6 +423,44 @@ export default function Home() {
         </div>
       </section>
 
+      {/* VIDEO SECTION */}
+      <section className="py-24 bg-rose-50/50">
+        <div className="container mx-auto px-4">
+          <motion.div {...fadeInUp} className="max-w-4xl mx-auto">
+            <div className="text-center mb-10">
+              <h2 className="text-4xl md:text-5xl font-serif text-rose-950 mb-4">
+                Mi historia completa
+              </h2>
+            </div>
+
+            <div className="relative aspect-video rounded-3xl overflow-hidden shadow-2xl bg-black group">
+              <iframe
+                className="w-full h-full"
+                src="https://www.youtube.com/embed/GpASEn6F8aA"
+                title="Renacer Video"
+                frameBorder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                allowFullScreen
+              />
+            </div>
+
+            <div className="text-center mt-8">
+              <a
+                href="https://www.youtube.com/@soysofivgonzalez"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <Button
+                  size="sm"
+                  className="bg-rose-600 hover:bg-rose-700 text-white rounded-full px-10 h-10 shadow-lg shadow-rose-600/20 text-xs font-medium uppercase tracking-widest"
+                >
+                  Suscribite a mi canal
+                </Button>
+              </a>
+            </div>
+          </motion.div>
+        </div>
+      </section>
       {/* HISTORIA COMPLETA ABAJO DE TODO */}
       <section id="historia" className="py-24 bg-white">
         <div className="container mx-auto px-4">
