@@ -280,7 +280,7 @@ export default function Home() {
               { title: "DESCUBRE TU PROPÓSITO DE VIDA", img: bg2 },
               {
                 title:
-                  "TRABAJO INTEGRAL Y EQUILIBRADO ESPÍRITU | ALMA-MENTE-CUERPO",
+                  "TRABAJO INTEGRAL Y EQUILIBRADO ESPÍRITU  ALMA-MENTE-CUERPO",
                 img: bg2,
               },
             ].map((card, idx) => (
