@@ -308,7 +308,7 @@ export default function Home() {
                 <div className="absolute inset-0 bg-gradient-to-t from-rose-950/90 via-rose-900/50 to-transparent backdrop-blur-[2px]" />
 
                 <div className="absolute inset-0 p-6 flex items-center justify-center">
-                  <h3 className="text-white text-lg md:text-xl font-serif tracking-[0.08em] uppercase leading-snug text-center font-extrabold whitespace-pre-line drop-shadow-[0_0_20px_rgba(255,255,255,0.6)]">
+                  <h3 className="text-white text-lg md:text-xl font-serif tracking-[0.12em] uppercase leading-snug text-center font-semibold whitespace-pre-line bg-gradient-to-r from-white via-rose-100 to-white bg-clip-text text-transparent drop-shadow-[0_0_25px_rgba(255,255,255,0.5)]">
                     {card.title}
                   </h3>
                 </div>
