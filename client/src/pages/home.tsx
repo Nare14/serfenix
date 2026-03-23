@@ -270,6 +270,7 @@ export default function Home() {
       </section>
 
       {/* 4 CARDS */}
+      {/* 4 CARDS */}
       <section className="py-24 bg-white">
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-8">
@@ -305,10 +306,14 @@ export default function Home() {
                   <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_70%,rgba(255,255,255,0.25)_0%,transparent_60%)] animate-pulse" />
                 </div>
 
+                <div className="absolute inset-0 overflow-hidden">
+                  <div className="absolute -left-full top-0 h-full w-full bg-gradient-to-r from-transparent via-white/30 to-transparent opacity-0 transition-all duration-1000 group-hover:left-full group-hover:opacity-100" />
+                </div>
+
                 <div className="absolute inset-0 bg-gradient-to-t from-rose-950/90 via-rose-900/50 to-transparent backdrop-blur-[2px]" />
 
-                <div className="absolute inset-0 p-6 flex items-center justify-center">
-                  <h3 className="text-white text-lg md:text-xl font-serif tracking-[0.12em] uppercase leading-snug text-center font-semibold whitespace-pre-line bg-gradient-to-r from-white via-rose-100 to-white bg-clip-text text-transparent drop-shadow-[0_0_25px_rgba(255,255,255,0.5)]">
+                <div className="absolute inset-0 flex items-center justify-center p-6">
+                  <h3 className="bg-gradient-to-r from-white via-rose-200 to-white bg-clip-text text-center font-serif text-lg font-medium uppercase leading-snug tracking-[0.15em] text-transparent whitespace-pre-line drop-shadow-[0_0_30px_rgba(255,255,255,0.7)] transition-all duration-500 group-hover:scale-105 md:text-xl">
                     {card.title}
                   </h3>
                 </div>
