@@ -17,7 +17,7 @@ export default function Home() {
       viewBox="0 0 200 120"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
-      className="inline-block w-[2.2em] h-[1.5em] align-middle ml-2 -mt-2"
+      className="inline-block w-[1.1em] h-[0.7em] align-middle ml-1 -mt-0.5"
     >
       <g>
         <line
