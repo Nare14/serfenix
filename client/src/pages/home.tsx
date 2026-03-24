@@ -313,7 +313,7 @@ export default function Home() {
                 <div className="absolute inset-0 bg-gradient-to-t from-rose-950/90 via-rose-900/50 to-transparent backdrop-blur-[2px]" />
 
                 <div className="absolute inset-0 flex items-center justify-center p-6">
-                  <h3 className="bg-gradient-to-r from-white via-rose-200 to-white bg-clip-text text-center font-serif text-lg font-medium uppercase leading-snug tracking-[0.15em] text-transparent whitespace-pre-line drop-shadow-[0_0_30px_rgba(255,255,255,0.7)] transition-all duration-500 group-hover:scale-105 md:text-xl">
+                  <h3 className="text-white text-lg md:text-xl font-serif font-bold tracking-[0.12em] uppercase leading-snug text-center whitespace-pre-line drop-shadow-[0_0_25px_rgba(255,255,255,0.6)] transition-all duration-500 group-hover:scale-105">
                     {card.title}
                   </h3>
                 </div>
