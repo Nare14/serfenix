@@ -204,7 +204,7 @@ export default function Home() {
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.9, delay: 0.2 }}
-              className="text-5xl md:text-7xl lg:text-8xl font-serif text-rose-950 mb-6 leading-tight text-center mx-auto"
+              className="text-5xl md:text-7xl lg:text-8xl font-serif text-rose-950 mb-6 leading-tight text-center flex flex-col items-center"
             >
               {(() => {
                 const clean = siteTitle.replace("♥", "").trim();
@@ -212,12 +212,16 @@ export default function Home() {
                 const mid = Math.ceil(words.length / 2);
                 const line1 = words.slice(0, mid).join(" ");
                 const line2 = words.slice(mid).join(" ");
+
                 return (
                   <>
-                    <span className="block">{line1}</span>
-                    <span className="block pl-[0.5em]">
-                      {line2}{" "}
-                      <span className="animate-pulse-soft inline-block">
+                    {/* PRIMERA LÍNEA */}
+                    <span>{line1}</span>
+
+                    {/* SEGUNDA LÍNEA + OJO */}
+                    <span className="flex items-center justify-center gap-3">
+                      {line2}
+                      <span className="animate-pulse-soft">
                         <SpiritualEyeSvg />
                       </span>
                     </span>
