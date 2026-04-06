@@ -411,12 +411,13 @@ export default function Home() {
 
                   <ul className="space-y-4 mb-10 flex-grow">
                     {[
-                      "Mentoría semanal en VIVO con Sofi exclusiva Sala Fenix 2.0",
+                      "Mentoría semanal en VIVO con Sofi exclusiva Sala Fénix 2.0",
                       "Acceso total a Sala Fenix",
                       "WhatsApp ilimitado 1:1 conmigo",
-                      "Descubrí tu misión de vida",
-                      "Rutinas personalizadas de cuerpo, mente y espíritu",
-                      "Reprogramá tu subconsciente y creá la vida que merecés y soñás en todas las áreas",
+                      "Descubrí tu propósito de vida",
+                      "Aprenderás a cómo armar una rutina equilibrada y estratégica de tu vida en todas las áreas",
+                      "Reprograma tu subconsciente y sintoniza con la vida que Dioss tiene para vos",
+                      "Crea tu marca personal",
                     ].map((item, i) => (
                       <li
                         key={i}
