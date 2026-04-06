@@ -139,6 +139,21 @@ export async function fetchSettings() {
 }
 
 export async function saveSettings(data: Record<string, string>) {
-  const res = await apiRequest("POST", "/api/admin/settings", data);
+  const res = await fetch(buildUrl("/api/admin/settings"), {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    credentials: "include",
+    body: JSON.stringify(data),
+  });
+
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(
+      `No se pudo guardar la configuración: ${res.status} ${text}`
+    );
+  }
+
   return await res.json();
 }

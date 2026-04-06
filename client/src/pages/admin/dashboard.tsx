@@ -126,7 +126,7 @@ export default function AdminDashboard() {
   const [siteTitle, setSiteTitle] = useState("");
   const [siteSubtitle, setSiteSubtitle] = useState("");
   const [priceFenix, setPriceFenix] = useState("99");
-  const [priceFenixPro, setPriceFenixPro] = useState("1499");
+  const [priceFenixPro, setPriceFenixPro] = useState("1999");
   const [whatsapp, setWhatsapp] = useState("");
   const [instagram, setInstagram] = useState("");
   const [contactEmail, setContactEmail] = useState("");
@@ -180,7 +180,7 @@ export default function AdminDashboard() {
       setSiteTitle(s.siteTitle || "Tu poder habita dentro de ti");
       setSiteSubtitle(s.siteSubtitle || "Bienvenido a tu renacer");
       setPriceFenix(s.priceFenix || "99");
-      setPriceFenixPro(s.priceFenixPro || "1499");
+      setPriceFenixPro(s.priceFenixPro || "1999");
 
       setWhatsapp(s.contactWhatsapp || "");
       setInstagram(s.contactInstagram || "");
