@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   ChevronLeft,
@@ -10,9 +10,16 @@ import {
 } from "lucide-react";
 import { Link } from "wouter";
 import { motion } from "framer-motion";
+import { fetchSettings } from "@/lib/api";
 
 export default function Pago() {
   const user = JSON.parse(localStorage.getItem("currentUser") || "null");
+
+  const [payLinkFenixMercadoPago, setPayLinkFenixMercadoPago] = useState("");
+  const [payLinkFenixPaypal, setPayLinkFenixPaypal] = useState("");
+  const [payLinkFenixInstagram, setPayLinkFenixInstagram] = useState("");
+  const [payLinkFenixProPaypal, setPayLinkFenixProPaypal] = useState("");
+  const [payLinkFenixProInstagram, setPayLinkFenixProInstagram] = useState("");
 
   const handleLogout = () => {
     localStorage.removeItem("currentUser");
@@ -22,11 +29,39 @@ export default function Pago() {
   const search = typeof window !== "undefined" ? window.location.search : "";
   const plan = new URLSearchParams(search).get("plan")?.trim();
 
-  const instagramLink =
-    "https://www.instagram.com/sofivgonzalez?igsh=MXM4ZndidHk4dDBkNg%3D%3D&utm_source=qr";
-
   const isFenixPro = plan === "fenix_pro";
   const planName = isFenixPro ? "Sala Fénix 2.0" : "Sala Fénix";
+
+  useEffect(() => {
+    const loadSettings = async () => {
+      try {
+        const s = await fetchSettings();
+
+        setPayLinkFenixMercadoPago(
+          s.payLinkFenixMercadoPago || s.payLinkFenix || ""
+        );
+        setPayLinkFenixPaypal(s.payLinkFenixPaypal || "");
+        setPayLinkFenixInstagram(
+          s.payLinkFenixInstagram ||
+            s.contactInstagram ||
+            "https://www.instagram.com/sofivgonzalez?igsh=MXM4ZndidHk4dDBkNg%3D%3D&utm_source=qr"
+        );
+
+        setPayLinkFenixProPaypal(
+          s.payLinkFenixProPaypal || s.payLinkFenixPro || ""
+        );
+        setPayLinkFenixProInstagram(
+          s.payLinkFenixProInstagram ||
+            s.contactInstagram ||
+            "https://www.instagram.com/sofivgonzalez?igsh=MXM4ZndidHk4dDBkNg%3D%3D&utm_source=qr"
+        );
+      } catch (error) {
+        console.error("Error cargando links de pago:", error);
+      }
+    };
+
+    loadSettings();
+  }, []);
 
   const paymentOptions = isFenixPro
     ? [
@@ -34,7 +69,7 @@ export default function Pago() {
           title: "PayPal",
           description:
             "Pagá de forma online con tu cuenta o tarjeta desde PayPal.",
-          href: "https://www.paypal.com/ncp/payment/DQGGMRWCB9ZAL",
+          href: payLinkFenixProPaypal,
           icon: DollarSign,
           buttonText: "Pagar con PayPal",
         },
@@ -42,17 +77,17 @@ export default function Pago() {
           title: "Pago a acordar",
           description:
             "Si preferís otro medio de pago, escribinos por Instagram para coordinar tu acceso.",
-          href: instagramLink,
+          href: payLinkFenixProInstagram,
           icon: MessageCircle,
           buttonText: "Contactar por Instagram",
         },
-      ]
+      ].filter((option) => option.href)
     : [
         {
           title: "Mercado Pago",
           description:
             "Pagá de forma rápida y segura a través de Mercado Pago.",
-          href: "https://www.mercadopago.com.ar/subscriptions/checkout?preapproval_plan_id=f350471e128b4bc9ae7017d8b3b7184c",
+          href: payLinkFenixMercadoPago,
           icon: CreditCard,
           buttonText: "Pagar con Mercado Pago",
         },
@@ -60,7 +95,7 @@ export default function Pago() {
           title: "PayPal",
           description:
             "Pagá de forma online con tu cuenta o tarjeta desde PayPal.",
-          href: "https://www.paypal.com/ncp/payment/9Y2TWTFFA2U32",
+          href: payLinkFenixPaypal,
           icon: DollarSign,
           buttonText: "Pagar con PayPal",
         },
@@ -68,11 +103,11 @@ export default function Pago() {
           title: "Pago a acordar",
           description:
             "Si preferís otro medio de pago, escribinos por Instagram para coordinar el pago y activar tu acceso.",
-          href: instagramLink,
+          href: payLinkFenixInstagram,
           icon: MessageCircle,
           buttonText: "Contactar por Instagram",
         },
-      ];
+      ].filter((option) => option.href);
 
   return (
     <div className="min-h-screen bg-[#fcf7f8] py-14 md:py-20 px-4 relative overflow-hidden">
@@ -92,7 +127,9 @@ export default function Pago() {
 
         <p className="text-rose-900 font-medium text-sm md:text-base text-center">
           Bienvenido/a{" "}
-          <span className="font-semibold text-rose-950">{user?.name}</span>
+          <span className="font-semibold text-rose-950">
+            {user?.name || user?.email || ""}
+          </span>
         </p>
 
         <Button
