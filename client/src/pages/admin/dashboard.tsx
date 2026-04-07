@@ -148,6 +148,12 @@ export default function AdminDashboard() {
   const [videoMembership, setVideoMembership] = useState("fenix");
   const [videoSaving, setVideoSaving] = useState(false);
   const [videoError, setVideoError] = useState("");
+  const [payLinkFenixMercadoPago, setPayLinkFenixMercadoPago] = useState("");
+const [payLinkFenixPaypal, setPayLinkFenixPaypal] = useState("");
+const [payLinkFenixInstagram, setPayLinkFenixInstagram] = useState("");
+
+const [payLinkFenixProPaypal, setPayLinkFenixProPaypal] = useState("");
+const [payLinkFenixProInstagram, setPayLinkFenixProInstagram] = useState("");
 
   useEffect(() => {
     if (localStorage.getItem("adminAuth") !== "true") {
@@ -215,6 +221,12 @@ export default function AdminDashboard() {
       });
 
       await loadData();
+      setPayLinkFenixMercadoPago(s.payLinkFenixMercadoPago || "");
+setPayLinkFenixPaypal(s.payLinkFenixPaypal || "");
+setPayLinkFenixInstagram(s.payLinkFenixInstagram || "");
+
+setPayLinkFenixProPaypal(s.payLinkFenixProPaypal || "");
+setPayLinkFenixProInstagram(s.payLinkFenixProInstagram || "");
       showSaved("Contenido guardado exitosamente");
     } catch (error) {
       console.error("Error al guardar contenido:", error);
@@ -235,8 +247,13 @@ export default function AdminDashboard() {
         socialInstagram: socialInstagram.trim(),
         socialTiktok: socialTiktok.trim(),
         socialYoutube: socialYoutube.trim(),
-        payLinkFenix: payLinkFenix.trim(),
-        payLinkFenixPro: payLinkFenixPro.trim(),
+      
+        payLinkFenixMercadoPago: payLinkFenixMercadoPago.trim(),
+        payLinkFenixPaypal: payLinkFenixPaypal.trim(),
+        payLinkFenixInstagram: payLinkFenixInstagram.trim(),
+      
+        payLinkFenixProPaypal: payLinkFenixProPaypal.trim(),
+        payLinkFenixProInstagram: payLinkFenixProInstagram.trim(),
       };
 
       console.log("Guardando settings:", payload);
@@ -1322,7 +1339,7 @@ export default function AdminDashboard() {
             <CardContent className="space-y-4 max-w-xl">
               <div className="space-y-2">
                 <Label className="text-rose-950">
-                  Link de Pago — Sala Fénix ($99 USD)
+                  Link de Pago — Sala Fénix
                 </Label>
                 <Input
                   value={payLinkFenix}
@@ -1333,7 +1350,7 @@ export default function AdminDashboard() {
               </div>
               <div className="space-y-2">
                 <Label className="text-rose-950">
-                  Link de Pago — Sala Fénix 2.0 ($1499 USD)
+                  Link de Pago — Sala Fénix 2.0
                 </Label>
                 <Input
                   value={payLinkFenixPro}
