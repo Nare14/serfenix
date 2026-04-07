@@ -1338,8 +1338,7 @@ export default function AdminDashboard() {
             <CardHeader>
               <CardTitle className="text-rose-950">Links de Pago</CardTitle>
               <CardDescription className="text-rose-900/60">
-                Configurá las opciones de pago de cada sala para que la
-                administradora pueda cambiarlas desde acá.
+                Configurá las opciones de pago de cada sala:
               </CardDescription>
             </CardHeader>
 
