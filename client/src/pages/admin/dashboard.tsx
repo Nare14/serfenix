@@ -127,14 +127,25 @@ export default function AdminDashboard() {
   const [siteSubtitle, setSiteSubtitle] = useState("");
   const [priceFenix, setPriceFenix] = useState("99");
   const [priceFenixPro, setPriceFenixPro] = useState("1999");
+
   const [whatsapp, setWhatsapp] = useState("");
   const [instagram, setInstagram] = useState("");
   const [contactEmail, setContactEmail] = useState("");
+
   const [socialInstagram, setSocialInstagram] = useState("");
   const [socialTiktok, setSocialTiktok] = useState("");
   const [socialYoutube, setSocialYoutube] = useState("");
+
   const [payLinkFenix, setPayLinkFenix] = useState("");
   const [payLinkFenixPro, setPayLinkFenixPro] = useState("");
+
+  const [payLinkFenixMercadoPago, setPayLinkFenixMercadoPago] = useState("");
+  const [payLinkFenixPaypal, setPayLinkFenixPaypal] = useState("");
+  const [payLinkFenixInstagram, setPayLinkFenixInstagram] = useState("");
+
+  const [payLinkFenixProPaypal, setPayLinkFenixProPaypal] = useState("");
+  const [payLinkFenixProInstagram, setPayLinkFenixProInstagram] = useState("");
+
   const [settingsSaving, setSettingsSaving] = useState(false);
   const [contentSaving, setContentSaving] = useState(false);
 
@@ -148,12 +159,6 @@ export default function AdminDashboard() {
   const [videoMembership, setVideoMembership] = useState("fenix");
   const [videoSaving, setVideoSaving] = useState(false);
   const [videoError, setVideoError] = useState("");
-  const [payLinkFenixMercadoPago, setPayLinkFenixMercadoPago] = useState("");
-const [payLinkFenixPaypal, setPayLinkFenixPaypal] = useState("");
-const [payLinkFenixInstagram, setPayLinkFenixInstagram] = useState("");
-
-const [payLinkFenixProPaypal, setPayLinkFenixProPaypal] = useState("");
-const [payLinkFenixProInstagram, setPayLinkFenixProInstagram] = useState("");
 
   useEffect(() => {
     if (localStorage.getItem("adminAuth") !== "true") {
@@ -198,6 +203,13 @@ const [payLinkFenixProInstagram, setPayLinkFenixProInstagram] = useState("");
 
       setPayLinkFenix(s.payLinkFenix || "");
       setPayLinkFenixPro(s.payLinkFenixPro || "");
+
+      setPayLinkFenixMercadoPago(s.payLinkFenixMercadoPago || "");
+      setPayLinkFenixPaypal(s.payLinkFenixPaypal || "");
+      setPayLinkFenixInstagram(s.payLinkFenixInstagram || "");
+
+      setPayLinkFenixProPaypal(s.payLinkFenixProPaypal || "");
+      setPayLinkFenixProInstagram(s.payLinkFenixProInstagram || "");
     } catch (error) {
       console.error("Error cargando dashboard:", error);
       showSaved("Error al cargar videos o datos del panel");
@@ -221,12 +233,6 @@ const [payLinkFenixProInstagram, setPayLinkFenixProInstagram] = useState("");
       });
 
       await loadData();
-      setPayLinkFenixMercadoPago(s.payLinkFenixMercadoPago || "");
-setPayLinkFenixPaypal(s.payLinkFenixPaypal || "");
-setPayLinkFenixInstagram(s.payLinkFenixInstagram || "");
-
-setPayLinkFenixProPaypal(s.payLinkFenixProPaypal || "");
-setPayLinkFenixProInstagram(s.payLinkFenixProInstagram || "");
       showSaved("Contenido guardado exitosamente");
     } catch (error) {
       console.error("Error al guardar contenido:", error);
@@ -247,16 +253,17 @@ setPayLinkFenixProInstagram(s.payLinkFenixProInstagram || "");
         socialInstagram: socialInstagram.trim(),
         socialTiktok: socialTiktok.trim(),
         socialYoutube: socialYoutube.trim(),
-      
+
+        payLinkFenix: payLinkFenix.trim(),
+        payLinkFenixPro: payLinkFenixPro.trim(),
+
         payLinkFenixMercadoPago: payLinkFenixMercadoPago.trim(),
         payLinkFenixPaypal: payLinkFenixPaypal.trim(),
         payLinkFenixInstagram: payLinkFenixInstagram.trim(),
-      
+
         payLinkFenixProPaypal: payLinkFenixProPaypal.trim(),
         payLinkFenixProInstagram: payLinkFenixProInstagram.trim(),
       };
-
-      console.log("Guardando settings:", payload);
 
       await saveSettings(payload);
       await loadData();
