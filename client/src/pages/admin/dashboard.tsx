@@ -1336,41 +1336,87 @@ export default function AdminDashboard() {
 
           <Card className="border-rose-100 shadow-md rounded-3xl bg-white/95">
             <CardHeader>
-              <CardTitle className="text-rose-950">
-                Links de Pago (Mercado Pago)
-              </CardTitle>
+              <CardTitle className="text-rose-950">Links de Pago</CardTitle>
               <CardDescription className="text-rose-900/60">
-                Pegá aquí los links de pago generados en Mercado Pago.
+                Configurá las opciones de pago de cada sala para que la
+                administradora pueda cambiarlas desde acá.
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4 max-w-xl">
-              <div className="space-y-2">
-                <Label className="text-rose-950">
-                  Link de Pago — Sala Fénix
-                </Label>
-                <Input
-                  value={payLinkFenix}
-                  onChange={(e) => setPayLinkFenix(e.target.value)}
-                  placeholder="https://www.mercadopago.com/..."
-                  className="rounded-xl border-rose-200 focus-visible:ring-rose-400"
-                />
+
+            <CardContent className="space-y-8 max-w-2xl">
+              <div className="space-y-4 rounded-2xl border border-rose-100 p-5 bg-rose-50/40">
+                <h4 className="text-lg font-semibold text-rose-950">
+                  Sala Fénix
+                </h4>
+
+                <div className="space-y-2">
+                  <Label className="text-rose-950">Mercado Pago</Label>
+                  <Input
+                    value={payLinkFenixMercadoPago}
+                    onChange={(e) => setPayLinkFenixMercadoPago(e.target.value)}
+                    placeholder="https://www.mercadopago.com/..."
+                    className="rounded-xl border-rose-200 focus-visible:ring-rose-400"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label className="text-rose-950">PayPal</Label>
+                  <Input
+                    value={payLinkFenixPaypal}
+                    onChange={(e) => setPayLinkFenixPaypal(e.target.value)}
+                    placeholder="https://www.paypal.com/..."
+                    className="rounded-xl border-rose-200 focus-visible:ring-rose-400"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label className="text-rose-950">
+                    Instagram / otro medio
+                  </Label>
+                  <Input
+                    value={payLinkFenixInstagram}
+                    onChange={(e) => setPayLinkFenixInstagram(e.target.value)}
+                    placeholder="https://instagram.com/..."
+                    className="rounded-xl border-rose-200 focus-visible:ring-rose-400"
+                  />
+                </div>
               </div>
-              <div className="space-y-2">
-                <Label className="text-rose-950">
-                  Link de Pago — Sala Fénix 2.0
-                </Label>
-                <Input
-                  value={payLinkFenixPro}
-                  onChange={(e) => setPayLinkFenixPro(e.target.value)}
-                  placeholder="https://www.mercadopago.com/..."
-                  className="rounded-xl border-rose-200 focus-visible:ring-rose-400"
-                />
+
+              <div className="space-y-4 rounded-2xl border border-rose-100 p-5 bg-rose-50/40">
+                <h4 className="text-lg font-semibold text-rose-950">
+                  Sala Fénix 2.0
+                </h4>
+
+                <div className="space-y-2">
+                  <Label className="text-rose-950">PayPal</Label>
+                  <Input
+                    value={payLinkFenixProPaypal}
+                    onChange={(e) => setPayLinkFenixProPaypal(e.target.value)}
+                    placeholder="https://www.paypal.com/..."
+                    className="rounded-xl border-rose-200 focus-visible:ring-rose-400"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label className="text-rose-950">
+                    Instagram / otro medio
+                  </Label>
+                  <Input
+                    value={payLinkFenixProInstagram}
+                    onChange={(e) =>
+                      setPayLinkFenixProInstagram(e.target.value)
+                    }
+                    placeholder="https://instagram.com/..."
+                    className="rounded-xl border-rose-200 focus-visible:ring-rose-400"
+                  />
+                </div>
               </div>
+
               <Button
                 type="button"
                 onClick={handleSaveSettings}
                 disabled={settingsSaving}
-                className="bg-gradient-to-r from-rose-600 to-red-600 text-white hover:from-rose-700 hover:to-red-700 mt-4 rounded-2xl shadow-sm"
+                className="bg-gradient-to-r from-rose-600 to-red-600 text-white hover:from-rose-700 hover:to-red-700 mt-2 rounded-2xl shadow-sm"
               >
                 {settingsSaving ? "Guardando..." : "Guardar Configuración"}
               </Button>
