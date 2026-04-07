@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { Link } from "wouter";
 import { CheckCircle2, ChevronRight, Lightbulb } from "lucide-react";
 import { useState, useEffect } from "react";
+import { fetchSettings } from "@/lib/api";
 
 import bg1 from "@/assets/images/spiritual-card_1.jpg";
 import bg2 from "@/assets/images/spiritual-card_2.jpg";
@@ -161,18 +162,23 @@ export default function Home() {
     "Llegó el momento de despertarlo"
   );
   const [priceFenix, setPriceFenix] = useState("99");
-  const [priceFenixPro, setPriceFenixPro] = useState("1499");
+  const [priceFenixPro, setPriceFenixPro] = useState("1999");
 
   useEffect(() => {
-    fetch("/api/settings")
-      .then((r) => r.json())
-      .then((s) => {
+    const loadSettings = async () => {
+      try {
+        const s = await fetchSettings();
+
         if (s.siteTitle) setSiteTitle(s.siteTitle);
         if (s.siteSubtitle) setSiteSubtitle(s.siteSubtitle);
         if (s.priceFenix) setPriceFenix(s.priceFenix);
         if (s.priceFenixPro) setPriceFenixPro(s.priceFenixPro);
-      })
-      .catch(() => {});
+      } catch (error) {
+        console.error("Error cargando settings:", error);
+      }
+    };
+
+    loadSettings();
   }, []);
 
   const fadeInUp = {
