@@ -3,7 +3,6 @@ import { Button } from "@/components/ui/button";
 import {
   ChevronLeft,
   LogOut,
-  CreditCard,
   MessageCircle,
   DollarSign,
   Sparkles,
@@ -15,9 +14,6 @@ import { fetchSettings } from "@/lib/api";
 export default function Pago() {
   const user = JSON.parse(localStorage.getItem("currentUser") || "null");
 
-  const [payLinkFenixMercadoPago, setPayLinkFenixMercadoPago] = useState("");
-  const [payLinkFenixPaypal, setPayLinkFenixPaypal] = useState("");
-  const [payLinkFenixInstagram, setPayLinkFenixInstagram] = useState("");
   const [payLinkFenixProPaypal, setPayLinkFenixProPaypal] = useState("");
   const [payLinkFenixProInstagram, setPayLinkFenixProInstagram] = useState("");
 
@@ -26,30 +22,15 @@ export default function Pago() {
     window.location.href = "/";
   };
 
-  const search = typeof window !== "undefined" ? window.location.search : "";
-  const plan = new URLSearchParams(search).get("plan")?.trim();
-
-  const isFenixPro = plan === "fenix_pro";
-  const planName = isFenixPro ? "Sala Fénix 2.0" : "Sala Fénix";
-
   useEffect(() => {
     const loadSettings = async () => {
       try {
         const s = await fetchSettings();
 
-        setPayLinkFenixMercadoPago(
-          s.payLinkFenixMercadoPago || s.payLinkFenix || ""
-        );
-        setPayLinkFenixPaypal(s.payLinkFenixPaypal || "");
-        setPayLinkFenixInstagram(
-          s.payLinkFenixInstagram ||
-            s.contactInstagram ||
-            "https://www.instagram.com/sofivgonzalez?igsh=MXM4ZndidHk4dDBkNg%3D%3D&utm_source=qr"
-        );
-
         setPayLinkFenixProPaypal(
           s.payLinkFenixProPaypal || s.payLinkFenixPro || ""
         );
+
         setPayLinkFenixProInstagram(
           s.payLinkFenixProInstagram ||
             s.contactInstagram ||
@@ -63,51 +44,25 @@ export default function Pago() {
     loadSettings();
   }, []);
 
-  const paymentOptions = isFenixPro
-    ? [
-        {
-          title: "PayPal",
-          description:
-            "Pagá de forma online con tu cuenta o tarjeta desde PayPal.",
-          href: payLinkFenixProPaypal,
-          icon: DollarSign,
-          buttonText: "Pagar con PayPal",
-        },
-        {
-          title: "Pago a acordar",
-          description:
-            "Si preferís otro medio de pago, escribinos por Instagram para coordinar tu acceso.",
-          href: payLinkFenixProInstagram,
-          icon: MessageCircle,
-          buttonText: "Contactar por Instagram",
-        },
-      ].filter((option) => option.href)
-    : [
-        {
-          title: "Mercado Pago",
-          description:
-            "Pagá de forma rápida y segura a través de Mercado Pago.",
-          href: payLinkFenixMercadoPago,
-          icon: CreditCard,
-          buttonText: "Pagar con Mercado Pago",
-        },
-        {
-          title: "PayPal",
-          description:
-            "Pagá de forma online con tu cuenta o tarjeta desde PayPal.",
-          href: payLinkFenixPaypal,
-          icon: DollarSign,
-          buttonText: "Pagar con PayPal",
-        },
-        {
-          title: "Pago a acordar",
-          description:
-            "Si preferís otro medio de pago, escribinos por Instagram para coordinar el pago y activar tu acceso.",
-          href: payLinkFenixInstagram,
-          icon: MessageCircle,
-          buttonText: "Contactar por Instagram",
-        },
-      ].filter((option) => option.href);
+  const planName = "Sala Fénix 2.0";
+
+  const paymentOptions = [
+    {
+      title: "PayPal",
+      description: "Pagá de forma online con tu cuenta o tarjeta desde PayPal.",
+      href: payLinkFenixProPaypal,
+      icon: DollarSign,
+      buttonText: "Pagar con PayPal",
+    },
+    {
+      title: "Pago a acordar",
+      description:
+        "Si preferís otro medio de pago, escribinos por Instagram para coordinar tu acceso.",
+      href: payLinkFenixProInstagram,
+      icon: MessageCircle,
+      buttonText: "Contactar por Instagram",
+    },
+  ].filter((option) => option.href);
 
   return (
     <div className="min-h-screen bg-[#fcf7f8] py-14 md:py-20 px-4 relative overflow-hidden">
@@ -156,6 +111,10 @@ export default function Pago() {
           Elegí tu medio de pago
         </h1>
 
+        <p className="text-rose-700 text-lg mb-4">
+          Estás a un paso de cambiar tu vida ✨
+        </p>
+
         <p className="text-rose-800/75 text-base md:text-lg max-w-2xl mx-auto leading-relaxed px-2">
           Estás por unirte a{" "}
           <span className="font-semibold text-rose-950">{planName}</span>. Elegí
@@ -190,11 +149,7 @@ export default function Pago() {
         </div>
       </motion.div>
 
-      <div
-        className={`max-w-6xl mx-auto grid grid-cols-1 ${
-          isFenixPro ? "md:grid-cols-2" : "md:grid-cols-2 xl:grid-cols-3"
-        } gap-6 md:gap-8`}
-      >
+      <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
         {paymentOptions.map((option, index) => {
           const Icon = option.icon;
 

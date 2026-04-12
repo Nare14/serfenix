@@ -243,7 +243,7 @@ export default function Home() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.7, delay: 0.8 }}
             >
-              <a href="#salas">
+              <a href="#sala">
                 <Button
                   size="sm"
                   className="bg-rose-600 hover:bg-rose-700 text-white rounded-full px-10 h-9 shadow-lg shadow-rose-600/20 text-xs font-medium uppercase tracking-widest hover:scale-105 transition-transform duration-300"
