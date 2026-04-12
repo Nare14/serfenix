@@ -6,12 +6,14 @@ import { CheckCircle2, ChevronRight, Lightbulb } from "lucide-react";
 import { useState, useEffect } from "react";
 import { fetchSettings } from "@/lib/api";
 
-import bg1 from "@/assets/images/spiritual-card_1.jpg";
 import bg2 from "@/assets/images/spiritual-card_2.jpg";
-import bg3 from "@/assets/images/spiritual-card_3.jpg";
 
 export default function Home() {
   const [siteTitle, setSiteTitle] = useState("Tu poder habita dentro de ti ♥");
+  const [siteSubtitle, setSiteSubtitle] = useState(
+    "Llegó el momento de despertarlo"
+  );
+  const [priceFenixPro, setPriceFenixPro] = useState("1999");
 
   const SpiritualEyeSvg = () => (
     <svg
@@ -158,12 +160,6 @@ export default function Home() {
     </svg>
   );
 
-  const [siteSubtitle, setSiteSubtitle] = useState(
-    "Llegó el momento de despertarlo"
-  );
-  const [priceFenix, setPriceFenix] = useState("99");
-  const [priceFenixPro, setPriceFenixPro] = useState("1999");
-
   useEffect(() => {
     const loadSettings = async () => {
       try {
@@ -171,7 +167,6 @@ export default function Home() {
 
         if (s.siteTitle) setSiteTitle(s.siteTitle);
         if (s.siteSubtitle) setSiteSubtitle(s.siteSubtitle);
-        if (s.priceFenix) setPriceFenix(s.priceFenix);
         if (s.priceFenixPro) setPriceFenixPro(s.priceFenixPro);
       } catch (error) {
         console.error("Error cargando settings:", error);
@@ -221,10 +216,7 @@ export default function Home() {
 
                 return (
                   <>
-                    {/* PRIMERA LÍNEA */}
                     <span>{line1}</span>
-
-                    {/* SEGUNDA LÍNEA + OJO */}
                     <span className="flex items-center justify-center gap-3">
                       {line2}
                       <span className="animate-pulse-soft">
@@ -236,7 +228,6 @@ export default function Home() {
               })()}
             </motion.h1>
 
-            {/* SUBTÍTULO CON LAMPARITA */}
             <motion.p
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -279,7 +270,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* 4 CARDS */}
       {/* 4 CARDS */}
       <section className="py-24 bg-white">
         <div className="container mx-auto px-4">
@@ -333,7 +323,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* SALAS (Pricing) */}
+      {/* SALA FÉNIX 2.0 */}
       <section id="salas" className="py-24 bg-rose-50 relative overflow-hidden">
         <div className="absolute top-0 left-0 w-full overflow-hidden leading-none rotate-180">
           <svg
@@ -353,77 +343,40 @@ export default function Home() {
         <div className="container mx-auto px-4 relative z-10 pt-10">
           <motion.div {...fadeInUp} className="text-center mb-16">
             <h2 className="text-4xl md:text-6xl font-serif text-rose-950 mb-4">
-              Elige tu experiencia
+              Tu nueva vida empieza acá
             </h2>
-            <p className="text-rose-800/60 text-xl md:text-3xl font-semibold font-serif">
-              Únete a nuestra comunidad y transforma tu realidad
+            <p className="text-rose-800/70 text-xl md:text-2xl font-semibold font-serif max-w-2xl mx-auto">
+              Esto no es solo contenido… es el proceso que te va a transformar
             </p>
           </motion.div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8 max-w-6xl mx-auto">
+          <div className="max-w-4xl mx-auto">
             <motion.div {...fadeInUp}>
-              <Card className="glass-card h-full rounded-[2rem] border-rose-200 overflow-hidden relative group hover:-translate-y-1 transition-transform duration-500">
-                <CardContent className="p-6 sm:p-8 md:p-10 flex flex-col h-full relative z-10">
-                  <h3 className="text-3xl font-serif font-bold text-rose-950 mb-2">
-                    Sala Fénix
-                  </h3>
-                  <div className="flex items-baseline gap-2 mb-6">
-                    <span className="text-4xl font-bold text-rose-700">
-                      {priceFenix} USD
-                    </span>
-                    <span className="text-rose-500 font-medium">/ mensual</span>
-                  </div>
-
-                  <ul className="space-y-4 mb-10 flex-grow">
-                    {[
-                      "Mentoría semanal en VIVO con Sofi",
-                      "Acceso a comunidad Telegram",
-                      "Acceso a contenido práctico grabado",
-                    ].map((item, i) => (
-                      <li
-                        key={i}
-                        className="flex items-start gap-3 text-rose-900/80 font-medium"
-                      >
-                        <CheckCircle2 className="w-5 h-5 text-rose-600 shrink-0 mt-0.5" />
-                        <span>{item}</span>
-                      </li>
-                    ))}
-                  </ul>
-
-                  <Link href="/pago?plan=fenix">
-                    <Button className="w-full bg-rose-600 hover:bg-rose-700 text-white rounded-full h-14 text-lg font-medium shadow-xl shadow-rose-600/20 hover:scale-[1.02] transition-transform">
-                      QUIERO UNIRME
-                    </Button>
-                  </Link>
-                </CardContent>
-              </Card>
-            </motion.div>
-
-            <motion.div
-              {...fadeInUp}
-              transition={{ duration: 0.8, delay: 0.2 }}
-            >
-              <Card className="glass-card h-full rounded-[2rem] border-rose-200 overflow-hidden relative group hover:-translate-y-1 transition-transform duration-500">
-                <CardContent className="p-6 sm:p-8 md:p-10 flex flex-col h-full relative z-10">
-                  <h3 className="text-3xl font-serif font-bold text-rose-950 mb-2">
+              <Card className="glass-card h-full rounded-[2.5rem] border-rose-200 overflow-hidden relative group hover:-translate-y-1 transition-transform duration-500">
+                <CardContent className="p-6 sm:p-8 md:p-10 flex flex-col h-full relative z-10 text-center">
+                  <h3 className="text-3xl md:text-4xl font-serif font-bold text-rose-950 mb-4">
                     Sala Fénix 2.0
                   </h3>
-                  <div className="flex items-baseline gap-2 mb-8">
-                    <span className="text-4xl font-bold text-rose-700">
-                      {priceFenixPro} USD
-                    </span>
-                    <span className="text-rose-500 font-medium">/ 6 meses</span>
+
+                  <p className="text-rose-800/70 mb-8 text-lg">
+                    El espacio donde vas a reconstruirte, alinearte y crear la
+                    vida que sentís que es para vos.
+                  </p>
+
+                  <div className="text-5xl font-bold text-rose-700 mb-2">
+                    {priceFenixPro} USD
                   </div>
 
-                  <ul className="space-y-4 mb-10 flex-grow">
+                  <p className="text-rose-500 mb-10">/ 6 meses</p>
+
+                  <ul className="space-y-4 text-left max-w-md mx-auto mb-10">
                     {[
                       "Mentoría semanal en VIVO con Sofi exclusiva Sala Fénix 2.0",
-                      "Acceso total a Sala Fenix",
                       "WhatsApp ilimitado 1:1 conmigo",
                       "Descubrí tu propósito de vida",
-                      "Aprenderás a cómo armar una rutina equilibrada y estratégica de tu vida en todas las áreas",
-                      "Reprograma tu subconsciente y sintoniza con la vida que Dioss tiene para vos",
-                      "Crea tu marca personal",
+                      "Aprenderás a armar una rutina equilibrada y estratégica de tu vida en todas las áreas",
+                      "Reprogramá tu subconsciente y sintonizá con la vida que Dios tiene para vos",
+                      "Creá tu marca personal",
                     ].map((item, i) => (
                       <li
                         key={i}
@@ -437,7 +390,7 @@ export default function Home() {
 
                   <Link href="/pago?plan=fenix_pro">
                     <Button className="w-full bg-rose-600 hover:bg-rose-700 text-white rounded-full h-14 text-lg font-medium shadow-xl shadow-rose-600/20 hover:scale-[1.02] transition-transform">
-                      QUIERO UNIRME
+                      QUIERO TRANSFORMAR MI VIDA
                     </Button>
                   </Link>
                 </CardContent>
