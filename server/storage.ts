@@ -1,10 +1,15 @@
 import { eq, asc, desc } from "drizzle-orm";
 import { db } from "./db";
-import { 
-  users, videos, siteSettings,
-  type User, type InsertUser, 
-  type Video, type InsertVideo, type UpdateVideo,
-  type SiteSetting
+import {
+  users,
+  videos,
+  siteSettings,
+  type User,
+  type InsertUser,
+  type Video,
+  type InsertVideo,
+  type UpdateVideo,
+  type SiteSetting,
 } from "@shared/schema";
 
 export interface IStorage {
@@ -52,7 +57,11 @@ export class DatabaseStorage implements IStorage {
   }
 
   async updateUser(id: number, data: Partial<User>): Promise<User | undefined> {
-    const [user] = await db.update(users).set(data).where(eq(users.id, id)).returning();
+    const [user] = await db
+      .update(users)
+      .set(data)
+      .where(eq(users.id, id))
+      .returning();
     return user;
   }
 
@@ -67,19 +76,33 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getAllVideos(): Promise<Video[]> {
-    return db.select().from(videos).orderBy(asc(videos.sortOrder), desc(videos.createdAt));
+    return db
+      .select()
+      .from(videos)
+      .orderBy(asc(videos.sortOrder), desc(videos.createdAt));
   }
 
+  // 🔥 ESTA ES LA PARTE IMPORTANTE QUE ARREGLA TU PROBLEMA
   async getActiveVideos(membershipType?: string): Promise<Video[]> {
-    const allActive = await db.select().from(videos)
+    const allActive = await db
+      .select()
+      .from(videos)
       .where(eq(videos.active, true))
       .orderBy(asc(videos.sortOrder), desc(videos.createdAt));
-    
+
     if (membershipType === "fenix_pro") {
-      return allActive; // Pro members see all
+      return allActive.filter(
+        (v) =>
+          v.membershipRequired === "fenix" ||
+          v.membershipRequired === "fenix_pro" ||
+          v.membershipRequired === "all"
+      );
     }
-    // Regular fenix members only see fenix videos
-    return allActive.filter(v => v.membershipRequired === "fenix");
+
+    // 👇 ACÁ ESTABA EL ERROR ANTES
+    return allActive.filter(
+      (v) => v.membershipRequired === "fenix" || v.membershipRequired === "all"
+    );
   }
 
   async createVideo(video: InsertVideo): Promise<Video> {
@@ -88,7 +111,11 @@ export class DatabaseStorage implements IStorage {
   }
 
   async updateVideo(id: number, data: UpdateVideo): Promise<Video | undefined> {
-    const [updated] = await db.update(videos).set(data).where(eq(videos.id, id)).returning();
+    const [updated] = await db
+      .update(videos)
+      .set(data)
+      .where(eq(videos.id, id))
+      .returning();
     return updated;
   }
 
@@ -98,13 +125,18 @@ export class DatabaseStorage implements IStorage {
 
   // ---- Site Settings ----
   async getSetting(key: string): Promise<string | undefined> {
-    const [setting] = await db.select().from(siteSettings).where(eq(siteSettings.key, key));
+    const [setting] = await db
+      .select()
+      .from(siteSettings)
+      .where(eq(siteSettings.key, key));
     return setting?.value;
   }
 
   async setSetting(key: string, value: string): Promise<void> {
-    await db.insert(siteSettings).values({ key, value })
-      .onConflictDoUpdate({ target: siteSettings.key, set: { value } });
+    await db.insert(siteSettings).values({ key, value }).onConflictDoUpdate({
+      target: siteSettings.key,
+      set: { value },
+    });
   }
 
   async getAllSettings(): Promise<SiteSetting[]> {
