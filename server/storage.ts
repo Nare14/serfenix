@@ -82,7 +82,6 @@ export class DatabaseStorage implements IStorage {
       .orderBy(asc(videos.sortOrder), desc(videos.createdAt));
   }
 
-  // 🔥 ESTA ES LA PARTE IMPORTANTE QUE ARREGLA TU PROBLEMA
   async getActiveVideos(membershipType?: string): Promise<Video[]> {
     const allActive = await db
       .select()
@@ -90,19 +89,11 @@ export class DatabaseStorage implements IStorage {
       .where(eq(videos.active, true))
       .orderBy(asc(videos.sortOrder), desc(videos.createdAt));
 
-    if (membershipType === "fenix_pro") {
-      return allActive.filter(
-        (v) =>
-          v.membershipRequired === "fenix" ||
-          v.membershipRequired === "fenix_pro" ||
-          v.membershipRequired === "all"
-      );
+    if (membershipType !== "fenix_pro") {
+      return [];
     }
 
-    // 👇 ACÁ ESTABA EL ERROR ANTES
-    return allActive.filter(
-      (v) => v.membershipRequired === "fenix" || v.membershipRequired === "all"
-    );
+    return allActive.filter((v) => v.membershipRequired === "fenix_pro");
   }
 
   async createVideo(video: InsertVideo): Promise<Video> {

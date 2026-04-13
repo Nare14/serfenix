@@ -1,5 +1,13 @@
 import { sql } from "drizzle-orm";
-import { pgTable, text, varchar, boolean, integer, timestamp, serial } from "drizzle-orm/pg-core";
+import {
+  pgTable,
+  text,
+  varchar,
+  boolean,
+  integer,
+  timestamp,
+  serial,
+} from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -11,7 +19,7 @@ export const users = pgTable("users", {
   password: text("password").notNull(),
   disabled: boolean("disabled").notNull().default(false),
   membershipActive: boolean("membership_active").notNull().default(false),
-  membershipType: text("membership_type"), // "fenix" | "fenix_pro"
+  membershipType: text("membership_type").default("fenix_pro"), // only "fenix_pro"
   createdAt: timestamp("created_at").defaultNow(),
 });
 
@@ -24,7 +32,9 @@ export const videos = pgTable("videos", {
   category: text("category").notNull().default("general"), // module/category
   sortOrder: integer("sort_order").notNull().default(0),
   active: boolean("active").notNull().default(true),
-  membershipRequired: text("membership_required").notNull().default("fenix"), // "fenix" | "fenix_pro"
+  membershipRequired: text("membership_required")
+    .notNull()
+    .default("fenix_pro"), // only "fenix_pro"
   createdAt: timestamp("created_at").defaultNow(),
 });
 
@@ -46,10 +56,12 @@ export const insertVideoSchema = createInsertSchema(videos).omit({
   createdAt: true,
 });
 
-export const updateVideoSchema = createInsertSchema(videos).omit({
-  id: true,
-  createdAt: true,
-}).partial();
+export const updateVideoSchema = createInsertSchema(videos)
+  .omit({
+    id: true,
+    createdAt: true,
+  })
+  .partial();
 
 // Types
 export type InsertUser = z.infer<typeof insertUserSchema>;

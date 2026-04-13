@@ -71,7 +71,12 @@ export async function registerRoutes(
         return res.status(409).json({ message: "El email ya está registrado" });
       }
 
-      const user = await storage.createUser({ email, password, name });
+      const user = await storage.createUser({
+        email,
+        password,
+        name,
+      });
+
       return res.json({
         id: user.id,
         name: user.name,
@@ -101,6 +106,7 @@ export async function registerRoutes(
       if (!user || user.password !== password) {
         return res.status(401).json({ message: "Credenciales incorrectas" });
       }
+
       if (user.disabled) {
         return res
           .status(403)
@@ -151,9 +157,11 @@ export async function registerRoutes(
     try {
       const id = parseInt(req.params.id);
       const updated = await storage.updateUser(id, req.body);
+
       if (!updated) {
         return res.status(404).json({ message: "Usuario no encontrado" });
       }
+
       return res.json({
         id: updated.id,
         email: updated.email,
@@ -208,7 +216,13 @@ export async function registerRoutes(
           .status(400)
           .json({ message: "Datos inválidos", errors: parsed.error.errors });
       }
-      const video = await storage.createVideo(parsed.data);
+
+      const normalizedData = {
+        ...parsed.data,
+        membershipRequired: "fenix_pro",
+      };
+
+      const video = await storage.createVideo(normalizedData);
       return res.json(video);
     } catch (error) {
       console.error("CREATE VIDEO ERROR:", error);
@@ -223,15 +237,23 @@ export async function registerRoutes(
     try {
       const id = parseInt(req.params.id);
       const parsed = updateVideoSchema.safeParse(req.body);
+
       if (!parsed.success) {
         return res
           .status(400)
           .json({ message: "Datos inválidos", errors: parsed.error.errors });
       }
-      const updated = await storage.updateVideo(id, parsed.data);
+
+      const normalizedData = {
+        ...parsed.data,
+        membershipRequired: "fenix_pro",
+      };
+
+      const updated = await storage.updateVideo(id, normalizedData);
       if (!updated) {
         return res.status(404).json({ message: "Video no encontrado" });
       }
+
       return res.json(updated);
     } catch (error) {
       console.error("UPDATE VIDEO ERROR:", error);
@@ -270,13 +292,18 @@ export async function registerRoutes(
       if (!user || user.disabled) {
         return res.status(403).json({ message: "Acceso denegado" });
       }
+
       if (!user.membershipActive) {
         return res.status(403).json({ message: "Membresía no activa" });
       }
 
-      const vids = await storage.getActiveVideos(
-        user.membershipType || "fenix"
-      );
+      if (user.membershipType !== "fenix_pro") {
+        return res
+          .status(403)
+          .json({ message: "Esta cuenta no tiene acceso a Fénix 2.0" });
+      }
+
+      const vids = await storage.getActiveVideos("fenix_pro");
       return res.json(vids);
     } catch (error) {
       console.error("GET MEMBER VIDEOS ERROR:", error);
@@ -294,9 +321,11 @@ export async function registerRoutes(
     try {
       const settings = await storage.getAllSettings();
       const obj: Record<string, string> = {};
+
       settings.forEach((s) => {
         obj[s.key] = s.value;
       });
+
       return res.json(obj);
     } catch (error) {
       console.error("GET SETTINGS ERROR:", error);
@@ -310,9 +339,11 @@ export async function registerRoutes(
   app.post("/api/admin/settings", async (req, res) => {
     try {
       const entries = Object.entries(req.body) as [string, string][];
+
       for (const [key, value] of entries) {
         await storage.setSetting(key, value);
       }
+
       return res.json({ success: true });
     } catch (error) {
       console.error("SAVE SETTINGS ERROR:", error);
@@ -322,6 +353,25 @@ export async function registerRoutes(
       });
     }
   });
+  app.get("/api/fix-fenix", async (_req, res) => {
+    try {
+      await pool.query(`
+        update users
+        set membership_type = 'fenix_pro'
+        where membership_type is null
+           or membership_type = 'fenix';
+  
+        update videos
+        set membership_required = 'fenix_pro'
+        where membership_required in ('fenix', 'all')
+           or membership_required is null;
+      `);
 
+      res.json({ success: true });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error });
+    }
+  });
   return httpServer;
 }
