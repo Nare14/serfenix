@@ -93,7 +93,12 @@ export class DatabaseStorage implements IStorage {
       return [];
     }
 
-    return allActive.filter((v) => v.membershipRequired === "fenix_pro");
+    return allActive.filter(
+      (v) =>
+        v.membershipRequired === "fenix_pro" ||
+        v.membershipRequired === "all" ||
+        v.membershipRequired === "fenix"
+    );
   }
 
   async createVideo(video: InsertVideo): Promise<Video> {
