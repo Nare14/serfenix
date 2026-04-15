@@ -270,7 +270,7 @@ export async function registerRoutes(
 
       const normalizedData = {
         ...parsed.data,
-        membershipRequired: "fenix_pro",
+        membershipRequired: parsed.data.membershipRequired || "fenix_pro",
       };
 
       const video = await storage.createVideo(normalizedData);
