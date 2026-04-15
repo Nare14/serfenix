@@ -342,12 +342,8 @@ export default function Home() {
 
         <div className="container mx-auto px-4 relative z-10 pt-10">
           <motion.div {...fadeInUp} className="text-center mb-16">
-            <h2 className="text-4xl md:text-6xl font-serif text-rose-950 mb-4">
-              Tu nueva vida empieza acá
-            </h2>
-            <p className="text-rose-800/70 text-xl md:text-2xl font-semibold font-serif max-w-2xl mx-auto">
-              Esto no es solo contenido… es el proceso que te va a transformar
-            </p>
+            <h2 className="text-4xl md:text-6xl font-serif text-rose-950 mb-4"></h2>
+            <p className="text-rose-800/70 text-xl md:text-2xl font-semibold font-serif max-w-2xl mx-auto"></p>
           </motion.div>
 
           <div className="max-w-4xl mx-auto">
@@ -390,7 +386,7 @@ export default function Home() {
 
                   <Link href="/pago?plan=fenix_pro">
                     <Button className="w-full bg-rose-600 hover:bg-rose-700 text-white rounded-full h-14 text-lg font-medium shadow-xl shadow-rose-600/20 hover:scale-[1.02] transition-transform">
-                      QUIERO TRANSFORMAR MI VIDA
+                      QUIERO UNIRME
                     </Button>
                   </Link>
                 </CardContent>
