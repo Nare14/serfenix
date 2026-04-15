@@ -361,12 +361,8 @@ export default function Home() {
 
         <div className="container mx-auto px-4 relative z-10 pt-10">
           <motion.div {...fadeInUp} className="text-center mb-16">
-            <h2 className="text-4xl md:text-6xl font-serif text-rose-950 mb-4">
-              Sala Fénix 2.0
-            </h2>
-            <p className="text-rose-800/70 text-xl md:text-2xl font-semibold font-serif max-w-2xl mx-auto">
-              Un espacio más profundo para transformar tu vida desde adentro.
-            </p>
+            <h2 className="text-4xl md:text-6xl font-serif text-rose-950 mb-4"></h2>
+            <p className="text-rose-800/70 text-xl md:text-2xl font-semibold font-serif max-w-2xl mx-auto"></p>
           </motion.div>
 
           <div className="max-w-4xl mx-auto">
