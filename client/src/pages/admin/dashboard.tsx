@@ -125,6 +125,7 @@ export default function AdminDashboard() {
 
   const [siteTitle, setSiteTitle] = useState("");
   const [siteSubtitle, setSiteSubtitle] = useState("");
+  const [salaFenixDescription, setSalaFenixDescription] = useState("");
   const [priceFenix, setPriceFenix] = useState("99");
   const [priceFenixPro, setPriceFenixPro] = useState("1999");
 
@@ -159,7 +160,7 @@ export default function AdminDashboard() {
   const [videoMembership, setVideoMembership] = useState("fenix");
   const [videoSaving, setVideoSaving] = useState(false);
   const [videoError, setVideoError] = useState("");
-  const [salaFenixDescription, setSalaFenixDescription] = useState("");
+
   useEffect(() => {
     if (localStorage.getItem("adminAuth") !== "true") {
       setLocation("/admin");
@@ -190,6 +191,7 @@ export default function AdminDashboard() {
 
       setSiteTitle(s.siteTitle || "Tu poder habita dentro de ti");
       setSiteSubtitle(s.siteSubtitle || "Bienvenido a tu renacer");
+      setSalaFenixDescription(s.salaFenixDescription || "");
       setPriceFenix(s.priceFenix || "99");
       setPriceFenixPro(s.priceFenixPro || "1999");
 
@@ -228,6 +230,7 @@ export default function AdminDashboard() {
       await saveSettings({
         siteTitle: siteTitle.trim(),
         siteSubtitle: siteSubtitle.trim(),
+        salaFenixDescription: salaFenixDescription.trim(),
         priceFenix: priceFenix.trim(),
         priceFenixPro: priceFenixPro.trim(),
       });
@@ -394,10 +397,12 @@ export default function AdminDashboard() {
       setVideoError("Ingresá la URL del video.");
       return;
     }
+
     if (!videoMembership) {
       setVideoError("Seleccioná al menos una sala para este video.");
       return;
     }
+
     setVideoSaving(true);
 
     try {
@@ -1058,6 +1063,7 @@ export default function AdminDashboard() {
                   className="max-w-xl rounded-xl border-rose-200 focus-visible:ring-rose-400"
                 />
               </div>
+
               <div className="space-y-2">
                 <Label className="text-rose-950">Subtítulo Hero</Label>
                 <Input
@@ -1066,6 +1072,7 @@ export default function AdminDashboard() {
                   className="max-w-xl rounded-xl border-rose-200 focus-visible:ring-rose-400"
                 />
               </div>
+
               <div className="space-y-2">
                 <Label className="text-rose-950">
                   Descripción de Sala Fénix 2.0
