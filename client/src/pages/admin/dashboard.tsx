@@ -126,6 +126,7 @@ export default function AdminDashboard() {
   const [siteTitle, setSiteTitle] = useState("");
   const [siteSubtitle, setSiteSubtitle] = useState("");
   const [salaFenixDescription, setSalaFenixDescription] = useState("");
+  const [salaFenixItems, setSalaFenixItems] = useState("");
   const [priceFenix, setPriceFenix] = useState("99");
   const [priceFenixPro, setPriceFenixPro] = useState("1999");
 
@@ -192,6 +193,17 @@ export default function AdminDashboard() {
       setSiteTitle(s.siteTitle || "Tu poder habita dentro de ti");
       setSiteSubtitle(s.siteSubtitle || "Bienvenido a tu renacer");
       setSalaFenixDescription(s.salaFenixDescription || "");
+      setSalaFenixItems(
+        s.salaFenixItems ||
+          [
+            "Mentoría semanal en VIVO con Sofi exclusiva Sala Fénix 2.0",
+            "WhatsApp ilimitado 1:1 conmigo",
+            "Descubrí tu propósito de vida",
+            "Aprenderás a armar una rutina equilibrada y estratégica de tu vida en todas las áreas",
+            "Reprogramá tu subconsciente y sintonizá con la vida que Dios tiene para vos",
+            "Creá tu marca personal",
+          ].join("\n")
+      );
       setPriceFenix(s.priceFenix || "99");
       setPriceFenixPro(s.priceFenixPro || "1999");
 
@@ -231,6 +243,7 @@ export default function AdminDashboard() {
         siteTitle: siteTitle.trim(),
         siteSubtitle: siteSubtitle.trim(),
         salaFenixDescription: salaFenixDescription.trim(),
+        salaFenixItems: salaFenixItems.trim(),
         priceFenix: priceFenix.trim(),
         priceFenixPro: priceFenixPro.trim(),
       });
@@ -1075,17 +1088,33 @@ export default function AdminDashboard() {
 
               <div className="space-y-2">
                 <Label className="text-rose-950">
-                  Descripción de Sala Fénix 2.0
+                  Descripción superior de Sala Fénix 2.0
                 </Label>
                 <textarea
                   value={salaFenixDescription}
                   onChange={(e) => setSalaFenixDescription(e.target.value)}
-                  placeholder="Escribí acá la descripción que va a mostrarse en la página de Sala Fénix 2.0"
-                  className="w-full max-w-3xl min-h-[160px] rounded-xl border border-rose-200 bg-white px-3 py-2 text-sm text-rose-950 outline-none focus:ring-2 focus:ring-rose-400"
+                  placeholder="Texto corto que aparece arriba de la card de Sala Fénix 2.0"
+                  className="w-full max-w-3xl min-h-[120px] rounded-xl border border-rose-200 bg-white px-3 py-2 text-sm text-rose-950 outline-none focus:ring-2 focus:ring-rose-400"
                 />
                 <p className="text-xs text-rose-900/50">
-                  Este texto podrá editarlo la administradora desde el panel sin
-                  tocar código.
+                  Este texto corresponde al bloque superior, no a la lista de
+                  beneficios.
+                </p>
+              </div>
+
+              <div className="space-y-2">
+                <Label className="text-rose-950">
+                  Ítems / beneficios de Sala Fénix 2.0
+                </Label>
+                <textarea
+                  value={salaFenixItems}
+                  onChange={(e) => setSalaFenixItems(e.target.value)}
+                  placeholder={`Escribí un beneficio por línea.\nEjemplo:\nMentoría semanal en VIVO con Sofi exclusiva Sala Fénix 2.0\nWhatsApp ilimitado 1:1 conmigo`}
+                  className="w-full max-w-3xl min-h-[220px] rounded-xl border border-rose-200 bg-white px-3 py-2 text-sm text-rose-950 outline-none focus:ring-2 focus:ring-rose-400 whitespace-pre-wrap"
+                />
+                <p className="text-xs text-rose-900/50">
+                  Cada línea se mostrará como un ítem con check en la card de
+                  Sala Fénix 2.0.
                 </p>
               </div>
             </CardContent>
