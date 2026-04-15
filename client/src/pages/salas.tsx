@@ -67,49 +67,24 @@ function getMembershipType(user: any): string | null {
     return "fenix_pro";
   }
 
-  if (
-    user.membershipType === "fenix" ||
-    user.plan === "fenix" ||
-    user.membership === "fenix"
-  ) {
-    return "fenix";
-  }
-
-  if (user.membershipActive === true || user.hasMembership === true) {
-    return "fenix";
-  }
-
   return null;
 }
 
 function hasActiveMembership(user: any): boolean {
-  return getMembershipType(user) !== null;
+  return getMembershipType(user) === "fenix_pro";
 }
 
 function canUserSeeVideo(user: any, video: VideoItem): boolean {
   const membership = getMembershipType(user);
 
-  if (!membership) return false;
+  if (membership !== "fenix_pro") return false;
   if (video.active === false) return false;
 
-  if (membership === "fenix_pro") {
-    return (
-      video.membershipRequired === "fenix_pro" ||
-      video.membershipRequired === "fenix" ||
-      video.membershipRequired === "all" ||
-      !video.membershipRequired
-    );
-  }
-
-  if (membership === "fenix") {
-    return (
-      video.membershipRequired === "fenix" ||
-      video.membershipRequired === "all" ||
-      !video.membershipRequired
-    );
-  }
-
-  return false;
+  return (
+    video.membershipRequired === "fenix_pro" ||
+    video.membershipRequired === "all" ||
+    !video.membershipRequired
+  );
 }
 
 export default function Salas() {
@@ -128,6 +103,7 @@ export default function Salas() {
           setLocation("/miembros");
           return;
         }
+
         const parsed = JSON.parse(stored);
         setUser(parsed);
 
@@ -135,8 +111,6 @@ export default function Salas() {
           setLoading(false);
           return;
         }
-
-        console.log("USUARIO LOGUEADO:", parsed);
 
         const userId = parsed?.id ?? parsed?.userId;
 
@@ -155,7 +129,7 @@ export default function Salas() {
 
         setVideos(visibleVideos);
       } catch (err: any) {
-        console.error("Error cargando salas:", err);
+        console.error("Error cargando sala:", err);
         setError(err?.message || "No se pudo cargar el contenido");
       } finally {
         setLoading(false);
@@ -183,7 +157,7 @@ export default function Salas() {
   if (!user) return null;
 
   const membershipType = getMembershipType(user);
-  const needsPayment = !membershipType;
+  const needsPayment = membershipType !== "fenix_pro";
 
   return (
     <div className="min-h-screen bg-[#fcf7f8] pb-24 relative overflow-hidden">
@@ -228,7 +202,7 @@ export default function Salas() {
             transition={{ duration: 0.45 }}
             className="text-4xl md:text-6xl lg:text-7xl font-serif font-bold text-rose-950 mb-4"
           >
-            MIS SALAS
+            SALA FÉNIX 2.0
           </motion.h1>
 
           <motion.p
@@ -238,8 +212,8 @@ export default function Salas() {
             className="text-rose-900/65 max-w-2xl mx-auto text-base md:text-lg leading-relaxed"
           >
             {needsPayment
-              ? "Elegí la membresía que mejor acompañe tu proceso y accedé a un espacio creado para tu transformación."
-              : "Bienvenida a tu espacio privado. Aquí vas a encontrar tus contenidos, tus salas activas y todo lo que necesitás para avanzar a tu ritmo."}
+              ? "Accedé a Sala Fénix 2.0 y encontrá un espacio exclusivo para tu transformación."
+              : "Bienvenida a tu espacio privado. Aquí vas a encontrar tu contenido exclusivo de Sala Fénix 2.0 para avanzar a tu ritmo."}
           </motion.p>
         </div>
       </section>
@@ -252,140 +226,94 @@ export default function Salas() {
             </div>
           </div>
         ) : needsPayment ? (
-          <section className="max-w-6xl mx-auto">
+          <section className="max-w-3xl mx-auto">
             <div className="text-center mb-12">
               <Sparkles className="w-10 h-10 text-rose-400 mx-auto mb-3" />
               <h2 className="text-3xl md:text-4xl font-serif text-rose-950 mb-3">
-                Elegí tu membresía
+                Sumate a Sala Fénix 2.0
               </h2>
               <p className="text-rose-700/70 max-w-xl mx-auto">
-                Seleccioná el plan que mejor se adapte a ti y comenzá tu camino
-                dentro de Sabiduría Fénix.
+                Activá tu acceso y empezá tu proceso dentro de Sala Fénix 2.0.
               </p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              <motion.div
-                initial={{ opacity: 0, y: 18 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.35 }}
-                className="rounded-[2rem] border border-rose-200 bg-white/85 backdrop-blur-sm p-8 shadow-[0_12px_40px_rgba(120,40,60,0.07)] text-center"
-              >
-                <div className="w-14 h-14 rounded-2xl bg-rose-100 flex items-center justify-center mx-auto mb-5 text-2xl">
-                  ✨
-                </div>
+            <motion.div
+              initial={{ opacity: 0, y: 18 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.45 }}
+              className="rounded-[2rem] border border-rose-300 bg-white/90 backdrop-blur-sm p-8 shadow-[0_16px_50px_rgba(120,40,60,0.10)] text-center relative overflow-hidden"
+            >
+              <div className="absolute top-4 right-4 rounded-full bg-rose-100 text-rose-700 text-xs font-semibold px-3 py-1">
+                Acceso exclusivo
+              </div>
 
-                <h3 className="font-serif text-2xl md:text-3xl font-bold text-rose-900 mb-3">
-                  Sala Fénix
-                </h3>
+              <div className="w-14 h-14 rounded-2xl bg-rose-100 flex items-center justify-center mx-auto mb-5 text-2xl">
+                🔥
+              </div>
 
-                <p className="text-rose-600/70 text-sm mb-6">
-                  99 USD – Suscripción mensual
-                </p>
+              <h3 className="font-serif text-2xl md:text-3xl font-bold text-rose-900 mb-2">
+                Sala Fénix 2.0
+              </h3>
 
-                <ul className="text-left space-y-3 mb-8 text-rose-800/80">
-                  <li className="flex items-start gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-green-500 shrink-0 mt-1" />
-                    <span>Mentoría semanal en VIVO con Sofi</span>
-                  </li>
+              <p className="text-rose-600 font-semibold mb-4">
+                TRANSFORMA TU REALIDAD A FUEGO
+              </p>
 
-                  <li className="flex items-start gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-green-500 shrink-0 mt-1" />
-                    <span>Acceso a comunidad Telegram</span>
-                  </li>
+              <div className="mb-6">
+                <span className="text-4xl font-bold text-rose-900">
+                  1499 USD
+                </span>
+                <span className="text-rose-600/60 ml-1">/ 6 meses</span>
+              </div>
 
-                  <li className="flex items-start gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-green-500 shrink-0 mt-1" />
-                    <span>Acceso a contenido práctico grabado</span>
-                  </li>
-                </ul>
-
-                <Link href="/pago?plan=fenix">
-                  <Button className="w-full bg-rose-600 hover:bg-rose-700 text-white rounded-full py-6 text-lg shadow-lg shadow-rose-600/20">
-                    <CreditCard className="w-5 h-5 mr-2" />
-                    Unirme a esta sala
-                  </Button>
-                </Link>
-              </motion.div>
-
-              <motion.div
-                initial={{ opacity: 0, y: 18 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.45 }}
-                className="rounded-[2rem] border border-rose-300 bg-white/90 backdrop-blur-sm p-8 shadow-[0_16px_50px_rgba(120,40,60,0.10)] text-center relative overflow-hidden"
-              >
-                <div className="absolute top-4 right-4 rounded-full bg-rose-100 text-rose-700 text-xs font-semibold px-3 py-1">
-                  Más elegido
-                </div>
-
-                <div className="w-14 h-14 rounded-2xl bg-rose-100 flex items-center justify-center mx-auto mb-5 text-2xl">
-                  🔥
-                </div>
-
-                <h3 className="font-serif text-2xl md:text-3xl font-bold text-rose-900 mb-2">
-                  Sala Fénix 2.0
-                </h3>
-
-                <p className="text-rose-600 font-semibold mb-4">
-                  TRANSFORMA TU REALIDAD A FUEGO
-                </p>
-
-                <div className="mb-6">
-                  <span className="text-4xl font-bold text-rose-900">
-                    1499 USD
+              <ul className="text-left space-y-3 mb-8 text-rose-800/80">
+                <li className="flex items-start gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-green-500 shrink-0 mt-1" />
+                  <span>
+                    Mentoría semanal en VIVO con Sofi exclusiva Sala Fénix 2.0
                   </span>
-                  <span className="text-rose-600/60 ml-1">/ 6 meses</span>
-                </div>
+                </li>
 
-                <ul className="text-left space-y-3 mb-8 text-rose-800/80">
-                  <li className="flex items-start gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-green-500 shrink-0 mt-1" />
-                    <span>
-                      Mentoría semanal en VIVO con Sofi exclusiva Sala Fénix 2.0
-                    </span>
-                  </li>
+                <li className="flex items-start gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-green-500 shrink-0 mt-1" />
+                  <span>WhatsApp ilimitado 1:1 conmigo</span>
+                </li>
 
-                  <li className="flex items-start gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-green-500 shrink-0 mt-1" />
-                    <span>WhatsApp ilimitado 1:1 conmigo</span>
-                  </li>
+                <li className="flex items-start gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-green-500 shrink-0 mt-1" />
+                  <span>
+                    Acceso a comunidad exclusiva WhatsApp Sala Fénix 2.0
+                  </span>
+                </li>
 
-                  <li className="flex items-start gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-green-500 shrink-0 mt-1" />
-                    <span>
-                      Acceso a comunidad exclusiva WhatsApp Sala Fénix 2.0
-                    </span>
-                  </li>
+                <li className="flex items-start gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-green-500 shrink-0 mt-1" />
+                  <span>Descubrí tu misión de vida</span>
+                </li>
 
-                  <li className="flex items-start gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-green-500 shrink-0 mt-1" />
-                    <span>Descubrí tu misión de vida</span>
-                  </li>
+                <li className="flex items-start gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-green-500 shrink-0 mt-1" />
+                  <span>
+                    Rutinas personalizadas de cuerpo, mente y espíritu
+                  </span>
+                </li>
 
-                  <li className="flex items-start gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-green-500 shrink-0 mt-1" />
-                    <span>
-                      Rutinas personalizadas de cuerpo, mente y espíritu
-                    </span>
-                  </li>
+                <li className="flex items-start gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-green-500 shrink-0 mt-1" />
+                  <span>
+                    Reprogramá tu subconsciente y creá la vida que merecés y
+                    soñás en todas las áreas
+                  </span>
+                </li>
+              </ul>
 
-                  <li className="flex items-start gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-green-500 shrink-0 mt-1" />
-                    <span>
-                      Reprogramá tu subconsciente y creá la vida que merecés y
-                      soñás en todas las áreas
-                    </span>
-                  </li>
-                </ul>
-
-                <Link href="/pago?plan=fenix_pro">
-                  <Button className="w-full bg-rose-600 hover:bg-rose-700 text-white rounded-full py-6 text-lg shadow-lg shadow-rose-600/20">
-                    <CreditCard className="w-5 h-5 mr-2" />
-                    Unirme a esta sala
-                  </Button>
-                </Link>
-              </motion.div>
-            </div>
+              <Link href="/pago?plan=fenix_pro">
+                <Button className="w-full bg-rose-600 hover:bg-rose-700 text-white rounded-full py-6 text-lg shadow-lg shadow-rose-600/20">
+                  <CreditCard className="w-5 h-5 mr-2" />
+                  Unirme a Sala Fénix 2.0
+                </Button>
+              </Link>
+            </motion.div>
           </section>
         ) : (
           <section className="max-w-6xl mx-auto">
@@ -419,9 +347,7 @@ export default function Salas() {
                     </div>
 
                     <div className="text-xs text-rose-500/70 uppercase tracking-[0.18em]">
-                      {membershipType === "fenix_pro"
-                        ? "Sala Fénix 2.0"
-                        : "Sala Fénix"}
+                      Sala Fénix 2.0
                     </div>
                   </div>
                 </div>
@@ -432,7 +358,7 @@ export default function Salas() {
               <>
                 <div className="mb-8">
                   <h3 className="text-2xl md:text-3xl font-serif text-rose-950 mb-2">
-                    Tus contenidos
+                    Tu contenido
                   </h3>
                   <p className="text-rose-900/60">
                     Acá encontrarás el contenido disponible para tu proceso de
@@ -507,9 +433,8 @@ export default function Salas() {
                   </h3>
 
                   <p className="text-rose-900/65 max-w-xl mx-auto leading-relaxed mb-6">
-                    Ya formas parte de tu membresía. Muy pronto tus salas y
-                    contenidos disponibles aparecerán aquí dentro de este
-                    espacio.
+                    Ya formas parte de Sala Fénix 2.0. Muy pronto tu contenido
+                    disponible aparecerá aquí dentro de este espacio.
                   </p>
 
                   <Link href="/">
