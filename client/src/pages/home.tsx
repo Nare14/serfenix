@@ -14,6 +14,9 @@ export default function Home() {
     "Llegó el momento de despertarlo"
   );
   const [priceFenixPro, setPriceFenixPro] = useState("1999");
+  const [salaFenixDescription, setSalaFenixDescription] = useState(
+    "El espacio donde vas a reconstruirte, alinearte y crear la vida que sentís que es para vos."
+  );
 
   const SpiritualEyeSvg = () => (
     <svg
@@ -168,6 +171,9 @@ export default function Home() {
         if (s.siteTitle) setSiteTitle(s.siteTitle);
         if (s.siteSubtitle) setSiteSubtitle(s.siteSubtitle);
         if (s.priceFenixPro) setPriceFenixPro(s.priceFenixPro);
+        if (s.salaFenixDescription) {
+          setSalaFenixDescription(s.salaFenixDescription);
+        }
       } catch (error) {
         console.error("Error cargando settings:", error);
       }
@@ -342,8 +348,12 @@ export default function Home() {
 
         <div className="container mx-auto px-4 relative z-10 pt-10">
           <motion.div {...fadeInUp} className="text-center mb-16">
-            <h2 className="text-4xl md:text-6xl font-serif text-rose-950 mb-4"></h2>
-            <p className="text-rose-800/70 text-xl md:text-2xl font-semibold font-serif max-w-2xl mx-auto"></p>
+            <h2 className="text-4xl md:text-6xl font-serif text-rose-950 mb-4">
+              Sala Fénix 2.0
+            </h2>
+            <p className="text-rose-800/70 text-xl md:text-2xl font-semibold font-serif max-w-2xl mx-auto">
+              Un espacio más profundo para transformar tu vida desde adentro.
+            </p>
           </motion.div>
 
           <div className="max-w-4xl mx-auto">
@@ -354,9 +364,9 @@ export default function Home() {
                     Sala Fénix 2.0
                   </h3>
 
-                  <p className="text-rose-800/70 mb-8 text-lg">
-                    El espacio donde vas a reconstruirte, alinearte y crear la
-                    vida que sentís que es para vos.
+                  <p className="text-rose-800/70 mb-8 text-lg leading-relaxed max-w-2xl mx-auto whitespace-pre-line">
+                    {salaFenixDescription ||
+                      "Próximamente vas a ver acá la descripción de Sala Fénix 2.0."}
                   </p>
 
                   <div className="text-5xl font-bold text-rose-700 mb-2">
