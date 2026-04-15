@@ -2,7 +2,7 @@ import { apiRequest } from "./queryClient";
 
 const API_BASE =
   import.meta.env.VITE_API_BASE_URL ||
-  "https://estasalebien-production.up.railway.app";
+  "https://serfenix-production-9661.up.railway.app";
 
 function buildUrl(path: string) {
   if (path.startsWith("http://") || path.startsWith("https://")) {
