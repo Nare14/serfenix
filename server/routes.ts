@@ -303,7 +303,7 @@ export async function registerRoutes(
 
       const normalizedData = {
         ...parsed.data,
-        membershipRequired: "fenix_pro",
+        membershipRequired: parsed.data.membershipRequired || "fenix_pro",
       };
 
       const updated = await storage.updateVideo(id, normalizedData);
@@ -438,7 +438,7 @@ export async function registerRoutes(
     }
   });
 
-  // Alias opcional para compatibilidad si ya estabas usando estas rutas viejas
+  // Compatibilidad con rutas viejas
   app.get("/api/settings", async (_req: Request, res: Response) => {
     try {
       const settings = await storage.getAllSettings();
