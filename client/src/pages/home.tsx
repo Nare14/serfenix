@@ -17,6 +17,14 @@ export default function Home() {
   const [salaFenixDescription, setSalaFenixDescription] = useState(
     "El espacio donde vas a reconstruirte, alinearte y crear la vida que sentís que es para vos."
   );
+  const [salaFenixItems, setSalaFenixItems] = useState<string[]>([
+    "Mentoría semanal en VIVO con Sofi exclusiva Sala Fénix 2.0",
+    "WhatsApp ilimitado 1:1 conmigo",
+    "Descubrí tu propósito de vida",
+    "Aprenderás a armar una rutina equilibrada y estratégica de tu vida en todas las áreas",
+    "Reprogramá tu subconsciente y sintonizá con la vida que Dios tiene para vos",
+    "Creá tu marca personal",
+  ]);
 
   const SpiritualEyeSvg = () => (
     <svg
@@ -174,6 +182,14 @@ export default function Home() {
         if (s.salaFenixDescription) {
           setSalaFenixDescription(s.salaFenixDescription);
         }
+        if (s.salaFenixItems) {
+          setSalaFenixItems(
+            s.salaFenixItems
+              .split("\n")
+              .map((item: string) => item.trim())
+              .filter(Boolean)
+          );
+        }
       } catch (error) {
         console.error("Error cargando settings:", error);
       }
@@ -191,7 +207,6 @@ export default function Home() {
 
   return (
     <div className="min-h-screen pt-20">
-      {/* HERO SECTION */}
       <section className="relative min-h-[90vh] flex items-center justify-center overflow-hidden bg-rose-50/50">
         <div className="absolute inset-0 z-0">
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,var(--color-rose-100)_0%,transparent_100%)] opacity-70 mix-blend-multiply" />
@@ -276,7 +291,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* 4 CARDS */}
       <section className="py-24 bg-white">
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-8">
@@ -329,7 +343,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* SALA FÉNIX 2.0 */}
       <section id="sala" className="py-24 bg-rose-50 relative overflow-hidden">
         <div className="absolute top-0 left-0 w-full overflow-hidden leading-none rotate-180">
           <svg
@@ -376,14 +389,7 @@ export default function Home() {
                   <p className="text-rose-500 mb-10">/ 6 meses</p>
 
                   <ul className="space-y-4 text-left max-w-md mx-auto mb-10">
-                    {[
-                      "Mentoría semanal en VIVO con Sofi exclusiva Sala Fénix 2.0",
-                      "WhatsApp ilimitado 1:1 conmigo",
-                      "Descubrí tu propósito de vida",
-                      "Aprenderás a armar una rutina equilibrada y estratégica de tu vida en todas las áreas",
-                      "Reprogramá tu subconsciente y sintonizá con la vida que Dios tiene para vos",
-                      "Creá tu marca personal",
-                    ].map((item, i) => (
+                    {salaFenixItems.map((item, i) => (
                       <li
                         key={i}
                         className="flex items-start gap-3 text-rose-900/80 font-medium"
@@ -406,7 +412,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* VIDEO SECTION */}
       <section className="py-24 bg-rose-50/50">
         <div className="container mx-auto px-4">
           <motion.div {...fadeInUp} className="max-w-4xl mx-auto">
