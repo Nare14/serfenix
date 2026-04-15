@@ -21,25 +21,37 @@ function Router() {
       <Route path="/admin/dashboard">
         <AdminDashboard />
       </Route>
+
       <Route path="/admin">
         <AdminLogin />
       </Route>
+
       <Route path="/miembros">
         <Navbar />
         <Miembros />
         <Footer />
       </Route>
+
+      {/* Ruta principal existente */}
       <Route path="/salas">
         <Salas />
       </Route>
+
+      {/* Alias opcional por si querés usar singular */}
+      <Route path="/sala">
+        <Salas />
+      </Route>
+
       <Route path="/pago">
         <Pago />
       </Route>
+
       <Route path="/">
         <Navbar />
         <Home />
         <Footer />
       </Route>
+
       <Route component={NotFound} />
     </Switch>
   );
