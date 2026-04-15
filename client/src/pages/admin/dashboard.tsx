@@ -159,7 +159,7 @@ export default function AdminDashboard() {
   const [videoMembership, setVideoMembership] = useState("fenix");
   const [videoSaving, setVideoSaving] = useState(false);
   const [videoError, setVideoError] = useState("");
-
+  const [salaFenixDescription, setSalaFenixDescription] = useState("");
   useEffect(() => {
     if (localStorage.getItem("adminAuth") !== "true") {
       setLocation("/admin");
@@ -1065,6 +1065,21 @@ export default function AdminDashboard() {
                   onChange={(e) => setSiteSubtitle(e.target.value)}
                   className="max-w-xl rounded-xl border-rose-200 focus-visible:ring-rose-400"
                 />
+              </div>
+              <div className="space-y-2">
+                <Label className="text-rose-950">
+                  Descripción de Sala Fénix 2.0
+                </Label>
+                <textarea
+                  value={salaFenixDescription}
+                  onChange={(e) => setSalaFenixDescription(e.target.value)}
+                  placeholder="Escribí acá la descripción que va a mostrarse en la página de Sala Fénix 2.0"
+                  className="w-full max-w-3xl min-h-[160px] rounded-xl border border-rose-200 bg-white px-3 py-2 text-sm text-rose-950 outline-none focus:ring-2 focus:ring-rose-400"
+                />
+                <p className="text-xs text-rose-900/50">
+                  Este texto podrá editarlo la administradora desde el panel sin
+                  tocar código.
+                </p>
               </div>
             </CardContent>
           </Card>
