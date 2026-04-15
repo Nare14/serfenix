@@ -324,7 +324,7 @@ export default function Home() {
       </section>
 
       {/* SALA FÉNIX 2.0 */}
-      <section id="salas" className="py-24 bg-rose-50 relative overflow-hidden">
+      <section id="sala" className="py-24 bg-rose-50 relative overflow-hidden">
         <div className="absolute top-0 left-0 w-full overflow-hidden leading-none rotate-180">
           <svg
             className="relative block w-full h-[60px]"

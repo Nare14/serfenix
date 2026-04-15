@@ -1,5 +1,5 @@
-import type { Express } from "express";
-import { createServer, type Server } from "http";
+import type { Express, Request, Response } from "express";
+import type { Server } from "http";
 import { storage } from "./storage";
 import { pool } from "./db";
 import { insertVideoSchema, updateVideoSchema } from "@shared/schema";
@@ -15,11 +15,11 @@ export async function registerRoutes(
   // ==========================================
   // HEALTH / DB TEST
   // ==========================================
-  app.get("/api/health", (_req, res) => {
+  app.get("/api/health", (_req: Request, res: Response) => {
     return res.json({ ok: true });
   });
 
-  app.get("/api/db-test", async (_req, res) => {
+  app.get("/api/db-test", async (_req: Request, res: Response) => {
     try {
       const result = await pool.query("select 1 as ok");
       return res.json(result.rows);
@@ -35,35 +35,68 @@ export async function registerRoutes(
   // ==========================================
   // AUTH - Admin Login
   // ==========================================
-  app.post("/api/admin/login", (req, res) => {
-    const { email, password } = req.body;
-    if (email === adminEmail && password === adminPassword) {
-      return res.json({ success: true });
+  app.post("/api/admin/login", (req: Request, res: Response) => {
+    try {
+      const { email, password } = req.body ?? {};
+
+      if (!email || !password) {
+        return res.status(400).json({
+          message: "Email y contraseña son requeridos",
+        });
+      }
+
+      if (email === adminEmail && password === adminPassword) {
+        return res.json({ success: true });
+      }
+
+      return res.status(401).json({ message: "Credenciales incorrectas" });
+    } catch (error) {
+      console.error("ADMIN LOGIN ERROR:", error);
+      return res.status(500).json({
+        message: "Error al iniciar sesión como administradora",
+        error: error instanceof Error ? error.message : String(error),
+      });
     }
-    return res.status(401).json({ message: "Credenciales incorrectas" });
   });
 
-  app.post("/api/admin/change-password", (req, res) => {
-    const { newPassword } = req.body;
-    if (!newPassword || newPassword.length < 6) {
-      return res
-        .status(400)
-        .json({ message: "La contraseña debe tener al menos 6 caracteres" });
+  app.post("/api/admin/change-password", (req: Request, res: Response) => {
+    try {
+      const { newPassword } = req.body ?? {};
+
+      if (!newPassword || typeof newPassword !== "string") {
+        return res.status(400).json({
+          message: "La nueva contraseña es requerida",
+        });
+      }
+
+      if (newPassword.length < 6) {
+        return res.status(400).json({
+          message: "La contraseña debe tener al menos 6 caracteres",
+        });
+      }
+
+      adminPassword = newPassword;
+      return res.json({ success: true });
+    } catch (error) {
+      console.error("CHANGE ADMIN PASSWORD ERROR:", error);
+      return res.status(500).json({
+        message: "Error cambiando la contraseña",
+        error: error instanceof Error ? error.message : String(error),
+      });
     }
-    adminPassword = newPassword;
-    return res.json({ success: true });
   });
 
   // ==========================================
   // AUTH - Member Register / Login
   // ==========================================
-  app.post("/api/auth/register", async (req, res) => {
+  app.post("/api/auth/register", async (req: Request, res: Response) => {
     try {
-      const { email, password, name } = req.body;
+      const { email, password, name } = req.body ?? {};
+
       if (!email || !password || !name) {
-        return res
-          .status(400)
-          .json({ message: "Nombre, email y contraseña son requeridos" });
+        return res.status(400).json({
+          message: "Nombre, email y contraseña son requeridos",
+        });
       }
 
       const existing = await storage.getUserByEmail(email);
@@ -93,24 +126,26 @@ export async function registerRoutes(
     }
   });
 
-  app.post("/api/auth/login", async (req, res) => {
+  app.post("/api/auth/login", async (req: Request, res: Response) => {
     try {
-      const { email, password } = req.body;
+      const { email, password } = req.body ?? {};
+
       if (!email || !password) {
-        return res
-          .status(400)
-          .json({ message: "Email y contraseña son requeridos" });
+        return res.status(400).json({
+          message: "Email y contraseña son requeridos",
+        });
       }
 
       const user = await storage.getUserByEmail(email);
+
       if (!user || user.password !== password) {
         return res.status(401).json({ message: "Credenciales incorrectas" });
       }
 
       if (user.disabled) {
-        return res
-          .status(403)
-          .json({ message: "Tu cuenta ha sido desactivada" });
+        return res.status(403).json({
+          message: "Tu cuenta ha sido desactivada",
+        });
       }
 
       return res.json({
@@ -132,17 +167,20 @@ export async function registerRoutes(
   // ==========================================
   // USERS - Admin management
   // ==========================================
-  app.get("/api/admin/users", async (_req, res) => {
+  app.get("/api/admin/users", async (_req: Request, res: Response) => {
     try {
       const allUsers = await storage.getAllUsers();
+
       const safeUsers = allUsers.map((u) => ({
         id: u.id,
+        name: u.name,
         email: u.email,
         disabled: u.disabled,
         membershipActive: u.membershipActive,
         membershipType: u.membershipType,
         createdAt: u.createdAt,
       }));
+
       return res.json(safeUsers);
     } catch (error) {
       console.error("GET USERS ERROR:", error);
@@ -153,9 +191,14 @@ export async function registerRoutes(
     }
   });
 
-  app.patch("/api/admin/users/:id", async (req, res) => {
+  app.patch("/api/admin/users/:id", async (req: Request, res: Response) => {
     try {
-      const id = parseInt(req.params.id);
+      const id = Number(req.params.id);
+
+      if (Number.isNaN(id)) {
+        return res.status(400).json({ message: "ID de usuario inválido" });
+      }
+
       const updated = await storage.updateUser(id, req.body);
 
       if (!updated) {
@@ -164,6 +207,7 @@ export async function registerRoutes(
 
       return res.json({
         id: updated.id,
+        name: updated.name,
         email: updated.email,
         disabled: updated.disabled,
         membershipActive: updated.membershipActive,
@@ -178,9 +222,14 @@ export async function registerRoutes(
     }
   });
 
-  app.delete("/api/admin/users/:id", async (req, res) => {
+  app.delete("/api/admin/users/:id", async (req: Request, res: Response) => {
     try {
-      const id = parseInt(req.params.id);
+      const id = Number(req.params.id);
+
+      if (Number.isNaN(id)) {
+        return res.status(400).json({ message: "ID de usuario inválido" });
+      }
+
       await storage.deleteUser(id);
       return res.json({ success: true });
     } catch (error) {
@@ -195,7 +244,7 @@ export async function registerRoutes(
   // ==========================================
   // VIDEOS - Admin CRUD
   // ==========================================
-  app.get("/api/admin/videos", async (_req, res) => {
+  app.get("/api/admin/videos", async (_req: Request, res: Response) => {
     try {
       const allVideos = await storage.getAllVideos();
       return res.json(allVideos);
@@ -208,13 +257,15 @@ export async function registerRoutes(
     }
   });
 
-  app.post("/api/admin/videos", async (req, res) => {
+  app.post("/api/admin/videos", async (req: Request, res: Response) => {
     try {
       const parsed = insertVideoSchema.safeParse(req.body);
+
       if (!parsed.success) {
-        return res
-          .status(400)
-          .json({ message: "Datos inválidos", errors: parsed.error.errors });
+        return res.status(400).json({
+          message: "Datos inválidos",
+          errors: parsed.error.errors,
+        });
       }
 
       const normalizedData = {
@@ -233,15 +284,21 @@ export async function registerRoutes(
     }
   });
 
-  app.patch("/api/admin/videos/:id", async (req, res) => {
+  app.patch("/api/admin/videos/:id", async (req: Request, res: Response) => {
     try {
-      const id = parseInt(req.params.id);
+      const id = Number(req.params.id);
+
+      if (Number.isNaN(id)) {
+        return res.status(400).json({ message: "ID de video inválido" });
+      }
+
       const parsed = updateVideoSchema.safeParse(req.body);
 
       if (!parsed.success) {
-        return res
-          .status(400)
-          .json({ message: "Datos inválidos", errors: parsed.error.errors });
+        return res.status(400).json({
+          message: "Datos inválidos",
+          errors: parsed.error.errors,
+        });
       }
 
       const normalizedData = {
@@ -250,6 +307,7 @@ export async function registerRoutes(
       };
 
       const updated = await storage.updateVideo(id, normalizedData);
+
       if (!updated) {
         return res.status(404).json({ message: "Video no encontrado" });
       }
@@ -264,9 +322,14 @@ export async function registerRoutes(
     }
   });
 
-  app.delete("/api/admin/videos/:id", async (req, res) => {
+  app.delete("/api/admin/videos/:id", async (req: Request, res: Response) => {
     try {
-      const id = parseInt(req.params.id);
+      const id = Number(req.params.id);
+
+      if (Number.isNaN(id)) {
+        return res.status(400).json({ message: "ID de video inválido" });
+      }
+
       await storage.deleteVideo(id);
       return res.json({ success: true });
     } catch (error) {
@@ -279,16 +342,24 @@ export async function registerRoutes(
   });
 
   // ==========================================
-  // VIDEOS - Member access (protected)
+  // VIDEOS - Member access
   // ==========================================
-  app.get("/api/videos", async (req, res) => {
+  app.get("/api/videos", async (req: Request, res: Response) => {
     try {
       const userId = req.query.userId as string;
+
       if (!userId) {
         return res.status(401).json({ message: "No autorizado" });
       }
 
-      const user = await storage.getUser(parseInt(userId));
+      const parsedUserId = Number(userId);
+
+      if (Number.isNaN(parsedUserId)) {
+        return res.status(400).json({ message: "userId inválido" });
+      }
+
+      const user = await storage.getUser(parsedUserId);
+
       if (!user || user.disabled) {
         return res.status(403).json({ message: "Acceso denegado" });
       }
@@ -298,9 +369,9 @@ export async function registerRoutes(
       }
 
       if (user.membershipType !== "fenix_pro") {
-        return res
-          .status(403)
-          .json({ message: "Esta cuenta no tiene acceso a Fénix 2.0" });
+        return res.status(403).json({
+          message: "Esta cuenta no tiene acceso a Fénix 2.0",
+        });
       }
 
       const vids = await storage.getActiveVideos("fenix_pro");
@@ -317,16 +388,67 @@ export async function registerRoutes(
   // ==========================================
   // SITE SETTINGS
   // ==========================================
-  app.get("/api/settings", async (_req, res) => {
+  app.get("/api/site-settings", async (_req: Request, res: Response) => {
     try {
       const settings = await storage.getAllSettings();
-      const obj: Record<string, string> = {};
 
-      settings.forEach((s) => {
-        obj[s.key] = s.value;
+      const formatted = settings.reduce((acc, setting) => {
+        acc[setting.key] = setting.value;
+        return acc;
+      }, {} as Record<string, string>);
+
+      return res.json(formatted);
+    } catch (error) {
+      console.error("GET SITE SETTINGS ERROR:", error);
+      return res.status(500).json({
+        message: "Error cargando configuración del sitio",
+        error: error instanceof Error ? error.message : String(error),
       });
+    }
+  });
 
-      return res.json(obj);
+  app.patch("/api/site-settings", async (req: Request, res: Response) => {
+    try {
+      const updates = req.body as Record<string, unknown>;
+
+      if (!updates || typeof updates !== "object" || Array.isArray(updates)) {
+        return res.status(400).json({
+          message: "El body debe ser un objeto con claves y valores",
+        });
+      }
+
+      for (const [key, value] of Object.entries(updates)) {
+        await storage.setSetting(key, String(value ?? ""));
+      }
+
+      const settings = await storage.getAllSettings();
+
+      const formatted = settings.reduce((acc, setting) => {
+        acc[setting.key] = setting.value;
+        return acc;
+      }, {} as Record<string, string>);
+
+      return res.json(formatted);
+    } catch (error) {
+      console.error("PATCH SITE SETTINGS ERROR:", error);
+      return res.status(500).json({
+        message: "Error guardando configuración del sitio",
+        error: error instanceof Error ? error.message : String(error),
+      });
+    }
+  });
+
+  // Alias opcional para compatibilidad si ya estabas usando estas rutas viejas
+  app.get("/api/settings", async (_req: Request, res: Response) => {
+    try {
+      const settings = await storage.getAllSettings();
+
+      const formatted = settings.reduce((acc, setting) => {
+        acc[setting.key] = setting.value;
+        return acc;
+      }, {} as Record<string, string>);
+
+      return res.json(formatted);
     } catch (error) {
       console.error("GET SETTINGS ERROR:", error);
       return res.status(500).json({
@@ -336,12 +458,18 @@ export async function registerRoutes(
     }
   });
 
-  app.post("/api/admin/settings", async (req, res) => {
+  app.post("/api/admin/settings", async (req: Request, res: Response) => {
     try {
-      const entries = Object.entries(req.body) as [string, string][];
+      const updates = req.body as Record<string, unknown>;
 
-      for (const [key, value] of entries) {
-        await storage.setSetting(key, value);
+      if (!updates || typeof updates !== "object" || Array.isArray(updates)) {
+        return res.status(400).json({
+          message: "El body debe ser un objeto con claves y valores",
+        });
+      }
+
+      for (const [key, value] of Object.entries(updates)) {
+        await storage.setSetting(key, String(value ?? ""));
       }
 
       return res.json({ success: true });
@@ -353,25 +481,33 @@ export async function registerRoutes(
       });
     }
   });
-  app.get("/api/fix-fenix", async (_req, res) => {
+
+  // ==========================================
+  // UTILIDAD TEMPORAL
+  // ==========================================
+  app.get("/api/fix-fenix", async (_req: Request, res: Response) => {
     try {
       await pool.query(`
         update users
         set membership_type = 'fenix_pro'
         where membership_type is null
            or membership_type = 'fenix';
-  
+
         update videos
         set membership_required = 'fenix_pro'
         where membership_required in ('fenix', 'all')
            or membership_required is null;
       `);
 
-      res.json({ success: true });
+      return res.json({ success: true });
     } catch (error) {
-      console.error(error);
-      res.status(500).json({ error });
+      console.error("FIX FENIX ERROR:", error);
+      return res.status(500).json({
+        message: "Error corrigiendo datos de Fénix",
+        error: error instanceof Error ? error.message : String(error),
+      });
     }
   });
+
   return httpServer;
 }
