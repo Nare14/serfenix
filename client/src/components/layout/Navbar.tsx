@@ -13,7 +13,7 @@ export default function Navbar() {
   const navLinks = [
     { href: "/", label: "Inicio" },
     { href: "/#historia", label: "Mi historia" },
-    { href: "/#salas", label: "Salas" },
+    { href: "/#sala", label: "Sala Fénix 2.0" },
   ];
 
   return (
@@ -26,15 +26,14 @@ export default function Navbar() {
       <div className="container mx-auto px-4 h-20 flex items-center justify-between">
         <Link href="/">
           <div className="flex items-center cursor-pointer">
-            <img 
-              src={logo} 
-              alt="Renacer Logo" 
+            <img
+              src={logo}
+              alt="Sabiduría Fénix"
               className="h-16 w-auto object-contain max-h-full"
             />
           </div>
         </Link>
 
-        {/* Desktop Nav */}
         <nav className="hidden md:flex items-center gap-8">
           <div className="flex items-center gap-6">
             {navLinks.map((link) => (
@@ -60,7 +59,6 @@ export default function Navbar() {
           </Link>
         </nav>
 
-        {/* Mobile Nav */}
         <div className="md:hidden">
           <Sheet open={isOpen} onOpenChange={setIsOpen}>
             <SheetTrigger asChild>
@@ -68,6 +66,7 @@ export default function Navbar() {
                 <Menu className="h-6 w-6" />
               </Button>
             </SheetTrigger>
+
             <SheetContent className="bg-white/95 backdrop-blur-xl border-l-white/20">
               <div className="flex flex-col gap-8 mt-12 items-center text-center">
                 {navLinks.map((link) => (
@@ -80,6 +79,7 @@ export default function Navbar() {
                     {link.label}
                   </a>
                 ))}
+
                 <Link href="/miembros">
                   <Button
                     onClick={() => setIsOpen(false)}
