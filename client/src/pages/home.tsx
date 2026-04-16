@@ -360,11 +360,6 @@ export default function Home() {
         </div>
 
         <div className="container mx-auto px-4 relative z-10 pt-10">
-          <motion.div {...fadeInUp} className="text-center mb-16">
-            <h2 className="text-4xl md:text-6xl font-serif text-rose-950 mb-4"></h2>
-            <p className="text-rose-800/70 text-xl md:text-2xl font-semibold font-serif max-w-2xl mx-auto"></p>
-          </motion.div>
-
           <div className="max-w-4xl mx-auto">
             <motion.div {...fadeInUp}>
               <Card className="glass-card h-full rounded-[2.5rem] border-rose-200 overflow-hidden relative group hover:-translate-y-1 transition-transform duration-500">
@@ -408,7 +403,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="py-24 bg-rose-50/50">
+      <section id="historia" className="py-24 bg-rose-50/50">
         <div className="container mx-auto px-4">
           <motion.div {...fadeInUp} className="max-w-4xl mx-auto">
             <div className="text-center mb-10">
