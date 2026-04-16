@@ -12,13 +12,6 @@ import {
 } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
   LogOut,
   LayoutDashboard,
   Users,
@@ -34,7 +27,6 @@ import {
   Pencil,
   X,
   Crown,
-  Sparkles,
   BadgeDollarSign,
   ArrowUp,
   ArrowDown,
@@ -127,7 +119,6 @@ export default function AdminDashboard() {
   const [siteSubtitle, setSiteSubtitle] = useState("");
   const [salaFenixDescription, setSalaFenixDescription] = useState("");
   const [salaFenixItems, setSalaFenixItems] = useState("");
-  const [priceFenix, setPriceFenix] = useState("99");
   const [priceFenixPro, setPriceFenixPro] = useState("1999");
 
   const [whatsapp, setWhatsapp] = useState("");
@@ -137,13 +128,6 @@ export default function AdminDashboard() {
   const [socialInstagram, setSocialInstagram] = useState("");
   const [socialTiktok, setSocialTiktok] = useState("");
   const [socialYoutube, setSocialYoutube] = useState("");
-
-  const [payLinkFenix, setPayLinkFenix] = useState("");
-  const [payLinkFenixPro, setPayLinkFenixPro] = useState("");
-
-  const [payLinkFenixMercadoPago, setPayLinkFenixMercadoPago] = useState("");
-  const [payLinkFenixPaypal, setPayLinkFenixPaypal] = useState("");
-  const [payLinkFenixInstagram, setPayLinkFenixInstagram] = useState("");
 
   const [payLinkFenixProPaypal, setPayLinkFenixProPaypal] = useState("");
   const [payLinkFenixProInstagram, setPayLinkFenixProInstagram] = useState("");
@@ -158,7 +142,7 @@ export default function AdminDashboard() {
   const [videoDesc, setVideoDesc] = useState("");
   const [videoCategory, setVideoCategory] = useState("general");
   const [videoOrder, setVideoOrder] = useState("0");
-  const [videoMembership, setVideoMembership] = useState("fenix");
+  const [videoMembership, setVideoMembership] = useState("fenix_pro");
   const [videoSaving, setVideoSaving] = useState(false);
   const [videoError, setVideoError] = useState("");
 
@@ -204,7 +188,6 @@ export default function AdminDashboard() {
             "Creá tu marca personal",
           ].join("\n")
       );
-      setPriceFenix(s.priceFenix || "99");
       setPriceFenixPro(s.priceFenixPro || "1999");
 
       setWhatsapp(s.contactWhatsapp || "");
@@ -214,13 +197,6 @@ export default function AdminDashboard() {
       setSocialInstagram(s.socialInstagram || "");
       setSocialTiktok(s.socialTiktok || "");
       setSocialYoutube(s.socialYoutube || "");
-
-      setPayLinkFenix(s.payLinkFenix || "");
-      setPayLinkFenixPro(s.payLinkFenixPro || "");
-
-      setPayLinkFenixMercadoPago(s.payLinkFenixMercadoPago || "");
-      setPayLinkFenixPaypal(s.payLinkFenixPaypal || "");
-      setPayLinkFenixInstagram(s.payLinkFenixInstagram || "");
 
       setPayLinkFenixProPaypal(s.payLinkFenixProPaypal || "");
       setPayLinkFenixProInstagram(s.payLinkFenixProInstagram || "");
@@ -244,7 +220,6 @@ export default function AdminDashboard() {
         siteSubtitle: siteSubtitle.trim(),
         salaFenixDescription: salaFenixDescription.trim(),
         salaFenixItems: salaFenixItems.trim(),
-        priceFenix: priceFenix.trim(),
         priceFenixPro: priceFenixPro.trim(),
       });
 
@@ -269,21 +244,12 @@ export default function AdminDashboard() {
         socialInstagram: socialInstagram.trim(),
         socialTiktok: socialTiktok.trim(),
         socialYoutube: socialYoutube.trim(),
-
-        payLinkFenix: payLinkFenix.trim(),
-        payLinkFenixPro: payLinkFenixPro.trim(),
-
-        payLinkFenixMercadoPago: payLinkFenixMercadoPago.trim(),
-        payLinkFenixPaypal: payLinkFenixPaypal.trim(),
-        payLinkFenixInstagram: payLinkFenixInstagram.trim(),
-
         payLinkFenixProPaypal: payLinkFenixProPaypal.trim(),
         payLinkFenixProInstagram: payLinkFenixProInstagram.trim(),
       };
 
       await saveSettings(payload);
       await loadData();
-
       showSaved("Configuración guardada exitosamente");
     } catch (error) {
       console.error("Error al guardar configuración:", error);
@@ -327,7 +293,7 @@ export default function AdminDashboard() {
 
       await updateUser(user.id, {
         membershipActive: newStatus,
-        membershipType: newStatus ? "fenix" : null,
+        membershipType: newStatus ? "fenix_pro" : null,
       });
 
       setUsers(
@@ -336,7 +302,7 @@ export default function AdminDashboard() {
             ? {
                 ...u,
                 membershipActive: newStatus,
-                membershipType: newStatus ? "fenix" : null,
+                membershipType: newStatus ? "fenix_pro" : null,
               }
             : u
         )
@@ -344,20 +310,6 @@ export default function AdminDashboard() {
     } catch (error) {
       console.error(error);
       showSaved("No se pudo actualizar la membresía");
-    }
-  };
-
-  const handleChangeMembershipType = async (user: UserItem, type: string) => {
-    try {
-      await updateUser(user.id, { membershipType: type });
-      setUsers(
-        users.map((u) =>
-          u.id === user.id ? { ...u, membershipType: type } : u
-        )
-      );
-    } catch (error) {
-      console.error(error);
-      showSaved("No se pudo cambiar el tipo de membresía");
     }
   };
 
@@ -381,7 +333,7 @@ export default function AdminDashboard() {
     setVideoDesc("");
     setVideoCategory("general");
     setVideoOrder(String(videos.length));
-    setVideoMembership("fenix");
+    setVideoMembership("fenix_pro");
     setVideoError("");
     setShowVideoForm(true);
   };
@@ -393,7 +345,9 @@ export default function AdminDashboard() {
     setVideoDesc(v.description || "");
     setVideoCategory(v.category);
     setVideoOrder(String(v.sortOrder));
-    setVideoMembership(v.membershipRequired);
+    setVideoMembership(
+      v.membershipRequired === "fenix_pro" ? "fenix_pro" : "fenix_pro"
+    );
     setVideoError("");
     setShowVideoForm(true);
   };
@@ -412,7 +366,7 @@ export default function AdminDashboard() {
     }
 
     if (!videoMembership) {
-      setVideoError("Seleccioná al menos una sala para este video.");
+      setVideoError("Seleccioná la sala para este video.");
       return;
     }
 
@@ -425,7 +379,7 @@ export default function AdminDashboard() {
         description: videoDesc.trim(),
         category: videoCategory.trim() || "general",
         sortOrder: parseInt(videoOrder) || 0,
-        membershipRequired: videoMembership,
+        membershipRequired: "fenix_pro",
         active: true,
       };
 
@@ -452,7 +406,7 @@ export default function AdminDashboard() {
       setVideoDesc("");
       setVideoCategory("general");
       setVideoOrder("0");
-      setVideoMembership("fenix");
+      setVideoMembership("fenix_pro");
     } catch (error) {
       console.error(error);
       setVideoError(
@@ -517,12 +471,10 @@ export default function AdminDashboard() {
 
   const totalUsers = users.length;
   const activeMemberships = users.filter((u) => u.membershipActive).length;
-  const fenixUsers = users.filter(
-    (u) => u.membershipActive && u.membershipType === "fenix"
-  ).length;
   const fenixProUsers = users.filter(
     (u) => u.membershipActive && u.membershipType === "fenix_pro"
   ).length;
+  const activeVideos = videos.filter((v) => v.active).length;
 
   const previewUrl = normalizeVideoPreviewUrl(videoUrl);
 
@@ -659,20 +611,6 @@ export default function AdminDashboard() {
           <Card className="border-rose-100 bg-white/90 shadow-md rounded-3xl backdrop-blur-sm">
             <CardContent className="p-5 flex items-center justify-between">
               <div>
-                <p className="text-rose-900/60 text-sm">Sala Fénix</p>
-                <h3 className="text-3xl font-bold text-rose-950 mt-1">
-                  {fenixUsers}
-                </h3>
-              </div>
-              <div className="w-12 h-12 rounded-2xl bg-pink-100 flex items-center justify-center">
-                <Sparkles className="w-6 h-6 text-pink-600" />
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="border-rose-100 bg-white/90 shadow-md rounded-3xl backdrop-blur-sm">
-            <CardContent className="p-5 flex items-center justify-between">
-              <div>
                 <p className="text-rose-900/60 text-sm">Sala Fénix 2.0</p>
                 <h3 className="text-3xl font-bold text-rose-950 mt-1">
                   {fenixProUsers}
@@ -680,6 +618,20 @@ export default function AdminDashboard() {
               </div>
               <div className="w-12 h-12 rounded-2xl bg-red-100 flex items-center justify-center">
                 <Crown className="w-6 h-6 text-red-600" />
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="border-rose-100 bg-white/90 shadow-md rounded-3xl backdrop-blur-sm">
+            <CardContent className="p-5 flex items-center justify-between">
+              <div>
+                <p className="text-rose-900/60 text-sm">Videos activos</p>
+                <h3 className="text-3xl font-bold text-rose-950 mt-1">
+                  {activeVideos}
+                </h3>
+              </div>
+              <div className="w-12 h-12 rounded-2xl bg-rose-100 flex items-center justify-center">
+                <Video className="w-6 h-6 text-rose-600" />
               </div>
             </CardContent>
           </Card>
@@ -797,56 +749,18 @@ export default function AdminDashboard() {
                       </div>
 
                       <div className="space-y-2">
-                        <Label className="text-rose-950">
-                          Mostrar en salas
-                        </Label>
+                        <Label className="text-rose-950">Mostrar en sala</Label>
 
                         <div className="space-y-3 rounded-2xl border border-rose-200 bg-rose-50/50 p-4">
                           <label className="flex items-center gap-3 text-sm text-rose-900 cursor-pointer">
                             <input
                               type="checkbox"
-                              checked={
-                                videoMembership === "fenix" ||
-                                videoMembership === "all"
+                              checked={videoMembership === "fenix_pro"}
+                              onChange={(e) =>
+                                setVideoMembership(
+                                  e.target.checked ? "fenix_pro" : ""
+                                )
                               }
-                              onChange={(e) => {
-                                const checked = e.target.checked;
-                                const hasPro =
-                                  videoMembership === "fenix_pro" ||
-                                  videoMembership === "all";
-
-                                if (checked && hasPro)
-                                  setVideoMembership("all");
-                                else if (checked) setVideoMembership("fenix");
-                                else if (hasPro)
-                                  setVideoMembership("fenix_pro");
-                                else setVideoMembership("");
-                              }}
-                              className="h-4 w-4 rounded border-rose-300 text-rose-600 focus:ring-rose-400"
-                            />
-                            Sala Fénix
-                          </label>
-
-                          <label className="flex items-center gap-3 text-sm text-rose-900 cursor-pointer">
-                            <input
-                              type="checkbox"
-                              checked={
-                                videoMembership === "fenix_pro" ||
-                                videoMembership === "all"
-                              }
-                              onChange={(e) => {
-                                const checked = e.target.checked;
-                                const hasFenix =
-                                  videoMembership === "fenix" ||
-                                  videoMembership === "all";
-
-                                if (checked && hasFenix)
-                                  setVideoMembership("all");
-                                else if (checked)
-                                  setVideoMembership("fenix_pro");
-                                else if (hasFenix) setVideoMembership("fenix");
-                                else setVideoMembership("");
-                              }}
                               className="h-4 w-4 rounded border-rose-300 text-rose-600 focus:ring-rose-400"
                             />
                             Sala Fénix 2.0
@@ -958,20 +872,8 @@ export default function AdminDashboard() {
                             {v.category}
                           </td>
                           <td className="px-4 py-3 hidden md:table-cell">
-                            <span
-                              className={`px-2 py-0.5 rounded-full text-xs font-medium ${
-                                v.membershipRequired === "all"
-                                  ? "bg-purple-100 text-purple-700"
-                                  : v.membershipRequired === "fenix_pro"
-                                  ? "bg-red-100 text-red-700"
-                                  : "bg-rose-100 text-rose-700"
-                              }`}
-                            >
-                              {v.membershipRequired === "all"
-                                ? "Ambas"
-                                : v.membershipRequired === "fenix_pro"
-                                ? "Fénix 2.0"
-                                : "Fénix"}
+                            <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-700">
+                              Fénix 2.0
                             </span>
                           </td>
                           <td className="px-4 py-3 hidden md:table-cell text-rose-900/60">
@@ -1122,23 +1024,14 @@ export default function AdminDashboard() {
 
           <Card className="border-rose-100 shadow-md rounded-3xl bg-white/95">
             <CardHeader>
-              <CardTitle className="text-rose-950">Planes y Precios</CardTitle>
+              <CardTitle className="text-rose-950">
+                Precio de la Membresía
+              </CardTitle>
               <CardDescription className="text-rose-900/60">
-                Actualiza los costos de las membresías
+                Actualiza el costo de Sala Fénix 2.0
               </CardDescription>
             </CardHeader>
             <CardContent className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-              <div className="space-y-2">
-                <Label className="text-rose-950">
-                  Precio Sala Fénix (USD/mes)
-                </Label>
-                <Input
-                  type="number"
-                  value={priceFenix}
-                  onChange={(e) => setPriceFenix(e.target.value)}
-                  className="rounded-xl border-rose-200 focus-visible:ring-rose-400"
-                />
-              </div>
               <div className="space-y-2">
                 <Label className="text-rose-950">
                   Precio Sala Fénix 2.0 (USD/6 meses)
@@ -1220,37 +1113,14 @@ export default function AdminDashboard() {
                                 <span
                                   className={`px-2 py-0.5 rounded-full text-xs font-medium ${
                                     user.membershipActive
-                                      ? "bg-rose-100 text-rose-700"
+                                      ? "bg-red-100 text-red-700"
                                       : "bg-zinc-100 text-zinc-500"
                                   }`}
                                 >
                                   {user.membershipActive
-                                    ? user.membershipType === "fenix_pro"
-                                      ? "Fénix 2.0"
-                                      : "Fénix"
+                                    ? "Sala Fénix 2.0"
                                     : "Sin membresía"}
                                 </span>
-
-                                {user.membershipActive && (
-                                  <Select
-                                    value={user.membershipType || "fenix"}
-                                    onValueChange={(val) =>
-                                      handleChangeMembershipType(user, val)
-                                    }
-                                  >
-                                    <SelectTrigger className="w-28 h-7 text-xs border-rose-200">
-                                      <SelectValue />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                      <SelectItem value="fenix">
-                                        Fénix
-                                      </SelectItem>
-                                      <SelectItem value="fenix_pro">
-                                        Fénix 2.0
-                                      </SelectItem>
-                                    </SelectContent>
-                                  </Select>
-                                )}
                               </div>
                             </td>
                             <td className="px-4 py-3 text-right">
@@ -1389,49 +1259,11 @@ export default function AdminDashboard() {
             <CardHeader>
               <CardTitle className="text-rose-950">Links de Pago</CardTitle>
               <CardDescription className="text-rose-900/60">
-                Configurá las opciones de pago de cada sala:
+                Configurá las opciones de pago de Sala Fénix 2.0
               </CardDescription>
             </CardHeader>
 
             <CardContent className="space-y-8 max-w-2xl">
-              <div className="space-y-4 rounded-2xl border border-rose-100 p-5 bg-rose-50/40">
-                <h4 className="text-lg font-semibold text-rose-950">
-                  Sala Fénix
-                </h4>
-
-                <div className="space-y-2">
-                  <Label className="text-rose-950">Mercado Pago</Label>
-                  <Input
-                    value={payLinkFenixMercadoPago}
-                    onChange={(e) => setPayLinkFenixMercadoPago(e.target.value)}
-                    placeholder="https://www.mercadopago.com/..."
-                    className="rounded-xl border-rose-200 focus-visible:ring-rose-400"
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label className="text-rose-950">PayPal</Label>
-                  <Input
-                    value={payLinkFenixPaypal}
-                    onChange={(e) => setPayLinkFenixPaypal(e.target.value)}
-                    placeholder="https://www.paypal.com/..."
-                    className="rounded-xl border-rose-200 focus-visible:ring-rose-400"
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label className="text-rose-950">
-                    Instagram / otro medio
-                  </Label>
-                  <Input
-                    value={payLinkFenixInstagram}
-                    onChange={(e) => setPayLinkFenixInstagram(e.target.value)}
-                    placeholder="https://instagram.com/..."
-                    className="rounded-xl border-rose-200 focus-visible:ring-rose-400"
-                  />
-                </div>
-              </div>
-
               <div className="space-y-4 rounded-2xl border border-rose-100 p-5 bg-rose-50/40">
                 <h4 className="text-lg font-semibold text-rose-950">
                   Sala Fénix 2.0
