@@ -120,6 +120,7 @@ export default function AdminDashboard() {
   const [salaFenixDescription, setSalaFenixDescription] = useState("");
   const [salaFenixItems, setSalaFenixItems] = useState("");
   const [priceFenixPro, setPriceFenixPro] = useState("1999");
+  const [fenixProMonths, setFenixProMonths] = useState("6");
 
   const [whatsapp, setWhatsapp] = useState("");
   const [instagram, setInstagram] = useState("");
@@ -189,6 +190,7 @@ export default function AdminDashboard() {
           ].join("\n")
       );
       setPriceFenixPro(s.priceFenixPro || "1999");
+      setFenixProMonths(s.fenixProMonths || "6");
 
       setWhatsapp(s.contactWhatsapp || "");
       setInstagram(s.contactInstagram || "");
@@ -221,6 +223,7 @@ export default function AdminDashboard() {
         salaFenixDescription: salaFenixDescription.trim(),
         salaFenixItems: salaFenixItems.trim(),
         priceFenixPro: priceFenixPro.trim(),
+        fenixProMonths: fenixProMonths.trim(),
       });
 
       await loadData();
@@ -1028,16 +1031,31 @@ export default function AdminDashboard() {
                 Precio de la Membresía
               </CardTitle>
               <CardDescription className="text-rose-900/60">
-                Actualiza el costo de Sala Fénix 2.0
+                Actualiza el costo y la duración de Sala Fénix 2.0
               </CardDescription>
             </CardHeader>
             <CardContent className="grid grid-cols-1 sm:grid-cols-2 gap-6">
               <div className="space-y-2">
                 <Label className="text-rose-950">
-                  Precio Sala Fénix 2.0 (USD/6 meses)
+                  Duración Sala Fénix 2.0 (meses)
                 </Label>
                 <Input
                   type="number"
+                  min="1"
+                  value={fenixProMonths}
+                  onChange={(e) => setFenixProMonths(e.target.value)}
+                  placeholder="Ej: 6"
+                  className="rounded-xl border-rose-200 focus-visible:ring-rose-400"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label className="text-rose-950">
+                  Precio Sala Fénix 2.0 (USD/{fenixProMonths || "6"} meses)
+                </Label>
+                <Input
+                  type="number"
+                  min="1"
                   value={priceFenixPro}
                   onChange={(e) => setPriceFenixPro(e.target.value)}
                   className="rounded-xl border-rose-200 focus-visible:ring-rose-400"
