@@ -14,6 +14,7 @@ export default function Home() {
     "Llegó el momento de despertarlo"
   );
   const [priceFenixPro, setPriceFenixPro] = useState("1999");
+  const [fenixProMonths, setFenixProMonths] = useState("6");
   const [salaFenixDescription, setSalaFenixDescription] = useState(
     "El espacio donde vas a reconstruirte, alinearte y crear la vida que sentís que es para vos."
   );
@@ -179,9 +180,12 @@ export default function Home() {
         if (s.siteTitle) setSiteTitle(s.siteTitle);
         if (s.siteSubtitle) setSiteSubtitle(s.siteSubtitle);
         if (s.priceFenixPro) setPriceFenixPro(s.priceFenixPro);
+        if (s.fenixProMonths) setFenixProMonths(s.fenixProMonths);
+
         if (s.salaFenixDescription) {
           setSalaFenixDescription(s.salaFenixDescription);
         }
+
         if (s.salaFenixItems) {
           setSalaFenixItems(
             s.salaFenixItems
@@ -377,7 +381,9 @@ export default function Home() {
                     {priceFenixPro} USD
                   </div>
 
-                  <p className="text-rose-500 mb-10">/ 6 meses</p>
+                  <p className="text-rose-500 mb-10">
+                    / {fenixProMonths} meses
+                  </p>
 
                   <ul className="space-y-4 text-left max-w-md mx-auto mb-10">
                     {salaFenixItems.map((item, i) => (
